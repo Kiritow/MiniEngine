@@ -111,7 +111,3 @@ InitManager_Mix::~InitManager_Mix()
     Mix_Quit();
 }
 
-InitManager_SDL syssdl;
-InitManager_IMG sysimg;
-InitManager_TTF systtf;
-InitManager_Mix sysmix;

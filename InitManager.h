@@ -41,4 +41,3 @@ extern InitManager_SDL syssdl;
 extern InitManager_IMG sysimg;
 extern InitManager_TTF systtf;
 extern InitManager_Mix sysmix;
-
