@@ -4,7 +4,12 @@ InitManager_SDL::InitManager_SDL()
 {
     if(SDL_Init(SDL_INIT_EVERYTHING)<0)
     {
+        #ifndef __C4DROID__
         Global::ErrorQuit("Failed to init SDL2.");
+        #else
+        /// C4droid does not fully support SDL2,
+        ///     so initializing everything crashes.
+        #endif
     }
 }
 
