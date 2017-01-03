@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef __C4DROID__
+#define _WINDOW_PROGRAM
+#endif // __C4DROID__
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>

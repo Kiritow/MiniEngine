@@ -111,3 +111,7 @@ InitManager_Mix::~InitManager_Mix()
     Mix_Quit();
 }
 
+InitManager_SDL* syssdl=NULL;
+InitManager_IMG* sysimg=NULL;
+InitManager_TTF* systtf=NULL;
+InitManager_Mix* sysmix=NULL;
