@@ -3,11 +3,11 @@
 
 int main()
 {
+    /// Initialize SDL2...
     AllInit();
-    /// Create The Default Window Instance
-    WindowManager::getDefaultInstance();
+    /// Call Application Main
     App::Main();
-    WindowManager::releaseDefaultInstance();
+    /// Clean Up SDL2
     AllQuit();
     return 0;
 }

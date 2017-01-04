@@ -6,9 +6,6 @@
 /// InitManager
 #include "InitManager.h"
 
-/// Window Manager
-#include "WindowManager.h"
-
 /******************************************************************************/
 /// Application
 #include "App.h"
