@@ -10,9 +10,6 @@ void ClearMessageQueue();
 
 int MyChangeDir(const char* DirName);
 
-extern SDL_Color color_white;
-extern SDL_Color color_black;
-
 namespace Engine
 {
 class Rect
@@ -28,12 +25,27 @@ public:
 
 class Renderer;
 class Texture;
+class Font;
+
+#define _SDL_ENGINE_IMPL_COPY_DECL(ClassName) \
+    ClassName(const ClassName&); \
+    ClassName(ClassName&&); \
+    ClassName& operator = (const ClassName&);
+
+#define _SDL_ENGINE_IMPL \
+    struct impl; \
+    impl* pimpl;
 
 class Window
 {
 public:
     Window(int winw,int winh);
     ~Window();
+
+    Window(Window&&);
+    Window(const Window&);
+    Window& operator = (const Window&);
+
     Renderer getRenderer();
     Rect getSize();
     void setSize(Rect r);
@@ -46,18 +58,22 @@ class Surface
 {
 public:
     ~Surface();
+    _SDL_ENGINE_IMPL_COPY_DECL(Surface);
 protected:
     Surface();
 private:
     struct impl;
     impl* pimpl;
     friend class Renderer;
+    friend class Font;
 };
 
 class Renderer
 {
 public:
     ~Renderer();
+    _SDL_ENGINE_IMPL_COPY_DECL(Renderer);
+
     int clear();
     void update();
     int copy(Texture t,Rect src,Rect dst);
@@ -66,6 +82,7 @@ public:
     int copyFullFill(Texture t);
     Texture loadImage(const char* FileName);
     Texture render(Surface surface);
+
 protected:
     Renderer();
 private:
@@ -80,6 +97,7 @@ public:
     ~Texture();
     int getw();
     int geth();
+    _SDL_ENGINE_IMPL_COPY_DECL(Texture);
 protected:
     Texture();
     int updateSize();
@@ -106,9 +124,10 @@ class Font
 public:
     Font();
     Font(const char* FontFileName,int sz);
+    int use(const char* FontFileName,int sz);
     ~Font();
 
-    int use(const char* FontFileName,int sz);
+    _SDL_ENGINE_IMPL_COPY_DECL(Font);
 
     Texture renderText(Renderer rnd,const char* Word,RGBA fg);
     Texture renderTextShaded(Renderer rnd,const char* Word,RGBA fg,RGBA bg);
@@ -117,7 +136,6 @@ public:
     Texture renderUTF8(Renderer rnd,const char* Word,RGBA fg);
     Texture renderUTF8Shaded(Renderer rnd,const char* Word,RGBA fg,RGBA bg);
     Texture renderUTF8Solid(Renderer rnd,const char* Word,RGBA fg);
-
 private:
     struct impl;
     impl* pimpl;
