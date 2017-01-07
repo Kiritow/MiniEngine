@@ -45,9 +45,7 @@ public:
     Window(int winw,int winh);
     ~Window();
 
-    Window(Window&&);
-    Window(const Window&);
-    Window& operator = (const Window&);
+    _SDL_ENGINE_IMPL_COPY_DECL(Window);
 
     Renderer getRenderer();
     void resetRenderer();
@@ -56,8 +54,7 @@ public:
     void setSize(Rect r);
 
 private:
-    struct impl;
-    impl* pimpl;
+    _SDL_ENGINE_IMPL
 };
 
 class Surface
@@ -68,8 +65,7 @@ public:
 protected:
     Surface();
 private:
-    struct impl;
-    impl* pimpl;
+    _SDL_ENGINE_IMPL
     friend class Renderer;
     friend class Font;
 };
@@ -92,8 +88,7 @@ public:
 protected:
     Renderer();
 private:
-    struct impl;
-    impl* pimpl;
+    _SDL_ENGINE_IMPL
     friend class Window;
 };
 
@@ -107,8 +102,7 @@ public:
 protected:
     Texture();
 private:
-    struct impl;
-    impl* pimpl;
+    _SDL_ENGINE_IMPL
     friend class Renderer;
 };
 
@@ -142,8 +136,7 @@ public:
     Texture renderUTF8Shaded(Renderer rnd,const char* Word,RGBA fg,RGBA bg);
     Texture renderUTF8Solid(Renderer rnd,const char* Word,RGBA fg);
 private:
-    struct impl;
-    impl* pimpl;
+    _SDL_ENGINE_IMPL
 };
 
 }/// End of namespace Engine
