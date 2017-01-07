@@ -47,31 +47,76 @@ namespace Engine
 /// Rect
 #include "sdl_engine_rect.hpp"
 
-struct Window::impl
-{
-    shared_ptr<SDL_Window> sWnd;
-    Renderer rnd;
-};
-
 struct Renderer::impl
 {
+private:
+    friend class Renderer;
     shared_ptr<SDL_Renderer> sRnd;
+public:
+    void set(SDL_Renderer* rnd)
+    {
+        sRnd.reset(rnd,SDL_DestroyRenderer);
+    }
+};
+
+struct Window::impl
+{
+private:
+    friend class Window;
+    shared_ptr<SDL_Window> sWnd;
+    Renderer rnd;
+public:
+    void set(SDL_Window* wnd)
+    {
+        sWnd.reset(wnd,SDL_DestroyWindow);
+        rnd.pimpl->set(SDL_CreateRenderer(wnd,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_TARGETTEXTURE));
+    }
 };
 
 struct Texture::impl
 {
+private:
+    friend class Texture;
     shared_ptr<SDL_Texture> sText;
     int w,h;
+public:
+    void set(SDL_Texture* text)
+    {
+        sText.reset(text,SDL_DestroyTexture);
+        SDL_QueryTexture(text,NULL,NULL,&w,&h);
+    }
+    SDL_Texture* getRawTexture()
+    {
+        return sText.get();
+    }
 };
 
 struct Surface::impl
 {
+private:
+    friend class Surface;
     shared_ptr<SDL_Surface> sSurf;
+public:
+    void set(SDL_Surface* surf)
+    {
+        sSurf.reset(surf,SDL_FreeSurface);
+    }
+    SDL_Surface* getRawSurface()
+    {
+        return sSurf.get();
+    }
 };
 
 struct Font::impl
 {
+private:
+    friend class Font;
     shared_ptr<TTF_Font> sTTF;
+public:
+    void set(TTF_Font* font)
+    {
+        sTTF.reset(font,TTF_CloseFont);
+    }
 };
 
 /// Window

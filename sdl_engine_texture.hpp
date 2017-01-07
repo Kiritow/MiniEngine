@@ -6,6 +6,12 @@ Texture::Texture(const Texture& inc) : Texture()
 {
     *pimpl=*(inc.pimpl);
 }
+Texture& Texture::operator = (const Texture& inc)
+{
+    *pimpl=*(inc.pimpl);
+    return *this;
+}
+
 int Texture::getw()
 {
     return pimpl->w;
@@ -17,8 +23,4 @@ int Texture::geth()
 Texture::~Texture()
 {
     delete pimpl;
-}
-int Texture::updateSize()
-{
-    return SDL_QueryTexture(pimpl->sText.get(),NULL,NULL,&pimpl->w,&pimpl->h);
 }

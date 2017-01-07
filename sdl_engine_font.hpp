@@ -24,7 +24,15 @@ Font::~Font()
 Texture Font::renderText(Renderer rnd,const char* Word,RGBA fg)
 {
     Surface surf;
-    surf.pimpl->sSurf.reset(TTF_RenderText_Blended(pimpl->sTTF.get(),Word,fg.toSDLColor()),SDL_FreeSurface);
+    surf.pimpl->set(TTF_RenderText_Blended(pimpl->sTTF.get(),Word,fg.toSDLColor()));
+    Texture t=rnd.render(surf);
+    return t;
+}
+
+Texture Font::renderUTF8(Renderer rnd,const char* Word,RGBA fg)
+{
+    Surface surf;
+    surf.pimpl->set(TTF_RenderUTF8_Blended(pimpl->sTTF.get(),Word,fg.toSDLColor()));
     Texture t=rnd.render(surf);
     return t;
 }

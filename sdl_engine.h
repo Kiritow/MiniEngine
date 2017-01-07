@@ -36,6 +36,9 @@ class Font;
     struct impl; \
     impl* pimpl;
 
+#define DEFAULT_WIDTH 1024
+#define DEFAULT_HEIGHT 768
+
 class Window
 {
 public:
@@ -47,8 +50,11 @@ public:
     Window& operator = (const Window&);
 
     Renderer getRenderer();
+    void resetRenderer();
+
     Rect getSize();
     void setSize(Rect r);
+
 private:
     struct impl;
     impl* pimpl;
@@ -100,7 +106,6 @@ public:
     _SDL_ENGINE_IMPL_COPY_DECL(Texture);
 protected:
     Texture();
-    int updateSize();
 private:
     struct impl;
     impl* pimpl;
