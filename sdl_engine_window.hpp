@@ -5,6 +5,32 @@ Window::Window(int winw,int winh)
     pimpl->set(wnd);
 }
 
+Window::Window(const Window& inc)
+{
+    pimpl=new impl;
+    *pimpl=*(inc.pimpl);
+}
+
+Window& Window::operator = (const Window& inc)
+{
+    *pimpl=*(inc.pimpl);
+    return *this;
+}
+
+Window::Window(Window&& inc)
+{
+    pimpl=inc.pimpl;
+    inc.pimpl=nullptr;
+}
+
+Window& Window::operator = (Window&& inc)
+{
+    *pimpl=*(inc.pimpl);
+    inc.pimpl=nullptr;
+    return *this;
+}
+
+
 Window::~Window()
 {
     delete pimpl;
@@ -15,7 +41,15 @@ Renderer Window::getRenderer()
     return pimpl->rnd;
 }
 
-Window::Window(const Window& inc) : Window(DEFAULT_WIDTH,DEFAULT_HEIGHT)
+Rect Window::getSize()
 {
-    *pimpl=*(inc.pimpl);
+    int w,h;
+    SDL_GetWindowSize(pimpl->getRawWindow(),&w,&h);
+    Rect rect(0,0,w,h);
+    return rect;
+}
+
+void Window::setSize(Rect rect)
+{
+    SDL_SetWindowSize(pimpl->getRawWindow(),rect.w,rect.h);
 }

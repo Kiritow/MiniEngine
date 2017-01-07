@@ -9,5 +9,7 @@ namespace App
     {
         Window wnd(1024,768);
         Renderer rnd=wnd.getRenderer();
+        rnd.clear();
+        rnd.update();
     }
 }

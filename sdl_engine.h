@@ -30,7 +30,8 @@ class Font;
 #define _SDL_ENGINE_IMPL_COPY_DECL(ClassName) \
     ClassName(const ClassName&); \
     ClassName(ClassName&&); \
-    ClassName& operator = (const ClassName&);
+    ClassName& operator = (const ClassName&); \
+    ClassName& operator = (ClassName&&);
 
 #define _SDL_ENGINE_IMPL \
     struct impl; \
@@ -51,6 +52,7 @@ public:
     void resetRenderer();
 
     Rect getSize();
+
     void setSize(Rect r);
 
 private:

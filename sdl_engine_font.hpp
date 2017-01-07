@@ -8,6 +8,32 @@ Font::Font(const char* FontFileName,int sz) : Font()
     use(FontFileName,sz);
 }
 
+Font::Font(const Font& inc) : Font()
+{
+    *pimpl=*(inc.pimpl);
+}
+Font& Font::operator = (const Font& inc)
+{
+    *pimpl=*(inc.pimpl);
+    return *this;
+}
+Font::Font(Font&& inc)
+{
+    pimpl=inc.pimpl;
+    inc.pimpl=nullptr;
+}
+Font& Font::operator = (Font&& inc)
+{
+    *pimpl=*(inc.pimpl);
+    inc.pimpl=nullptr;
+    return *this;
+}
+
+Font::~Font()
+{
+    delete pimpl;
+}
+
 int Font::use(const char* FontFileName,int sz)
 {
     TTF_Font* font=TTF_OpenFont(FontFileName,sz);
@@ -16,10 +42,7 @@ int Font::use(const char* FontFileName,int sz)
     return 0;
 }
 
-Font::~Font()
-{
-    delete pimpl;
-}
+
 
 Texture Font::renderText(Renderer rnd,const char* Word,RGBA fg)
 {

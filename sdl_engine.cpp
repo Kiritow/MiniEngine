@@ -71,6 +71,10 @@ public:
         sWnd.reset(wnd,SDL_DestroyWindow);
         rnd.pimpl->set(SDL_CreateRenderer(wnd,-1,SDL_RENDERER_ACCELERATED|SDL_RENDERER_TARGETTEXTURE));
     }
+    SDL_Window* getRawWindow()
+    {
+        return sWnd.get();
+    }
 };
 
 struct Texture::impl

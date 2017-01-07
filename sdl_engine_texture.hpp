@@ -11,6 +11,17 @@ Texture& Texture::operator = (const Texture& inc)
     *pimpl=*(inc.pimpl);
     return *this;
 }
+Texture::Texture(Texture&& inc)
+{
+    pimpl=inc.pimpl;
+    inc.pimpl=nullptr;
+}
+Texture& Texture::operator = (Texture&& inc)
+{
+    *(pimpl)=*(inc.pimpl);
+    inc.pimpl=nullptr;
+    return *this;
+}
 
 int Texture::getw()
 {

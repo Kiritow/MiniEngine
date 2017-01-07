@@ -11,11 +11,23 @@ Renderer& Renderer::operator = (const Renderer& inc)
     *pimpl=*(inc.pimpl);
     return *this;
 }
+Renderer::Renderer(Renderer&& inc)
+{
+    pimpl=inc.pimpl;
+    inc.pimpl=nullptr;
+}
+Renderer& Renderer::operator = (Renderer&& inc)
+{
+    *pimpl=*(inc.pimpl);
+    inc.pimpl=nullptr;
+    return *this;
+}
 
 Renderer::~Renderer()
 {
     delete pimpl;
 }
+
 int Renderer::clear()
 {
     return SDL_RenderClear(pimpl->sRnd.get());
