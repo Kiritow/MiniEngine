@@ -8,8 +8,6 @@
 #include <cstdlib>
 #include <cstring>
 
-using namespace std;
-
 /// If you have configured SDL2 header files,
 /// they will be used first.
 

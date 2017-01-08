@@ -48,7 +48,7 @@ public:
 
     _SDL_ENGINE_IMPL_COPY_DECL(Window);
 
-    Renderer getRenderer();
+    Renderer getRenderer() const;
     void resetRenderer();
 
     Rect getSize();
@@ -75,7 +75,7 @@ private:
 class Renderer
 {
 public:
-    ~Renderer();
+    virtual ~Renderer();
     _SDL_ENGINE_IMPL_COPY_DECL(Renderer);
 
     int clear();

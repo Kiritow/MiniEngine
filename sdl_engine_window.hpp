@@ -36,7 +36,7 @@ Window::~Window()
     delete pimpl;
 }
 
-Renderer Window::getRenderer()
+Renderer Window::getRenderer() const
 {
     return pimpl->rnd;
 }
