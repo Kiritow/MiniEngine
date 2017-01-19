@@ -16,8 +16,8 @@ public:
     _MINI_ENGINE_IMPL_COPY_DECL(Brush)
 
     void copy(Engine::Texture t,Engine::Rect src,Engine::Rect dst,bool autoZoom);
-    void copyFill(Engine::Texture t,Engine::Rect src,bool autoZoom);
     void copyTo(Engine::Texture t,Engine::Rect dst,bool autoZoom);
+    void copyFill(Engine::Texture t,Engine::Rect src);
     void copyFullFill(Engine::Texture t);
 public:
     Brush(const Engine::Window& rnd,Engine::Rect DrawableArea);
@@ -40,7 +40,7 @@ public:
     virtual Engine::Rect getSize()=0;
 };
 
-class BaseButton
+class BaseButton : public Drawable
 {
 public:
     BaseButton();
@@ -50,6 +50,7 @@ public:
     BaseButton& operator = (BaseButton&&);
 
     virtual int Draw(const Brush& brush);
+    virtual Engine::Rect getSize();
 
     virtual ~BaseButton();
 private:
@@ -71,6 +72,18 @@ public:
     SimpleButton(SimpleButton&&);
     SimpleButton& operator = (SimpleButton&&);
     ~SimpleButton();
+};
+
+class SimpleProgressBar
+{
+public:
+    SimpleProgressBar(int incw,int inch,Engine::RGBA upper_color,Engine::RGBA lower_color);
+    void DrawAt(Engine::Renderer& rnd,int x,int y);
+    void setPercentage(int iPercentage);
+    ~SimpleProgressBar();
+private:
+    struct impl;
+    impl* pimpl;
 };
 
 }/// End of namespace MiniEngine.

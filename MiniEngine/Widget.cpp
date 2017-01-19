@@ -5,63 +5,43 @@ using namespace std;
 
 namespace MiniEngine
 {
+/// Brush
+#include "widget_brush.hpp"
 
-struct Brush::impl
+struct SimpleProgressBar::impl
 {
-    Renderer rnd;
-    Rect area;
-    impl(const Renderer& incrnd) : rnd(incrnd)
-    {
-
-    }
+    int percentage;
+    int w,h;
+    RGBA ucolor,lcolor;
 };
-Brush::Brush(const Window& wnd,Rect DrawableArea) /// Protected
-{
-    pimpl=new impl(wnd.getRenderer());
-    pimpl->area=DrawableArea;
-}
-void Brush::copy(Texture t,Rect src,Rect dst,bool autoZoom)
-{
-    dst.x+=pimpl->area.x;
-    dst.y+=pimpl->area.y;
-    if(dst.w>pimpl->area.w) dst.w=pimpl->area.w;
-    if(dst.h>pimpl->area.h) dst.h=pimpl->area.h;
-    if(autoZoom)
-    {
 
-    }
-    else
-    {
-        if(src.w>pimpl->area.w) src.w=pimpl->area.w;
-        if(src.h>pimpl->area.h) src.h=pimpl->area.h;
-    }
-    pimpl->rnd.copy(t,src,dst);
-}
-void Brush::copyTo(Texture t,Rect dst,bool autoZoom)
+SimpleProgressBar::SimpleProgressBar(int incw,int inch,RGBA upper_color,RGBA lower_color)
 {
-    dst.x+=pimpl->area.x;
-    dst.y+=pimpl->area.y;
-
-    if(dst.w>pimpl->area.w) dst.w=pimpl->area.w;
-    if(dst.h>pimpl->area.h) dst.h=pimpl->area.h;
-
-    if(autoZoom)
-    {
-        pimpl->rnd.copyTo(t,dst);
-    }
-    else
-    {
-        int w=t.getw();
-        int h=t.geth();
-        if(w>pimpl->area.w) w=pimpl->area.w;
-        if(h>pimpl->area.h) h=pimpl->area.h;
-        Rect src(0,0,w,h);
-        pimpl->rnd.copy(t,src,dst);
-    }
+    pimpl=new impl;
+    pimpl->w=incw;
+    pimpl->h=inch;
+    pimpl->ucolor=upper_color;
+    pimpl->lcolor=lower_color;
+    pimpl->percentage=0;
 }
-Brush::~Brush()
+void SimpleProgressBar::DrawAt(Renderer& rnd,int x,int y)
 {
-    delete pimpl;
+    RGBA prev=rnd.getColor();
+    if(pimpl->percentage)
+    {
+        rnd.setColor(pimpl->ucolor);
+        rnd.fillRect(Rect(x,y,pimpl->w*pimpl->percentage/100,pimpl->h));
+    }
+    if(pimpl->percentage-100)
+    {
+        rnd.setColor(pimpl->lcolor);
+        rnd.fillRect(Rect(x+pimpl->w*pimpl->percentage/100,y,pimpl->w*(100-pimpl->percentage)/100,pimpl->h));
+    }
+    rnd.setColor(prev);
+}
+void SimpleProgressBar::setPercentage(int iPercentage)
+{
+    pimpl->percentage=min(max(0,iPercentage),100);
 }
 
 }/// End of namespace MiniEngine

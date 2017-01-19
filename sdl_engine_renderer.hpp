@@ -70,3 +70,29 @@ int Renderer::copyFullFill(Texture t)
 {
     return SDL_RenderCopy(pimpl->sRnd.get(),t.pimpl->getRawTexture(),NULL,NULL);
 }
+
+int Renderer::setColor(RGBA pack)
+{
+    return SDL_SetRenderDrawColor(pimpl->sRnd.get(),pack.r,pack.g,pack.b,pack.a);
+}
+
+RGBA Renderer::getColor(int* pstatus)
+{
+    Uint8 r,g,b,a;
+    int ret=SDL_GetRenderDrawColor(pimpl->sRnd.get(),&r,&g,&b,&a);
+    RGBA pack(r,g,b,a);
+    if(pstatus) *pstatus=ret;
+    return pack;
+}
+
+int Renderer::fillRect(Rect rect)
+{
+    auto inr=rect.toSDLRect();
+    return SDL_RenderFillRect(pimpl->sRnd.get(),&inr);
+}
+
+int Renderer::drawRect(Rect rect)
+{
+    auto inr=rect.toSDLRect();
+    return SDL_RenderDrawRect(pimpl->sRnd.get(),&inr);
+}

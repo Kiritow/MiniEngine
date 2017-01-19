@@ -22,6 +22,17 @@ public:
 
     int x,y,w,h;
 };
+class RGBA
+{
+public:
+    RGBA();
+    RGBA(int incr,int incg,int incb,int inca);
+    ~RGBA();
+
+    SDL_Color toSDLColor();
+
+    int r,g,b,a;
+};
 
 class Renderer;
 class Texture;
@@ -87,6 +98,14 @@ public:
     Texture loadImage(const char* FileName);
     Texture render(Surface surface);
 
+    int setColor(RGBA pack);
+    RGBA getColor(int* pStatus=nullptr);
+
+    int fillRect(Rect rect);
+    int drawRect(Rect rect);
+
+    /// Not Recommended
+    SDL_Renderer* getDirectRenderer();
 protected:
     Renderer();
 private:
@@ -106,18 +125,6 @@ protected:
 private:
     _SDL_ENGINE_IMPL
     friend class Renderer;
-};
-
-class RGBA
-{
-public:
-    RGBA();
-    RGBA(int incr,int incg,int incb,int inca);
-    ~RGBA();
-
-    SDL_Color toSDLColor();
-
-    int r,g,b,a;
 };
 
 class Font
@@ -141,4 +148,11 @@ private:
     _SDL_ENGINE_IMPL
 };
 
+class SDLSystem
+{
+public:
+    static void delay(int ms);
+};
+
 }/// End of namespace Engine
+

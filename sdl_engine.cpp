@@ -136,6 +136,9 @@ public:
 /// Font
 #include "sdl_engine_font.hpp"
 
-
+void SDLSystem::delay(int ms)
+{
+    SDL_Delay(ms);
+}
 
 }/// End of namespace Engine
