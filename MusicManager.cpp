@@ -25,8 +25,10 @@ int Music::load(const char* MusicFileName)
 }
 int Music::unload()
 {
+    printf("Unloaded.\n");
     if(pimpl->sMusic.get())
     {
+        printf("Reset to NULL\n");
         pimpl->sMusic.reset();
         return 0;
     }
@@ -38,7 +40,7 @@ bool Music::ready()
 }
 Music::~Music()
 {
-    unload();
+
 }
 
 

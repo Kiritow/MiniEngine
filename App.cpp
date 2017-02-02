@@ -20,9 +20,14 @@ namespace App
         rnd.update();
 
         MusicPlayer player;
-        Music m("res/music.mp3");
-        player.add(m,-1);
-        player.play();
+        Music m;
+        int ret=m.load("res/music.mp3");
+        printf("ret=%d\n",ret);
+        ret=player.add(m,-1);
+        printf("ret=%d\n",ret);
+        ret=player.play();
+        printf("ret=%d\n",ret);
+        printf("%s\n",Mix_GetError());
 
         while(1) SDL_PollEvent(0);
 
