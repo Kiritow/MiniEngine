@@ -1,5 +1,4 @@
 #include "App.h"
-#include "Game/Main.h"
 
 using namespace Engine;
 using namespace MiniEngine;
@@ -17,7 +16,15 @@ namespace App
             mlog("Failed to open Font.");
             return;
         }
-        Game::Main(wnd,rnd,bigf);
+        rnd.clear();
+        rnd.update();
+
+        MusicPlayer player;
+        Music m("res/music.mp3");
+        player.add(m,-1);
+        player.play();
+
+        while(1) SDL_PollEvent(0);
 
         /*
         /// Sample Code of Brush

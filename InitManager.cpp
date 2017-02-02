@@ -98,16 +98,18 @@ InitManager_Mix::InitManager_Mix()
         Global::ErrorQuit("Failed to Init Mixer.");
     }
 
+    /*
     if(Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 1024)<0)
     {
         Global::ErrorQuit("Failed to OpenAudio");
     }
     Mix_AllocateChannels(32);
+    */
 }
 
 InitManager_Mix::~InitManager_Mix()
 {
-    Mix_CloseAudio();
+    //Mix_CloseAudio();
     Mix_Quit();
 }
 
