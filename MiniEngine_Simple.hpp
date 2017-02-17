@@ -160,9 +160,13 @@ namespace MiniEngine
 		friend class Renderer;
 	};
 
+
 	class Renderer
 	{
 	public:
+	    enum class Type { Software=SDL_RENDERER_SOFTWARE, Accelerated=SDL_RENDERER_ACCELERATED,
+                         PresentSync=SDL_RENDERER_PRESENTVSYNC, TargetTexture=SDL_RENDERER_TARGETTEXTURE };
+
 		int setColor(RGBA pack)
 		{
 			return SDL_SetRenderDrawColor(rnd.get(), pack.r, pack.g, pack.b, pack.a);
@@ -279,16 +283,19 @@ namespace MiniEngine
 				throw e;
 			}
 			wnd.reset(temp, SDL_DestroyWindow);
-			setRenderer();
+			setRenderer(Renderer::Type::Accelerated,Renderer::Type::TargetTexture);
 		}
 		Renderer getRenderer() const
 		{
 			return winrnd;
 		}
-		void setRenderer()
-		{
-			winrnd.rnd.reset(SDL_CreateRenderer(wnd.get(), -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE),SDL_DestroyRenderer);
-		}
+
+		/// TODO: Unfinished.
+        void setRenderer(Renderer::Type a,Renderer::Type b)
+        {
+            _setRenderer_Real(static_cast<int>(a)|static_cast<int>(b));
+        }
+
 		Rect getSize()
 		{
 			int w, h;
@@ -305,6 +312,10 @@ namespace MiniEngine
 			SDL_SetWindowSize(wnd.get(),w,h);
 		}
 	private:
+	    void _setRenderer_Real(Uint32 flags)
+	    {
+	        winrnd.rnd.reset(SDL_CreateRenderer(wnd.get(), -1, flags),SDL_DestroyRenderer);
+	    }
 		shared_ptr<SDL_Window> wnd;
 		Renderer winrnd;
 	};
