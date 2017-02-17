@@ -11,6 +11,7 @@ namespace MiniEngine
 {
 	using namespace std;
 
+
 	class Rect
 	{
 	public:
@@ -30,6 +31,34 @@ namespace MiniEngine
 			return r;
 		}
 	};
+
+	class Point
+	{
+    public:
+        int x,y;
+        Point(int X,int Y)
+        {
+            x=X;y=Y;
+        }
+        Point()
+        {
+            x=y=0;
+        }
+        SDL_Point toSDLPoint()
+        {
+            SDL_Point p;
+            p.x=x;
+            p.y=y;
+            return p;
+        }
+        bool inRect(Rect rect)
+        {
+            auto p=toSDLPoint();
+            auto r=rect.toSDLRect();
+            return SDL_PointInRect(&p,&r);
+        }
+	};
+
 	class RGBA
 	{
 	public:
@@ -46,8 +75,9 @@ namespace MiniEngine
 		{
 			SDL_Color c;
 			c.r = r;c.g = g;c.b = b;c.a = a;
+			return c;
 		}
-	};
+    };
 
 	class NonCopyable
 	{
@@ -145,13 +175,13 @@ namespace MiniEngine
 			RGBA pack(r, g, b, a);
 			return pack;
 		}
-		int Renderer::fillRect(Rect rect)
+		int fillRect(Rect rect)
 		{
 			auto inr = rect.toSDLRect();
 			return SDL_RenderFillRect(rnd.get(), &inr);
 		}
 
-		int Renderer::drawRect(Rect rect)
+		int drawRect(Rect rect)
 		{
 			auto inr = rect.toSDLRect();
 			return SDL_RenderDrawRect(rnd.get(), &inr);
@@ -357,14 +387,14 @@ namespace MiniEngine
 			Mix_Quit();
 		}
 
-		void Init()
+		static void Init()
 		{
 			SDLInit();
 			IMGInit();
 			TTFInit();
 			MixInit();
 		}
-		void Quit()
+		static void Quit()
 		{
 			MixQuit();
 			TTFQuit();
@@ -378,6 +408,6 @@ namespace MiniEngine
 		}
 	};
 
-	
-	
+
+
 }/// End of namespace MiniEngine
