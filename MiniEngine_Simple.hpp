@@ -99,10 +99,6 @@ protected:
     NonCopyable& operator = (const NonCopyable&) = delete;
 };
 
-/// Forward Declaration
-class Window;
-class Renderer;
-
 class ErrorViewer : public std::exception
 {
 public:
@@ -125,10 +121,7 @@ private:
 class Surface
 {
 public:
-    ~Surface()
-    {
-
-    }
+    ~Surface()=default;
 protected:
     Surface() = default;
 private:
@@ -140,10 +133,7 @@ private:
 class Texture
 {
 public:
-    ~Texture()
-    {
-
-    }
+    ~Texture()=default;
     Rect getSize()
     {
         return rect;
@@ -156,11 +146,13 @@ public:
     {
         return rect.h;
     }
-protected:
-    Texture()
+    bool isReady()
     {
-
+        return (text.get() != nullptr);
     }
+protected:
+    Texture()=default;
+    /// updateInfo() must be called after Texture is changed.
     void updateInfo()
     {
         SDL_QueryTexture(text.get(), NULL, NULL, &rect.w, &rect.h);
@@ -172,19 +164,29 @@ private:
     friend class Renderer;
 };
 
+enum class RendererType
+{
+    Software=SDL_RENDERER_SOFTWARE,
+    Accelerated=SDL_RENDERER_ACCELERATED,
+    PresentSync=SDL_RENDERER_PRESENTVSYNC,
+    TargetTexture=SDL_RENDERER_TARGETTEXTURE
+};
+
+enum class BlendMode
+{
+    None=SDL_BLENDMODE_NONE,
+    Blend=SDL_BLENDMODE_BLEND,
+    Add=SDL_BLENDMODE_ADD,
+    Mod=SDL_BLENDMODE_MOD
+};
 
 class Renderer
 {
 public:
-    enum class Type { Software=SDL_RENDERER_SOFTWARE, Accelerated=SDL_RENDERER_ACCELERATED,
-                      PresentSync=SDL_RENDERER_PRESENTVSYNC, TargetTexture=SDL_RENDERER_TARGETTEXTURE
-                    };
-
     int setColor(RGBA pack)
     {
         return SDL_SetRenderDrawColor(rnd.get(), pack.r, pack.g, pack.b, pack.a);
     }
-
     RGBA getColor()
     {
         Uint8 r, g, b, a;
@@ -192,12 +194,31 @@ public:
         RGBA pack(r, g, b, a);
         return pack;
     }
+    int setBlendMode(BlendMode mode)
+    {
+        return SDL_SetRenderDrawBlendMode(rnd.get(),static_cast<SDL_BlendMode>(mode));
+    }
+    BlendMode getBlendMode()
+    {
+        SDL_BlendMode temp;
+        SDL_GetRenderDrawBlendMode(rnd.get(),&temp);
+        return static_cast<BlendMode>(temp);
+    }
+
+    int setTarget(Texture& t)
+    {
+        return SDL_SetRenderTarget(rnd.get(),t.text.get());
+    }
+    int setTarget()
+    {
+        return SDL_SetRenderTarget(rnd.get(),nullptr);
+    }
+
     int fillRect(Rect rect)
     {
         auto inr = rect.toSDLRect();
         return SDL_RenderFillRect(rnd.get(), &inr);
     }
-
     int drawRect(Rect rect)
     {
         auto inr = rect.toSDLRect();
@@ -272,12 +293,24 @@ public:
         t.updateInfo();
         return t;
     }
+    Texture createTexture(int Width,int Height) throw(ErrorViewer)
+    {
+        SDL_Texture* temp=SDL_CreateTexture(rnd.get(),SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, Width, Height);
+        if(temp==NULL)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+        Texture t;
+        t.text.reset(temp,SDL_DestroyTexture);
+        t.updateInfo();
+        return t;
+    }
 
 protected:
-    Renderer()
-    {
-        /// This function is called by Window ONLY.
-    }
+    /// This function is called by Window ONLY.
+    Renderer()=default;
 private:
     std::shared_ptr<SDL_Renderer> rnd;
     friend class Window;
@@ -286,7 +319,7 @@ private:
 class Window
 {
 public:
-    Window(std::string Title, int Width, int Height) throw(ErrorViewer)
+    Window(std::string Title, int Width, int Height,std::initializer_list<RendererType> RendererFlags= {RendererType::Accelerated,RendererType::TargetTexture}) throw(ErrorViewer)
     {
         SDL_Window* temp = SDL_CreateWindow(Title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_SHOWN);
         if (temp == NULL)
@@ -296,17 +329,21 @@ public:
             throw e;
         }
         wnd.reset(temp, SDL_DestroyWindow);
-        setRenderer(Renderer::Type::Accelerated,Renderer::Type::TargetTexture);
+        setRenderer(RendererFlags);
     }
     Renderer getRenderer() const
     {
         return winrnd;
     }
 
-    /// TODO: Unfinished.
-    void setRenderer(Renderer::Type a,Renderer::Type b)
+    void setRenderer(std::initializer_list<RendererType> RendererFlags)
     {
-        _setRenderer_Real(static_cast<int>(a)|static_cast<int>(b));
+        int flag=0;
+        for(auto v:RendererFlags)
+        {
+            flag|=static_cast<int>(v);
+        }
+        _setRenderer_Real(flag);
     }
 
     Rect getSize()
@@ -327,7 +364,11 @@ public:
 
     void setTitle(std::string Title)
     {
-
+        SDL_SetWindowTitle(wnd.get(),Title.c_str());
+    }
+    std::string getTitle()
+    {
+        return std::string(SDL_GetWindowTitle(wnd.get()));
     }
 private:
     void _setRenderer_Real(Uint32 flags)
@@ -341,10 +382,7 @@ private:
 class Font
 {
 public:
-    Font()
-    {
-
-    }
+    Font()=default;
     Font(std::string FontFileName, int size) throw(ErrorViewer)
     {
         if (use(FontFileName, size) != 0)
@@ -368,7 +406,6 @@ public:
         Texture t = rnd.render(surf);
         return t;
     }
-
     Texture renderUTF8(Renderer rnd, std::string Text, RGBA fg)
     {
         Surface surf;
@@ -435,6 +472,212 @@ public:
     {
         SDL_Delay(ms);
     }
+};
+
+
+class AudioPlayer
+{
+public:
+    AudioPlayer()
+    {
+        if(!_sysAudioCounter)
+        {
+            _sysAudio=new _Audio;
+        }
+        ++_sysAudioCounter;
+    }
+    ~AudioPlayer()
+    {
+        --_sysAudioCounter;
+        if(!_sysAudioCounter)
+        {
+            delete _sysAudio;
+        }
+    }
+private:
+    class _Audio
+    {
+    public:
+        _Audio()
+        {
+            Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024);
+        }
+        ~_Audio()
+        {
+            Mix_CloseAudio();
+        }
+    };
+
+    static _Audio* _sysAudio;
+    static int _sysAudioCounter;
+};
+AudioPlayer::_Audio* AudioPlayer::_sysAudio=NULL;
+int AudioPlayer::_sysAudioCounter=0;
+
+
+/// Forward Declaration
+class Music
+{
+public:
+
+protected:
+    Music()=default;
+private:
+    std::shared_ptr<Mix_Music> music;
+    friend class MusicPlayer;
+};
+
+class MusicPlayer : public AudioPlayer
+{
+public:
+    Music loadMusic(std::string Filename) throw (ErrorViewer)
+    {
+        Mix_Music* temp=Mix_LoadMUS(Filename.c_str());
+        if(temp==nullptr)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+        Music m;
+        m.music.reset(temp,Mix_FreeMusic);
+        return m;
+    }
+
+    void load(Music music)
+    {
+        m=music;
+    }
+    int play(int loops)
+    {
+        return Mix_PlayMusic(m.music.get(),loops);
+    }
+    void pause()
+    {
+        Mix_PauseMusic();
+    }
+    void resume()
+    {
+        Mix_ResumeMusic();
+    }
+    void rewind()
+    {
+        Mix_RewindMusic();
+    }
+    int stop()
+    {
+        return Mix_HaltMusic();
+    }
+    int fadeIn(int loops,int ms)
+    {
+        return Mix_FadeInMusic(m.music.get(),loops,ms);
+    }
+    int fadeOut(int ms)
+    {
+        return Mix_FadeOutMusic(ms);
+    }
+
+    bool isPlaying()
+    {
+        return Mix_PlayingMusic();
+    }
+    bool isPaused()
+    {
+        return Mix_PausedMusic();
+    }
+    int isFading()
+    {
+        switch(Mix_FadingMusic())
+        {
+        case MIX_NO_FADING:
+            return 0;
+        case MIX_FADING_IN:
+            return 1;
+        case MIX_FADING_OUT:
+            return 2;
+        default:
+            return -1;
+        }
+    }
+
+private:
+    Music m;
+};
+
+
+class Sound
+{
+public:
+protected:
+    Sound()=default;
+private:
+    std::shared_ptr<Mix_Chunk> sound;
+    friend class SoundPlayer;
+};
+
+typedef int ChannelID;
+
+class SoundPlayer : public AudioPlayer
+{
+public:
+    SoundPlayer(int Channels=16)
+    {
+        Mix_AllocateChannels(Channels);
+    }
+    Sound loadSound(std::string Filename) throw (ErrorViewer)
+    {
+        Mix_Chunk* temp=Mix_LoadWAV(Filename.c_str());
+        if(temp==NULL)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+        Sound s;
+        s.sound.reset(temp,Mix_FreeChunk);
+        return s;
+    }
+    ChannelID playSound(Sound sound,int loops) throw (ErrorViewer)
+    {
+        ChannelID id;
+        if(-1==(id=Mix_PlayChannel(-1,sound.sound.get(),loops)))
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+        return id;
+    }
+    ChannelID fadein(Sound sound,int loops,int ms) throw (ErrorViewer)
+    {
+        ChannelID id;
+        if(-1==(id=Mix_FadeInChannel(-1,sound.sound.get(),loops,ms)))
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+        return id;
+    }
+    int fadeout(ChannelID id,int ms)
+    {
+        return Mix_FadeOutChannel(id,ms);
+    }
+    void pause(ChannelID id)
+    {
+        Mix_Pause(id);
+    }
+    void resume(ChannelID id)
+    {
+        Mix_Resume(id);
+    }
+    int stop(ChannelID id)
+    {
+        return Mix_HaltChannel(id);
+    }
+
+private:
+
 };
 
 
