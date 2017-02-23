@@ -5,6 +5,9 @@ A C++ Mini Engine. Based on SDL2.
 C++编写的SDL2引擎.  
 
 ### 编译说明
+
+### !!!目前无法编译项目!!!
+
 Windows: 请使用Codeblocks 16.01(推荐)载入所有.cpp文件.接下来Codeblocks会完成其余的工作.  
 > 依赖库  
 > SDL2 (SDL2.lib, SDL2main.lib, SDL2test.lib)  
