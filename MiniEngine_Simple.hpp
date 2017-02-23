@@ -7,6 +7,9 @@
 #include <string>
 #include <memory>
 
+#define _DECL_DEPRECATED __declspec(deprecated)
+#define _DECL_DEPRECATED_MSG(InfoString) __declspec(deprecated(InfoString))
+
 namespace MiniEngine
 {
 
@@ -64,20 +67,43 @@ public:
     }
 };
 
+class ColorMode
+{
+public:
+    int r,g,b;
+    ColorMode(int R,int G,int B)
+    {
+        r=R;
+        g=G;
+        b=B;
+    }
+    ColorMode()
+    {
+        r=g=b=0;
+    }
+};
+
 class RGBA
 {
 public:
-    int r, g, b, a;
+    int r,g,b,a;
     RGBA(int R, int G, int B, int A)
     {
-        r = R;
-        g = G;
-        b = B;
+        r=R;
+        g=G;
+        b=B;
         a = A;
+    }
+    RGBA(ColorMode mode,int A)
+    {
+        r=mode.r;
+        g=mode.g;
+        b=mode.b;
+        a=A;
     }
     RGBA()
     {
-        r = g = b = a = 0;
+        r=g=b=a=0;
     }
     SDL_Color toSDLColor()
     {
@@ -87,6 +113,10 @@ public:
         c.b = b;
         c.a = a;
         return c;
+    }
+    ColorMode toColorMode()
+    {
+        return ColorMode(r,g,b);
     }
 };
 
@@ -118,6 +148,14 @@ private:
     std::string str;
 };
 
+enum class BlendMode
+{
+    None=SDL_BLENDMODE_NONE,
+    Blend=SDL_BLENDMODE_BLEND,
+    Add=SDL_BLENDMODE_ADD,
+    Mod=SDL_BLENDMODE_MOD
+};
+
 class Surface
 {
 public:
@@ -126,6 +164,7 @@ protected:
     Surface() = default;
 private:
     std::shared_ptr<SDL_Surface> surf;
+    friend class Window;
     friend class Renderer;
     friend class Font;
 };
@@ -150,6 +189,52 @@ public:
     {
         return (text.get() != nullptr);
     }
+    int setBlendMode(BlendMode mode)
+    {
+        return SDL_SetTextureBlendMode(text.get(),static_cast<SDL_BlendMode>(mode));
+    }
+    BlendMode getBlendMode()
+    {
+        SDL_BlendMode temp;
+        SDL_GetTextureBlendMode(text.get(),&temp);
+        return static_cast<BlendMode>(temp);
+    }
+    /// Alpha:  0: Transparent 255: opaque
+    int setAlphaMode(int alpha)
+    {
+        Uint8 temp=std::max(std::min(alpha,255),0);
+        return SDL_SetTextureAlphaMod(text.get(),temp);
+    }
+    int getAlphaMode()
+    {
+        Uint8 temp;
+        SDL_GetTextureAlphaMod(text.get(),&temp);
+        return temp;
+    }
+
+    ColorMode getColorMode()
+    {
+        ColorMode pack;
+        Uint8 r,g,b;
+        SDL_GetTextureColorMod(text.get(),&r,&g,&b);
+        pack.r=r;
+        pack.g=g;
+        pack.b=b;
+        return pack;
+    }
+    int setColorMode(ColorMode mode)
+    {
+        return SDL_SetTextureColorMod(text.get(),mode.r,mode.g,mode.b);
+    }
+    RGBA getRGBA()
+    {
+        return RGBA(getColorMode(),getAlphaMode());
+    }
+    void setRGBA(RGBA pack)
+    {
+        setColorMode(pack.toColorMode());
+        setAlphaMode(pack.a);
+    }
 protected:
     Texture()=default;
     /// updateInfo() must be called after Texture is changed.
@@ -172,13 +257,7 @@ enum class RendererType
     TargetTexture=SDL_RENDERER_TARGETTEXTURE
 };
 
-enum class BlendMode
-{
-    None=SDL_BLENDMODE_NONE,
-    Blend=SDL_BLENDMODE_BLEND,
-    Add=SDL_BLENDMODE_ADD,
-    Mod=SDL_BLENDMODE_MOD
-};
+
 
 class Renderer
 {
@@ -309,7 +388,7 @@ public:
     }
 
 protected:
-    /// This function is called by Window ONLY.
+    /// This function is called by class Window ONLY.
     Renderer()=default;
 private:
     std::shared_ptr<SDL_Renderer> rnd;
@@ -350,8 +429,7 @@ public:
     {
         int w, h;
         SDL_GetWindowSize(wnd.get(), &w, &h);
-        Rect rect(0, 0, w, h);
-        return rect;
+        return Rect(0, 0, w, h);
     }
     void setSize(Rect sizeRect)
     {
@@ -362,6 +440,23 @@ public:
         SDL_SetWindowSize(wnd.get(),w,h);
     }
 
+    Rect getPosition()
+    {
+        int x,y;
+        SDL_GetWindowPosition(wnd.get(),&x,&y);
+        return Rect(x,y,0,0);
+    }
+    void setPosition(int x,int y)
+    {
+        SDL_SetWindowPosition(wnd.get(),x,y);
+    }
+    /// FIXME: Use class Point or class Rect ?
+    void setPosition(Point point)
+    {
+        SDL_SetWindowPosition(wnd.get(),point.x,point.y);
+    }
+
+
     void setTitle(std::string Title)
     {
         SDL_SetWindowTitle(wnd.get(),Title.c_str());
@@ -369,6 +464,46 @@ public:
     std::string getTitle()
     {
         return std::string(SDL_GetWindowTitle(wnd.get()));
+    }
+
+    void setResizable(bool resizable)
+    {
+        SDL_SetWindowResizable(wnd.get(),static_cast<SDL_bool>(resizable));
+    }
+
+    void show()
+    {
+        SDL_ShowWindow(wnd.get());
+    }
+    void hide()
+    {
+        SDL_HideWindow(wnd.get());
+    }
+    void raise()
+    {
+        SDL_RaiseWindow(wnd.get());
+    }
+    void minimize()
+    {
+        SDL_MinimizeWindow(wnd.get());
+    }
+    void maximize()
+    {
+        SDL_MaximizeWindow(wnd.get());
+    }
+    void restore()
+    {
+        SDL_RestoreWindow(wnd.get());
+    }
+
+
+    _DECL_DEPRECATED Surface getSurface()
+    {
+        SDL_Surface* temp=SDL_GetWindowSurface(wnd.get());
+        Surface s;
+        /// Don't Free This Surface
+        s.surf.reset(temp,[](SDL_Surface*){});
+        return s;
     }
 private:
     void _setRenderer_Real(Uint32 flags)
