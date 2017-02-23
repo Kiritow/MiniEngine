@@ -6,7 +6,9 @@ C++编写的SDL2引擎.
 
 ### 编译说明
 
-### !!!目前无法编译项目!!!
+Simple版本: 直接在cpp文件中include这个hpp文件.(目前可用)  
+
+**>>目前无法编译项目<<**  
 
 Windows: 请使用Codeblocks 16.01(推荐)载入所有.cpp文件.接下来Codeblocks会完成其余的工作.  
 > 依赖库  
@@ -24,12 +26,4 @@ C4droid: 长按编译键选择编译模式为Makefile. 选择编译目标为SDL2
 [前往SDL2官网下载最新版本](http://www.libsdl.org/download-2.0.php)  
 [C4droid on GooglePlay](https://play.google.com/store/apps/details?id=com.n0n3m4.droidc&hl=en)  
 
-### 类说明
-class Window 窗口类  
-class Renderer 渲染器类  
-class Texture 纹理类  
-class Surface 图层类  
-class Font 字体渲染类  
-class RGBA 颜色包  
-class Rect 矩形类  
 
