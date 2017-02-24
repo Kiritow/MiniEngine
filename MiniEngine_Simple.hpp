@@ -815,6 +815,63 @@ private:
 
 };
 
+class Event
+{
+public:
+    int gettype()
+    {
+        return e.type;
+    }
+protected:
+    Event()=default;
+    SDL_Event e;
+private:
+    friend class EventEngine;
+};
+
+class MouseButtonEvent : public Event
+{
+public:
+    int getx()
+    {
+        return e.button.x;
+    }
+    int gety()
+    {
+        return e.button.y;
+    }
+    int getbutton()
+    {
+        return e.button.button;
+    }
+};
+
+class EventEngine
+{
+public:
+    Event poll(bool mustNew=false) /// mustNew: false=SDL_PollEvent(&e) returns 0 ; true=SDL_PollEvent(&e) returns 1
+    {
+        Event e;
+        while(1)
+        {
+            int ret=SDL_PollEvent(&e.e);
+            if((mustNew&&ret)||!mustNew) break;
+        }
+        return e;
+    }
+    Event wait()
+    {
+        Event e;
+        SDL_WaitEvent(&e.e);
+        return e;
+    }
+    Event waitfor(int ms)
+    {
+        Event e;
+        SDL_WaitEventTimeout(&e.e,ms);
+        return e;
+    }
+};
 
 }/// End of namespace MiniEngine
 
