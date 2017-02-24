@@ -6,6 +6,8 @@
 
 #include <string>
 #include <memory>
+#include <map>
+#include <mutex>
 
 #define _DECL_DEPRECATED __declspec(deprecated)
 #define _DECL_DEPRECATED_MSG(InfoString) __declspec(deprecated(InfoString))
@@ -502,7 +504,7 @@ public:
         SDL_Surface* temp=SDL_GetWindowSurface(wnd.get());
         Surface s;
         /// Don't Free This Surface
-        s.surf.reset(temp,[](SDL_Surface*){});
+        s.surf.reset(temp,[](SDL_Surface*) {});
         return s;
     }
 private:
@@ -872,6 +874,108 @@ public:
         return e;
     }
 };
+
+
+
+namespace EventHandle
+{
+
+using DispatcherType = std::function<void(SDL_Event e,int& running,int& update)> ;
+std::map<int,DispatcherType> disvec;
+
+std::mutex mdisvec_counter;
+int disvec_counter=0;
+
+int RegistDispatcher(DispatcherType func)
+{
+    mdisvec_counter.lock();
+    int id=disvec_counter++;
+    mdisvec_counter.unlock();
+
+    disvec.insert(make_pair(id,func));
+    return id;
+}
+int UnregistDispatcher(int callbackid)
+{
+    for(auto it=disvec.begin(); it!=disvec.end(); it++)
+    {
+        if(callbackid==it->first)
+        {
+            disvec.erase(it);
+            return 0;
+        }
+    }
+    return -1;
+}
+
+using UpdaterType = std::function<void(Renderer& rnd)> ;
+std::map<int,UpdaterType> upvec;
+
+std::mutex mupvec_counter;
+int upvec_counter=0;
+
+int RegistUpdater(UpdaterType func)
+{
+    mupvec_counter.lock();
+    int id=upvec_counter++;
+    mupvec_counter.unlock();
+
+    upvec.insert(make_pair(id,func));
+    return id;
+}
+int UnregistUpdater(int callbackid)
+{
+    for(auto it=upvec.begin(); it!=upvec.end(); it++)
+    {
+        if(callbackid==it->first)
+        {
+            upvec.erase(it);
+            return 0;
+        }
+    }
+    return -1;
+}
+
+void Dispatcher(SDL_Event e,int& running,int& update)
+{
+    for(auto& func:disvec)
+    {
+        int r=1;
+        int u=0;
+        func.second(e,r,u);
+        running&=r;
+        update|=u;
+    }
+}
+
+void Updater(Renderer& rnd)
+{
+    for(auto& func:upvec)
+    {
+        func.second(rnd);
+    }
+}
+
+void Loop(Renderer& rnd)
+{
+    SDL_Event e;
+    int running=1;
+    int update=1;
+    while(running)
+    {
+        while(!update&&SDL_WaitEvent(&e))
+        {
+            Dispatcher(e,running,update);
+        }
+
+        rnd.clear();
+        Updater(rnd);
+        rnd.update();
+        update=0;
+    }
+}
+
+}/// End of namespace MiniEngine::EventHandle
 
 }/// End of namespace MiniEngine
 
