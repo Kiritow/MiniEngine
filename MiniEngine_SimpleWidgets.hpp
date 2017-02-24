@@ -1,106 +1,9 @@
-#include "MiniEngine.h"
+#include "MiniEngine_Simple.h"
 #include <functional>
 #include <vector>
 #include <map>
 #include <mutex>
 using namespace MiniEngine;
-
-
-using DispatcherType = function<void(SDL_Event e,int& running,int& update)> ;
-map<int,DispatcherType> disvec;
-
-mutex mdisvec_counter;
-int disvec_counter=0;
-
-
-
-using UpdaterType = function<void(Renderer& rnd)> ;
-map<int,UpdaterType> upvec;
-
-mutex mupvec_counter;
-int upvec_counter=0;
-
-int RegistDispatcher(DispatcherType func)
-{
-    mdisvec_counter.lock();
-    int id=disvec_counter++;
-    mdisvec_counter.unlock();
-
-    disvec.insert(make_pair(id,func));
-    return id;
-}
-int UnregistDispatcher(int callbackid)
-{
-    for(auto it=disvec.begin();it!=disvec.end();it++)
-    {
-        if(callbackid==it->first)
-        {
-            disvec.erase(it);
-            return 0;
-        }
-    }
-    return -1;
-}
-int RegistUpdater(UpdaterType func)
-{
-    mupvec_counter.lock();
-    int id=upvec_counter++;
-    mupvec_counter.unlock();
-
-    upvec.insert(make_pair(id,func));
-    return id;
-}
-int UnregistUpdater(int callbackid)
-{
-    for(auto it=upvec.begin();it!=upvec.end();it++)
-    {
-        if(callbackid==it->first)
-        {
-            upvec.erase(it);
-            return 0;
-        }
-    }
-    return -1;
-}
-
-void EventDispatcher(SDL_Event e,int& running,int& update)
-{
-    for(auto& func:disvec)
-    {
-        int r=1;
-        int u=0;
-        func.second(e,r,u);
-        running&=r;
-        update|=u;
-    }
-}
-
-void EventUpdater(Renderer& rnd)
-{
-    for(auto& func:upvec)
-    {
-        func.second(rnd);
-    }
-}
-
-void EventLoop(Renderer& rnd)
-{
-    SDL_Event e;
-    int running=1;
-    int update=1;
-    while(running)
-    {
-        while(!update&&SDL_WaitEvent(&e))
-        {
-            EventDispatcher(e,running,update);
-        }
-
-        rnd.clear();
-        EventUpdater(rnd);
-        rnd.update();
-        update=0;
-    }
-}
 
 class Drawable
 {
@@ -256,6 +159,8 @@ private:
     ButtonStatus bstatus;
 };
 
+/**
+//Example Code
 int main()
 {
     SDLSystem::Init();
@@ -279,3 +184,4 @@ int main()
     SDLSystem::Quit();
     return 0;
 }
+*/
