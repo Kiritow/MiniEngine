@@ -324,6 +324,10 @@ public:
         SDL_Rect d = dst.toSDLRect();
         return SDL_RenderCopy(rnd.get(), t.text.get(), NULL, &d);
     }
+    int copyTo(Texture t,Point lupoint)
+    {
+        return copyTo(t,Rect(lupoint.x,lupoint.y,t.getw(),t.geth()));
+    }
     int copyFill(Texture t, Rect src)
     {
         SDL_Rect s = src.toSDLRect();
@@ -540,15 +544,50 @@ public:
     {
         Surface surf;
         surf.surf.reset(TTF_RenderText_Blended(font.get(), Text.c_str(), fg.toSDLColor()));
-        Texture t = rnd.render(surf);
-        return t;
+        return rnd.render(surf);
     }
+    Texture renderTextWrapped(Renderer rnd,std::string Text,RGBA fg,int WrapLength)
+    {
+        Surface surf;
+        surf.surf.reset(TTF_RenderText_Blended_Wrapped(font.get(),Text.c_str(),fg.toSDLColor(),WrapLength));
+        return rnd.render(surf);
+    }
+    Texture renderTextShaded(Renderer rnd,std::string Text,RGBA fg,RGBA bg)
+    {
+        Surface surf;
+        surf.surf.reset(TTF_RenderText_Shaded(font.get(),Text.c_str(),fg.toSDLColor(),bg.toSDLColor()));
+        return rnd.render(surf);
+    }
+    Texture renderTextSolid(Renderer rnd,std::string Text,RGBA fg)
+    {
+        Surface surf;
+        surf.surf.reset(TTF_RenderText_Solid(font.get(),Text.c_str(),fg.toSDLColor()));
+        return rnd.render(surf);
+    }
+
     Texture renderUTF8(Renderer rnd, std::string Text, RGBA fg)
     {
         Surface surf;
         surf.surf.reset(TTF_RenderUTF8_Blended(font.get(), Text.c_str(), fg.toSDLColor()));
-        Texture t = rnd.render(surf);
-        return t;
+        return rnd.render(surf);
+    }
+    Texture renderUTF8Wrapped(Renderer rnd,std::string Text,RGBA fg,int WrapLength)
+    {
+        Surface surf;
+        surf.surf.reset(TTF_RenderUTF8_Blended_Wrapped(font.get(),Text.c_str(),fg.toSDLColor(),WrapLength));
+        return rnd.render(surf);
+    }
+    Texture renderUTF8Shaded(Renderer rnd,std::string Text,RGBA fg,RGBA bg)
+    {
+        Surface surf;
+        surf.surf.reset(TTF_RenderUTF8_Shaded(font.get(),Text.c_str(),fg.toSDLColor(),bg.toSDLColor()));
+        return rnd.render(surf);
+    }
+    Texture renderUTF8Solid(Renderer rnd,std::string Text,RGBA fg)
+    {
+        Surface surf;
+        surf.surf.reset(TTF_RenderUTF8_Solid(font.get(),Text.c_str(),fg.toSDLColor()));
+        return rnd.render(surf);
     }
 private:
     std::shared_ptr<TTF_Font> font;
@@ -979,19 +1018,18 @@ void Loop(Renderer& rnd)
 
 }/// End of namespace MiniEngine
 
-namespace App
-{
 
-int main(int argc,char* argv[]);
-
-}/// End of namespace App
+/// Your Program Should Start Here
+int AppMain();
 
 
 /// Default Setup Code
 int main(int argc,char* argv[])
 {
     MiniEngine::SDLSystem::Init();
-    int ret=App::main(argc,argv);
+    int ret=AppMain();
     MiniEngine::SDLSystem::Quit();
     return ret;
 }
+
+
