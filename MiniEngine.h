@@ -7,8 +7,6 @@
 
 #include <string>
 #include <memory>
-#include <map>
-#include <mutex>
 
 #define _DECL_DEPRECATED __declspec(deprecated)
 #define _DECL_DEPRECATED_MSG(InfoString) __declspec(deprecated(InfoString))
@@ -351,9 +349,8 @@ namespace MiniEngine
 
 	namespace EventHandle
 	{
-
 		using DispatcherType = std::function<void(SDL_Event e, int& running, int& update)>;
-		int RegistDispatcher(DispatcherType func);
+		int RegistDispatcher(int EventType,DispatcherType func);
 		int UnregistDispatcher(int callbackid);
 
 		using UpdaterType = std::function<void(Renderer& rnd)>;
@@ -370,7 +367,11 @@ namespace MiniEngine
 
 }/// End of namespace MiniEngine
 
+std::string UTF8ToGBK(std::string UTF8String);
+std::string GBKToUTF8(std::string GBKString);
 
  /// Your Program Should Start Here
 int AppMain();
 
+/// MiniEngine Provides main
+int main(int argc,char* argv[]);
