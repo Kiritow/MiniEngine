@@ -1,5 +1,7 @@
 #include "MiniEngine.h"
 #include <algorithm>
+#include <map>
+#include <mutex>
 
 namespace MiniEngine
 {
@@ -418,7 +420,7 @@ namespace MiniEngine
 
 	void Window::setResizable(bool resizable)
 	{
-		SDL_SetWindowResizable(wnd.get(), static_cast<SDL_bool>(resizable));
+		//SDL_SetWindowResizable(wnd.get(), static_cast<SDL_bool>(resizable));
 	}
 
 	void Window::show()
@@ -814,7 +816,212 @@ namespace MiniEngine
 
 	namespace EventHandle
 	{
-		std::map<int, DispatcherType> disvec;
+	    const int _internal_event_num=46;
+
+	    std::vector<std::map<int,DispatcherType>> disvec(_internal_event_num);
+
+        int TransIDToEvent(int ID)
+        {
+            switch(ID)
+            {
+            case 0:
+                return SDL_QUIT;
+            case 1:
+                return SDL_APP_TERMINATING;
+            case 2:
+                return SDL_APP_LOWMEMORY;
+            case 3:
+                return SDL_APP_WILLENTERBACKGROUND;
+            case 4:
+                return SDL_APP_DIDENTERBACKGROUND;
+            case 5:
+                return SDL_APP_WILLENTERFOREGROUND;
+            case 6:
+                return SDL_APP_DIDENTERFOREGROUND;
+            case 7:
+                return SDL_WINDOWEVENT;
+            case 8:
+                return SDL_SYSWMEVENT;
+            case 9:
+                return SDL_KEYDOWN;
+            case 10:
+                return SDL_KEYUP;
+            case 11:
+                return SDL_TEXTEDITING;
+            case 12:
+                return SDL_TEXTINPUT;
+            case 13:
+                return SDL_KEYMAPCHANGED;
+            case 14:
+                return SDL_MOUSEMOTION;
+            case 15:
+                return SDL_MOUSEBUTTONDOWN;
+            case 16:
+                return SDL_MOUSEBUTTONUP;
+            case 17:
+                return SDL_MOUSEWHEEL;
+            case 18:
+                return SDL_JOYAXISMOTION;
+            case 19:
+                return SDL_JOYBALLMOTION;
+            case 20:
+                return SDL_JOYHATMOTION;
+            case 21:
+                return SDL_JOYBUTTONDOWN;
+            case 22:
+                return SDL_JOYBUTTONUP;
+            case 23:
+                return SDL_JOYDEVICEADDED;
+            case 24:
+                return SDL_JOYDEVICEREMOVED;
+            case 25:
+                return SDL_CONTROLLERAXISMOTION;
+            case 26:
+                return SDL_CONTROLLERBUTTONDOWN;
+            case 27:
+                return SDL_CONTROLLERBUTTONUP;
+            case 28:
+                return SDL_CONTROLLERDEVICEADDED;
+            case 29:
+                return SDL_CONTROLLERDEVICEREMOVED;
+            case 30:
+                return SDL_CONTROLLERDEVICEREMAPPED;
+            case 31:
+                return SDL_FINGERDOWN;
+            case 32:
+                return SDL_FINGERUP;
+            case 33:
+                return SDL_FINGERMOTION;
+            case 34:
+                return SDL_DOLLARGESTURE;
+            case 35:
+                return SDL_DOLLARRECORD;
+            case 36:
+                return SDL_MULTIGESTURE;
+            case 37:
+                return SDL_CLIPBOARDUPDATE;
+            case 38:
+                return SDL_DROPFILE;
+            case 39:
+                return SDL_DROPTEXT;
+            case 40:
+                return SDL_DROPBEGIN;
+            case 41:
+                return SDL_DROPCOMPLETE;
+            case 42:
+                return SDL_AUDIODEVICEADDED;
+            case 43:
+                return SDL_AUDIODEVICEREMOVED;
+            case 44:
+                return SDL_RENDER_TARGETS_RESET;
+            case 45:
+                return SDL_RENDER_DEVICE_RESET;
+            default:
+                return 0;/// Nothing.
+            }
+        }
+
+        int TransEventToID(int EventType)
+        {
+            switch(EventType)
+            {
+            case SDL_QUIT:
+                return 0;
+            case SDL_APP_TERMINATING:
+                return 1;
+            case SDL_APP_LOWMEMORY:
+                return 2;
+            case SDL_APP_WILLENTERBACKGROUND:
+                return 3;
+            case SDL_APP_DIDENTERBACKGROUND:
+                return 4;
+            case SDL_APP_WILLENTERFOREGROUND:
+                return 5;
+            case SDL_APP_DIDENTERFOREGROUND:
+                return 6;
+            case SDL_WINDOWEVENT:
+                return 7;
+            case SDL_SYSWMEVENT:
+                return 8;
+            case SDL_KEYDOWN:
+                return 9;
+            case SDL_KEYUP:
+                return 10;
+            case SDL_TEXTEDITING:
+                return 11;
+            case SDL_TEXTINPUT:
+                return 12;
+            case SDL_KEYMAPCHANGED:
+                return 13;
+            case SDL_MOUSEMOTION:
+                return 14;
+            case SDL_MOUSEBUTTONDOWN:
+                return 15;
+            case SDL_MOUSEBUTTONUP:
+                return 16;
+            case SDL_MOUSEWHEEL:
+                return 17;
+            case SDL_JOYAXISMOTION:
+                return 18;
+            case SDL_JOYBALLMOTION:
+                return 19;
+            case SDL_JOYHATMOTION:
+                return 20;
+            case SDL_JOYBUTTONDOWN:
+                return 21;
+            case SDL_JOYBUTTONUP:
+                return 22;
+            case SDL_JOYDEVICEADDED:
+                return 23;
+            case SDL_JOYDEVICEREMOVED:
+                return 24;
+            case SDL_CONTROLLERAXISMOTION:
+                return 25;
+            case SDL_CONTROLLERBUTTONDOWN:
+                return 26;
+            case SDL_CONTROLLERBUTTONUP:
+                return 27;
+            case SDL_CONTROLLERDEVICEADDED:
+                return 28;
+            case SDL_CONTROLLERDEVICEREMOVED:
+                return 29;
+            case SDL_CONTROLLERDEVICEREMAPPED:
+                return 30;
+            case SDL_FINGERDOWN:
+                return 31;
+            case SDL_FINGERUP:
+                return 32;
+            case SDL_FINGERMOTION:
+                return 33;
+            case SDL_DOLLARGESTURE:
+                return 34;
+            case SDL_DOLLARRECORD:
+                return 35;
+            case SDL_MULTIGESTURE:
+                return 36;
+            case SDL_CLIPBOARDUPDATE:
+                return 37;
+            case SDL_DROPFILE:
+                return 38;
+            case SDL_DROPTEXT:
+                return 39;
+            case SDL_DROPBEGIN:
+                return 40;
+            case SDL_DROPCOMPLETE:
+                return 41;
+            case SDL_AUDIODEVICEADDED:
+                return 42;
+            case SDL_AUDIODEVICEREMOVED:
+                return 43;
+            case SDL_RENDER_TARGETS_RESET:
+                return 44;
+            case SDL_RENDER_DEVICE_RESET:
+                return 45;
+            default:
+                return -1;/// Error
+            }
+        }
+
 		std::mutex mdisvec_counter;
 		int disvec_counter = 0;
 
@@ -822,28 +1029,32 @@ namespace MiniEngine
 
 		std::mutex mupvec_counter;
 		int upvec_counter = 0;
-		int RegistDispatcher(DispatcherType func)
+
+		int RegistDispatcher(int EventType,DispatcherType func)
 		{
 			mdisvec_counter.lock();
 			int id = disvec_counter++;
 			mdisvec_counter.unlock();
 
-			disvec.insert(make_pair(id, func));
+			disvec.at(TransEventToID(EventType)).insert(make_pair(id, func));
 			return id;
 		}
 
-		int UnregistDispatcher(int callbackid)
-		{
-			for (auto it = disvec.begin(); it != disvec.end(); it++)
-			{
-				if (callbackid == it->first)
-				{
-					disvec.erase(it);
-					return 0;
-				}
-			}
-			return -1;
-		}
+        int UnregistDispatcher(int callbackid)
+        {
+            for (auto it = disvec.begin(); it != disvec.end(); it++)
+            {
+                for(auto i=it->begin(); i!=it->end(); i++)
+                {
+                    if (callbackid == i->first)
+                    {
+                        it->erase(i);
+                        return 0;
+                    }
+                }
+            }
+            return -1;
+        }
 
 		int RegistUpdater(UpdaterType func)
 		{
@@ -870,7 +1081,7 @@ namespace MiniEngine
 
 		void Dispatcher(SDL_Event e, int & running, int & update)
 		{
-			for (auto& func : disvec)
+			for (auto& func : disvec.at(TransEventToID(e.type)))
 			{
 				int r = 1;
 				int u = 0;
