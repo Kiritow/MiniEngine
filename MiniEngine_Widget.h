@@ -1,6 +1,7 @@
 #pragma once
 #include "MiniEngine.h"
 #include <functional>
+#include <vector>
 
 namespace MiniEngine
 {
@@ -26,16 +27,6 @@ private:
     friend class Board;
 };
 
-class Board
-{
-public:
-    Board(Renderer Rnd,Rect Area);
-    Brush getBrush();
-    Rect getArea();
-private:
-    Rect area;
-    Brush brush;
-};
 
 class Drawable
 {
@@ -49,6 +40,8 @@ class Interactive
 public:
     virtual int handle(SDL_Event e,int& running,int& update)=0;
 };
+
+
 
 class ButtonBase : public Drawable, public Interactive
 {
@@ -66,6 +59,29 @@ private:
     int status;
     Texture t1,t2,t3;
     Rect rect;
+};
+
+class Board
+{
+public:
+    Board(Renderer Rnd,Rect Area);
+    Brush getBrush();
+    Rect getArea();
+
+    class _Control
+    {
+    public:
+        void add(Interactive* widget);
+        Interactive* at(int index);
+        int size();
+        bool remove(Interactive* widget);
+    private:
+        std::vector<Interactive*> vec;
+    }Control;
+
+private:
+    Rect area;
+    Brush brush;
 };
 
 }/// End of namespace MiniEngine::Widget
