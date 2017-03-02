@@ -2,27 +2,35 @@
 #include "MiniEngine.h"
 #include <functional>
 
-class Brush : public MiniEngine::Renderer
+namespace MiniEngine
+{
+
+namespace Widget
+{
+
+class Brush : public Renderer
 {
 public:
-    void setArea(MiniEngine::Rect Area);
+    void setArea(Rect Area);
+    void setFullArea(Rect FullArea);
 
-    int copy(MiniEngine::Texture t, MiniEngine::Rect src, MiniEngine::Rect dst);
-    int copyTo(MiniEngine::Texture t, MiniEngine::Rect dst);
-    int copyTo(MiniEngine::Texture t, MiniEngine::Point lupoint);
-    int copyFill(MiniEngine::Texture t,MiniEngine::Rect src);
-    int copyFullFill(MiniEngine::Texture t);
+    int copy(Texture t, Rect src, Rect dst);
+    int copyTo(Texture t, Rect dst);
+    int copyTo(Texture t, Point lupoint);
+    int copyFill(Texture t,Rect src);
+    int copyFullFill(Texture t);
 private:
-    MiniEngine::Rect area;
+    Rect area,fullarea;
 };
 
 class Board
 {
 public:
-    Board(MiniEngine::Window wnd,MiniEngine::Rect Area);
+    Board(Rect Area);
     Brush getBrush();
+    Rect getArea();
 private:
-    MiniEngine::Rect area,fullwnd;
+    Rect area;
 };
 
 class Drawable
@@ -42,14 +50,18 @@ class ButtonBase : public Drawable, public Interactive
 {
 public:
     ButtonBase();
-    void setTextureNormal(MiniEngine::Texture Normal);
-    void setTextureMouseover(MiniEngine::Texture Mouseover);
-    void setTextureClicked(MiniEngine::Texture Clicked);
-    void setRect(MiniEngine::Rect SensorArea);
+    void setTextureNormal(Texture Normal);
+    void setTextureMouseover(Texture Mouseover);
+    void setTextureClicked(Texture Clicked);
+    void setRect(Rect SensorArea);
     virtual void draw(Brush& brush);
     virtual void handle(SDL_Event e,int& running,int& update);
 private:
     int status;
-    MiniEngine::Texture t1,t2,t3;
-    MiniEngine::Rect rect;
+    Texture t1,t2,t3;
+    Rect rect;
 };
+
+}/// End of namespace MiniEngine::Widget
+
+}/// End of namespace MiniEngine
