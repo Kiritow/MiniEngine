@@ -19,18 +19,22 @@ public:
     int copyTo(Texture t, Point lupoint);
     int copyFill(Texture t,Rect src);
     int copyFullFill(Texture t);
+protected:
+    Brush(Renderer Rnd);
 private:
     Rect area,fullarea;
+    friend class Board;
 };
 
 class Board
 {
 public:
-    Board(Rect Area);
+    Board(Renderer Rnd,Rect Area);
     Brush getBrush();
     Rect getArea();
 private:
     Rect area;
+    Brush brush;
 };
 
 class Drawable
@@ -43,7 +47,7 @@ public:
 class Interactive
 {
 public:
-    virtual void handle(SDL_Event e,int& running,int& update)=0;
+    virtual int handle(SDL_Event e,int& running,int& update)=0;
 };
 
 class ButtonBase : public Drawable, public Interactive
@@ -55,7 +59,9 @@ public:
     void setTextureClicked(Texture Clicked);
     void setRect(Rect SensorArea);
     virtual void draw(Brush& brush);
-    virtual void handle(SDL_Event e,int& running,int& update);
+    virtual int handle(SDL_Event e,int& running,int& update);
+
+    std::function<void()> onmouseover,onclicked,onrelease,onmouseout;
 private:
     int status;
     Texture t1,t2,t3;

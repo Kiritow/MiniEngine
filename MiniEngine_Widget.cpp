@@ -1,4 +1,6 @@
 #include "MiniEngine_Widget.h"
+#include <iostream>
+using namespace std;
 using namespace MiniEngine;
 
 namespace MiniEngine
@@ -98,16 +100,19 @@ int Brush::copyFullFill(Texture t)
     return Renderer::copyTo(t,dst);
 }
 
-Board::Board(Rect Area)
+Brush::Brush(Renderer Rnd) : Renderer(Rnd)
 {
-    area=Area;
+
+}
+
+Board::Board(Renderer Rnd,Rect Area) :  area(Area),brush(Rnd)
+{
+    brush.setArea(area);
 }
 
 Brush Board::getBrush()
 {
-    Brush b;
-    b.setArea(area);
-    return b;
+    return brush;
 }
 
 Rect Board::getArea()
@@ -123,7 +128,7 @@ Rect Board::getArea()
 
 ButtonBase::ButtonBase()
 {
-    status=0;
+    status=1;
 }
 
 void ButtonBase::setTextureClicked(Texture Clicked)
@@ -148,20 +153,89 @@ void ButtonBase::setRect(Rect SensorArea)
 
 void ButtonBase::draw(Brush& brush) /// virtual
 {
+    int ret=-1;
     switch(status)
     {
-    case 0:
-        break;
     case 1:
+        ret=brush.copyTo(t1,rect);
         break;
     case 2:
+        ret=brush.copyTo(t2,rect);
+        break;
+    case 3:
+        ret=brush.copyTo(t3,rect);
         break;
     }
 }
 
-void ButtonBase::handle(SDL_Event e,int& running,int& update) /// virtual
+int ButtonBase::handle(SDL_Event e,int& running,int& update) /// virtual
 {
+    switch(e.type)
+    {
+    case SDL_MOUSEMOTION:
+        {
+            if(Point(e.motion.x,e.motion.y).inRect(rect))
+            {
+                if(status==1)
+                {
+                    if(onmouseover) onmouseover();
+                    status=2;
+                    update=1;
+                }
+            }
+            else
+            {
+                if(status==2)
+                {
+                    if(onmouseout) onmouseout();
+                    status=1;
+                    update=1;
+                }
+                else if(status==3)
+                {
+                    if(onrelease) onrelease();
+                    if(onmouseout) onmouseout();
+                    status=1;
+                    update=1;
+                }
+            }
 
+            return 1;
+        }
+        break;
+    case SDL_MOUSEBUTTONDOWN:
+        {
+            if(Point(e.button.x,e.button.y).inRect(rect))
+            {
+                if(status==2)
+                {
+                    if(onclicked) onclicked();
+                    status=3;
+                    update=1;
+                }
+            }
+
+            return 1;
+        }
+        break;
+    case SDL_MOUSEBUTTONUP:
+        {
+            if(Point(e.button.x,e.button.y).inRect(rect))
+            {
+                if(status==3)
+                {
+                    if(onrelease) onrelease();
+                    status=2;
+                    update=1;
+                }
+            }
+
+            return 1;
+        }
+        break;
+    }
+
+    return 0;
 }
 
 }/// End of namespace MiniEngine::Widget
