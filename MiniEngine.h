@@ -95,6 +95,7 @@ namespace MiniEngine
 	class Texture
 	{
 	public:
+	    Texture();
 		~Texture() = default;
 		Rect getSize();
 		int getw();
@@ -110,8 +111,8 @@ namespace MiniEngine
 		int setColorMode(ColorMode mode);
 		RGBA getRGBA();
 		void setRGBA(RGBA pack);
+
 	protected:
-		Texture() = default;
 		/// updateInfo() must be called after Texture is changed.
 		void updateInfo();
 	private:
