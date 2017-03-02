@@ -1,12 +1,10 @@
-# MiniEngine  
+# MiniEngine (In maintenance)  
 
 A C++ Mini Engine. Based on SDL2.  
 
-C++编写的SDL2引擎.  
+C++编写的SDL2引擎.(维护中)  
 
 ### 编译说明
-
-Simple版本: 直接在cpp文件中include这个hpp文件.(目前可用)  
 
 **>>目前无法编译项目<<**  
 
@@ -26,4 +24,6 @@ C4droid: 长按编译键选择编译模式为Makefile. 选择编译目标为SDL2
 [前往SDL2官网下载最新版本](http://www.libsdl.org/download-2.0.php)  
 [C4droid on GooglePlay](https://play.google.com/store/apps/details?id=com.n0n3m4.droidc&hl=en)  
 
+### 项目状态
+解决Brush和Board的问题中  
 
