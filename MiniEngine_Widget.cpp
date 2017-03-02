@@ -1,6 +1,4 @@
 #include "MiniEngine_Widget.h"
-#include <iostream>
-using namespace std;
 using namespace MiniEngine;
 
 namespace MiniEngine
@@ -120,9 +118,33 @@ Rect Board::getArea()
     return area;
 }
 
+void Board::_Control::add(Interactive* widget)
+{
+    vec.push_back(widget);
+}
 
+int Board::_Control::size()
+{
+    return vec.size();
+}
 
+bool Board::_Control::remove(Interactive* widget)
+{
+    for(auto iter=vec.begin();iter!=vec.end();++iter)
+    {
+        if(*iter==widget)
+        {
+            vec.erase(iter);
+            return true;
+        }
+    }
+    return false;
+}
 
+Interactive* Board::_Control::at(int index)
+{
+    return vec.at(index);
+}
 
 
 
