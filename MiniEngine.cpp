@@ -117,6 +117,11 @@ namespace MiniEngine
 		return str.c_str();
 	}
 
+	Texture::Texture()
+	{
+        updateInfo();
+	}
+
 	Rect Texture::getSize()
 	{
 		return rect;
@@ -195,6 +200,10 @@ namespace MiniEngine
 
 	void Texture::updateInfo()
 	{
+	    if(text.get()==nullptr)
+        {
+            rect.x=rect.y=rect.w=rect.h=0;
+        }
 		SDL_QueryTexture(text.get(), NULL, NULL, &rect.w, &rect.h);
 		rect.x = rect.y = 0;
 	}
