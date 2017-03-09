@@ -2,6 +2,13 @@
 #include <algorithm>
 #include <map>
 #include <mutex>
+#include <fstream>
+
+#include <unistd.h>
+
+#include "rapidxml/rapidxml.hpp"
+#include "rapidxml/rapidxml_print.hpp"
+#include "rapidxml/rapidxml_utils.hpp"
 
 namespace MiniEngine
 {
@@ -1157,12 +1164,85 @@ namespace MiniEngine
 		}
 	}/// End of namespace EventHandle
 
-
-
 	AudioPlayer::_Audio* AudioPlayer::_sysAudio = nullptr;
 	int AudioPlayer::_sysAudioCounter = 0;
 
+    struct StringEngine::impl
+    {
+        rapidxml::xml_document<> doc;
+        rapidxml::xml_node<>* root;
+        bool status;
+    };
+
+    StringEngine::StringEngine(std::string StringFile,std::string LanguageTag)
+    {
+        pimpl=new impl;
+        pimpl->status=false;
+        std::ifstream ifs(StringFile);
+        if(!ifs) return;
+        rapidxml::file<> strFile(ifs);
+        pimpl->doc.parse<0>(strFile.data());
+        pimpl->root=pimpl->doc.first_node(LanguageTag.c_str());
+        if(pimpl->root==nullptr) return;
+
+        pimpl->status=true;
+    }
+
+    bool StringEngine::ready()
+    {
+        return pimpl->status;
+    }
+
+    int StringEngine::useLanaguage(std::string LanguageTag)
+    {
+        pimpl->root=pimpl->doc.first_node(LanguageTag.c_str());
+        if(pimpl->root==nullptr)
+        {
+            pimpl->status=false;
+            return -1;
+        }
+        else
+        {
+            pimpl->status=true;
+            return 0;
+        }
+    }
+
+    std::string StringEngine::getString(std::string Tag)
+    {
+        if(!ready()) return "";
+        char* context=pimpl->root->first_node(Tag.c_str())->value();
+        if(context==nullptr) return "";
+        else return std::string(context);
+    }
+
+    StringEngine::~StringEngine()
+    {
+        delete pimpl;
+    }
+
 }/// End of namespace MiniEngine
+
+
+bool isexist(std::string Path)
+{
+    return access(Path.c_str(),F_OK)==0;
+}
+
+bool canread(std::string Path)
+{
+    return access(Path.c_str(),R_OK)==0;
+}
+
+bool canwrite(std::string Path)
+{
+    return access(Path.c_str(),W_OK)==0;
+}
+
+bool canexecute(std::string Path)
+{
+    return access(Path.c_str(),X_OK)==0;
+}
 
  /// Default Setup Code
 int main(int argc, char* argv[])
