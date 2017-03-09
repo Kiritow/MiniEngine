@@ -611,6 +611,35 @@ namespace MiniEngine
 		SDL_Delay(ms);
 	}
 
+	Platform SDLSystem::GetPlatform()
+	{
+        std::string s(SDL_GetPlatform());
+        if(s=="Windows")
+        {
+            return Platform::Windows;
+        }
+        else if(s=="Mac OS X")
+        {
+            return Platform::MacOS;
+        }
+        else if(s=="Linux")
+        {
+            return Platform::Linux;
+        }
+        else if(s=="iOS")
+        {
+            return Platform::iOS;
+        }
+        else if(s=="Android")
+        {
+            return Platform::Android;
+        }
+        else
+        {
+            return Platform::Unknown;
+        }
+	}
+
 	AudioPlayer::AudioPlayer()
 	{
 		if (!_sysAudioCounter)

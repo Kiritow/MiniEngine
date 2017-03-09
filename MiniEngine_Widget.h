@@ -41,8 +41,6 @@ public:
     virtual int handle(SDL_Event e,int& running,int& update)=0;
 };
 
-
-
 class ButtonBase : public Drawable, public Interactive
 {
 public:

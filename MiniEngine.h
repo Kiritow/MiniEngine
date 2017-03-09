@@ -219,6 +219,8 @@ namespace MiniEngine
 		std::shared_ptr<TTF_Font> font;
 	};
 
+	enum class Platform { Unknown,Windows,MacOS,Linux,iOS,Android };
+
 	class SDLSystem
 	{
 	public:
@@ -235,6 +237,19 @@ namespace MiniEngine
 		static void Quit();
 
 		static void Delay(int ms);
+
+		static Platform GetPlatform();
+
+		class Android
+		{
+        public:
+            static std::string GetInternal();
+            static bool ExternalAvaliable();
+            static bool CanReadExternal();
+            static bool CanWriteExternal();
+            static std::string GetExternal();
+            static void* GetJNIEnv();
+		};
 	};
 
 

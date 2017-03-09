@@ -175,17 +175,16 @@ void ButtonBase::setRect(Rect SensorArea)
 
 void ButtonBase::draw(Brush& brush) /// virtual
 {
-    int ret=-1;
     switch(status)
     {
     case 1:
-        ret=brush.copyTo(t1,rect);
+        brush.copyTo(t1,rect);
         break;
     case 2:
-        ret=brush.copyTo(t2,rect);
+        brush.copyTo(t2,rect);
         break;
     case 3:
-        ret=brush.copyTo(t3,rect);
+        brush.copyTo(t3,rect);
         break;
     }
 }
