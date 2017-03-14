@@ -142,6 +142,7 @@ namespace MiniEngine
 
 		int fillRect(Rect rect);
 		int drawRect(Rect rect);
+		int drawPoint(Point p);
 		int clear();
 		void update();
 		int copy(Texture t, Rect src, Rect dst);

@@ -262,6 +262,11 @@ namespace MiniEngine
 		return SDL_RenderDrawRect(rnd.get(), &inr);
 	}
 
+	int Renderer::drawPoint(Point p)
+	{
+        return SDL_RenderDrawPoint(rnd.get(),p.x,p.y);
+	}
+
 	int Renderer::clear()
 	{
 		return SDL_RenderClear(rnd.get());
