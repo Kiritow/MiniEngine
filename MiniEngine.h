@@ -163,6 +163,8 @@ namespace MiniEngine
 		friend class Window;
 	};
 
+	enum class MessageBoxType { Error,Warning,Information };
+
 	class Window
 	{
 	public:
@@ -185,6 +187,9 @@ namespace MiniEngine
 		std::string getTitle();
 
 		void setResizable(bool resizable);
+
+		/// Use UTF8 in Title and Message please.
+		int showSimpleMessageBox(MessageBoxType type,std::string Title,std::string Message);
 
 		void show();
 		void hide();

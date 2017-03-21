@@ -488,6 +488,24 @@ namespace MiniEngine
 		winrnd.rnd.reset(SDL_CreateRenderer(wnd.get(), -1, flags), SDL_DestroyRenderer);
 	}
 
+	int Window::showSimpleMessageBox(MessageBoxType type,std::string Title,std::string Message)
+	{
+	    Uint32 flags=0;
+	    switch(type)
+	    {
+        case MessageBoxType::Error:
+            flags=SDL_MESSAGEBOX_ERROR;
+            break;
+        case MessageBoxType::Information:
+            flags=SDL_MESSAGEBOX_INFORMATION;
+            break;
+        case MessageBoxType::Warning:
+            flags=SDL_MESSAGEBOX_WARNING;
+            break;
+	    }
+        return SDL_ShowSimpleMessageBox(flags,Title.c_str(),Message.c_str(),wnd.get());
+	}
+
 	Font::Font(std::string FontFileName, int size) throw(ErrorViewer)
 	{
 		if (use(FontFileName, size) != 0)
