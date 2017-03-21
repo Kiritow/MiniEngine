@@ -129,6 +129,8 @@ namespace MiniEngine
 		TargetTexture = SDL_RENDERER_TARGETTEXTURE
 	};
 
+	enum class FlipMode { None, Horizontal, Vertical };
+
 	class Renderer
 	{
 	public:
@@ -143,13 +145,18 @@ namespace MiniEngine
 		int fillRect(Rect rect);
 		int drawRect(Rect rect);
 		int drawPoint(Point p);
+
 		int clear();
 		void update();
+
 		int copy(Texture t, Rect src, Rect dst);
 		int copyTo(Texture t, Rect dst);
 		int copyTo(Texture t, Point lupoint);
 		int copyFill(Texture t, Rect src);
 		int copyFullFill(Texture t);
+
+		int supercopy(Texture t,bool srcfull,Rect src,bool dstfull,Rect dst,double angle,bool haspoint,Point center,FlipMode mode);
+
 		Surface loadSurface(std::string FileName) throw(ErrorViewer);
 		Texture render(Surface surf) throw (ErrorViewer);
 		Texture loadTexture(std::string FileName) throw(ErrorViewer);
@@ -261,7 +268,6 @@ namespace MiniEngine
 		};
 	};
 
-
 	class AudioPlayer
 	{
 	public:
@@ -278,8 +284,6 @@ namespace MiniEngine
 		static _Audio* _sysAudio;
 		static int _sysAudioCounter;
 	};
-
-
 
 	/// Forward Declaration
 	class Music
@@ -369,8 +373,6 @@ namespace MiniEngine
 		Event wait();
 		Event waitfor(int ms);
 	};
-
-
 
 	namespace EventHandle
 	{

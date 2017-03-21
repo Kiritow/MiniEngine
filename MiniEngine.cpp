@@ -306,6 +306,46 @@ namespace MiniEngine
 		return SDL_RenderCopy(rnd.get(), t.text.get(), NULL, NULL);
 	}
 
+	int Renderer::supercopy(Texture t,bool srcfull,Rect src,bool dstfull,Rect dst,double angle,bool haspoint,Point center,FlipMode mode)
+	{
+	    SDL_Rect R1,R2;
+	    SDL_Point P;
+	    SDL_Rect* pR1=nullptr;
+	    SDL_Rect* pR2=nullptr;
+	    SDL_Point* pPoint=nullptr;
+	    SDL_RendererFlip flip;
+	    if(srcfull)
+        {
+            R1=src.toSDLRect();
+            pR1=&R1;
+        }
+        if(dstfull)
+        {
+            R2=dst.toSDLRect();
+            pR2=&R2;
+        }
+        if(haspoint)
+        {
+            P=center.toSDLPoint();
+            pPoint=&P;
+        }
+
+        switch(mode)
+        {
+        case FlipMode::None:
+            flip=SDL_FLIP_NONE;
+            break;
+        case FlipMode::Horizontal:
+            flip=SDL_FLIP_HORIZONTAL;
+            break;
+        case FlipMode::Vertical:
+            flip=SDL_FLIP_VERTICAL;
+            break;
+        }
+
+        return SDL_RenderCopyEx(rnd.get(),t.text.get(),pR1,pR2,angle,pPoint,flip);
+	}
+
 	Surface Renderer::loadSurface(std::string FileName) throw(ErrorViewer)
 	{
 		Surface surf;
