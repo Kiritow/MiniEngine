@@ -221,6 +221,7 @@ namespace MiniEngine
 	};
 
 	enum class Platform { Unknown,Windows,MacOS,Linux,iOS,Android };
+	enum class PowerState { Unknown,OnBattery,NoBattery,Charging,Charged };
 
 	class SDLSystem
 	{
@@ -238,6 +239,8 @@ namespace MiniEngine
 		static void Quit();
 
 		static void Delay(int ms);
+
+		static PowerState GetPowerState();
 
 		static Platform GetPlatform();
 

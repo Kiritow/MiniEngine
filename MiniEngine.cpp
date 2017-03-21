@@ -623,6 +623,26 @@ namespace MiniEngine
 		SDL_Delay(ms);
 	}
 
+	PowerState SDLSystem::GetPowerState()
+	{
+        SDL_PowerState ret=SDL_GetPowerInfo(NULL,NULL);
+        switch(ret)
+        {
+        case SDL_POWERSTATE_ON_BATTERY:
+            return PowerState::OnBattery;
+        case SDL_POWERSTATE_NO_BATTERY:
+            return PowerState::NoBattery;
+        case SDL_POWERSTATE_CHARGING:
+            return PowerState::Charging;
+        case SDL_POWERSTATE_CHARGED:
+            return PowerState::Charged;
+
+        case SDL_POWERSTATE_UNKNOWN:
+        default:
+            return PowerState::Unknown;
+        }
+	}
+
 	Platform SDLSystem::GetPlatform()
 	{
         std::string s(SDL_GetPlatform());
