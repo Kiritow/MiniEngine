@@ -11,7 +11,6 @@
 #include <unistd.h>
 #endif
 
-
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_print.hpp"
 #include "rapidxml/rapidxml_utils.hpp"
@@ -411,6 +410,11 @@ namespace MiniEngine
 		return t;
 	}
 
+	bool Renderer::isReady()
+	{
+		return (rnd.get() != nullptr);
+	}
+
 	Window::Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags) throw(ErrorViewer)
 	{
 		SDL_Window* temp = SDL_CreateWindow(Title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_SHOWN);
@@ -573,56 +577,56 @@ namespace MiniEngine
 	Texture Font::renderText(Renderer rnd, std::string Text, RGBA fg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderText_Blended(font.get(), Text.c_str(), fg.toSDLColor()));
+		surf.surf.reset(TTF_RenderText_Blended(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderText_Blended_Wrapped(font.get(), Text.c_str(), fg.toSDLColor(), WrapLength));
+		surf.surf.reset(TTF_RenderText_Blended_Wrapped(font.get(), Text.c_str(), fg.toSDLColor(), WrapLength), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderTextShaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderText_Shaded(font.get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()));
+		surf.surf.reset(TTF_RenderText_Shaded(font.get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderTextSolid(Renderer rnd, std::string Text, RGBA fg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderText_Solid(font.get(), Text.c_str(), fg.toSDLColor()));
+		surf.surf.reset(TTF_RenderText_Solid(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderUTF8(Renderer rnd, std::string Text, RGBA fg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Blended(font.get(), Text.c_str(), fg.toSDLColor()));
+		surf.surf.reset(TTF_RenderUTF8_Blended(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Blended_Wrapped(font.get(), Text.c_str(), fg.toSDLColor(), WrapLength));
+		surf.surf.reset(TTF_RenderUTF8_Blended_Wrapped(font.get(), Text.c_str(), fg.toSDLColor(), WrapLength), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Shaded(font.get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()));
+		surf.surf.reset(TTF_RenderUTF8_Shaded(font.get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Solid(font.get(), Text.c_str(), fg.toSDLColor()));
+		surf.surf.reset(TTF_RenderUTF8_Solid(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
@@ -1312,7 +1316,7 @@ namespace MiniEngine
 
 }/// End of namespace MiniEngine
 
-
+/// The Following Functions are not avaliable in Visual Studio
 #if (_MINIENGINE_HAS_UNISTD == 1)
 bool isexist(std::string Path)
 {
@@ -1333,7 +1337,7 @@ bool canexecute(std::string Path)
 {
     return access(Path.c_str(),X_OK)==0;
 }
-#else /// _MINIENGINE_HAS_UNISTD = 0
+#else /// _MINIENGINE_HAS_UNISTD == 0
 /// File Functions will be implied in platform specific source file.
 #endif
 
