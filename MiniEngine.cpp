@@ -4,8 +4,6 @@
 #include <mutex>
 #include <fstream>
 
-#include <unistd.h>
-
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_print.hpp"
 #include "rapidxml/rapidxml_utils.hpp"
@@ -1306,6 +1304,9 @@ namespace MiniEngine
 
 }/// End of namespace MiniEngine
 
+/// The Following Functions are not avaliable in Visual Studio
+#if 0
+#include <unitstd.h>
 
 bool isexist(std::string Path)
 {
@@ -1326,6 +1327,7 @@ bool canexecute(std::string Path)
 {
     return access(Path.c_str(),X_OK)==0;
 }
+#endif /// End of if 0
 
  /// Default Setup Code
 int main(int argc, char* argv[])

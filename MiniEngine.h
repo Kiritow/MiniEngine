@@ -7,6 +7,7 @@
 
 #include <string>
 #include <memory>
+#include <functional>
 
 #define _DECL_DEPRECATED __declspec(deprecated)
 #define _DECL_DEPRECATED_MSG(InfoString) __declspec(deprecated(InfoString))
