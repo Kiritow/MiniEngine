@@ -4,7 +4,13 @@
 #include <mutex>
 #include <fstream>
 
+#ifdef _MSC_VER /// Visual Studio
+#define _MINIENGINE_HAS_UNISTD 0
+#else
+#define _MINIENGINE_HAS_UNISTD 1
 #include <unistd.h>
+#endif
+
 
 #include "rapidxml/rapidxml.hpp"
 #include "rapidxml/rapidxml_print.hpp"
@@ -1307,6 +1313,7 @@ namespace MiniEngine
 }/// End of namespace MiniEngine
 
 
+#if (_MINIENGINE_HAS_UNISTD == 1)
 bool isexist(std::string Path)
 {
     return access(Path.c_str(),F_OK)==0;
@@ -1326,6 +1333,9 @@ bool canexecute(std::string Path)
 {
     return access(Path.c_str(),X_OK)==0;
 }
+#else /// _MINIENGINE_HAS_UNISTD = 0
+/// File Functions will be implied in platform specific source file.
+#endif
 
  /// Default Setup Code
 int main(int argc, char* argv[])
