@@ -403,6 +403,11 @@ namespace MiniEngine
 		return t;
 	}
 
+	bool Renderer::isReady()
+	{
+		return (rnd.get() != nullptr);
+	}
+
 	Window::Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags) throw(ErrorViewer)
 	{
 		SDL_Window* temp = SDL_CreateWindow(Title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_SHOWN);

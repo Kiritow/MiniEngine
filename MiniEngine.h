@@ -163,9 +163,8 @@ namespace MiniEngine
 		Texture loadTexture(std::string FileName) throw(ErrorViewer);
 		Texture createTexture(int Width, int Height) throw(ErrorViewer);
 
-	protected:
-		/// This function is called by class Window ONLY.
 		Renderer() = default;
+		bool isReady();
 	private:
 		std::shared_ptr<SDL_Renderer> rnd;
 		friend class Window;
