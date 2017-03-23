@@ -565,56 +565,56 @@ namespace MiniEngine
 	Texture Font::renderText(Renderer rnd, std::string Text, RGBA fg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderText_Blended(font.get(), Text.c_str(), fg.toSDLColor()));
+		surf.surf.reset(TTF_RenderText_Blended(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderText_Blended_Wrapped(font.get(), Text.c_str(), fg.toSDLColor(), WrapLength));
+		surf.surf.reset(TTF_RenderText_Blended_Wrapped(font.get(), Text.c_str(), fg.toSDLColor(), WrapLength), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderTextShaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderText_Shaded(font.get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()));
+		surf.surf.reset(TTF_RenderText_Shaded(font.get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderTextSolid(Renderer rnd, std::string Text, RGBA fg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderText_Solid(font.get(), Text.c_str(), fg.toSDLColor()));
+		surf.surf.reset(TTF_RenderText_Solid(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderUTF8(Renderer rnd, std::string Text, RGBA fg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Blended(font.get(), Text.c_str(), fg.toSDLColor()));
+		surf.surf.reset(TTF_RenderUTF8_Blended(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Blended_Wrapped(font.get(), Text.c_str(), fg.toSDLColor(), WrapLength));
+		surf.surf.reset(TTF_RenderUTF8_Blended_Wrapped(font.get(), Text.c_str(), fg.toSDLColor(), WrapLength), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Shaded(font.get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()));
+		surf.surf.reset(TTF_RenderUTF8_Shaded(font.get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
 	Texture Font::renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg)
 	{
 		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Solid(font.get(), Text.c_str(), fg.toSDLColor()));
+		surf.surf.reset(TTF_RenderUTF8_Solid(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
 		return rnd.render(surf);
 	}
 
