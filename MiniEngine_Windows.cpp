@@ -1,7 +1,7 @@
 #include "MiniEngine.h"
 using namespace std;
 
-#include "windows.h"
+#include <windows.h>
 
 //GBK编码转换到UTF8编码
 int _GBKToUTF8(unsigned char * lpGBKStr,unsigned char * lpUTF8Str,int nUTF8StrLen)
@@ -118,3 +118,25 @@ string GBKToUTF8(string GBKString)
     delete[] utf8str;
     return s;
 }
+
+#ifdef _MSC_VER
+bool isexist(std::string Path)
+{
+    return false;
+}
+
+bool canread(std::string Path)
+{
+    return false;
+}
+
+bool canwrite(std::string Path)
+{
+    return false;
+}
+
+bool canexecute(std::string Path)
+{
+    return false;
+}
+#endif /// End of _MSC_VER
