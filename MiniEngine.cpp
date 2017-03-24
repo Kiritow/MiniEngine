@@ -1101,6 +1101,8 @@ namespace MiniEngine
                 return SDL_MULTIGESTURE;
             case 37:
                 return SDL_CLIPBOARDUPDATE;
+
+			#ifdef __C4DROID__ /// C4droid does not support SDL_DROP...
             case 38:
                 return SDL_DROPFILE;
             case 39:
@@ -1109,6 +1111,8 @@ namespace MiniEngine
                 return SDL_DROPBEGIN;
             case 41:
                 return SDL_DROPCOMPLETE;
+			#endif
+
             case 42:
                 return SDL_AUDIODEVICEADDED;
             case 43:
@@ -1202,6 +1206,8 @@ namespace MiniEngine
                 return 36;
             case SDL_CLIPBOARDUPDATE:
                 return 37;
+
+			#ifdef __C4DROID__ /// C4droid does not support SDL_DROP...
             case SDL_DROPFILE:
                 return 38;
             case SDL_DROPTEXT:
@@ -1210,6 +1216,8 @@ namespace MiniEngine
                 return 40;
             case SDL_DROPCOMPLETE:
                 return 41;
+			#endif 
+			
             case SDL_AUDIODEVICEADDED:
                 return 42;
             case SDL_AUDIODEVICEREMOVED:
