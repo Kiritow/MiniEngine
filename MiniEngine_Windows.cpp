@@ -83,7 +83,7 @@ int _UTF8ToGBK(unsigned char * lpUTF8Str,unsigned char * lpGBKStr,int nGBKStrLen
 
 string UTF8ToGBK(string UTF8String)
 {
-    int sz=UTF8String.size()+32;
+    int sz=UTF8String.size()*2/3+256;
     auto utf8str=new unsigned char[sz];
     memset(utf8str,0,sz);
     memcpy(utf8str,UTF8String.c_str(),UTF8String.size());
@@ -102,7 +102,7 @@ string UTF8ToGBK(string UTF8String)
 
 string GBKToUTF8(string GBKString)
 {
-    int sz=GBKString.size()+32;
+    int sz=GBKString.size()*3/2+32;
     auto gbkstr=new unsigned char[sz];
     memset(gbkstr,0,sz);
     memcpy(gbkstr,GBKString.c_str(),GBKString.size());
