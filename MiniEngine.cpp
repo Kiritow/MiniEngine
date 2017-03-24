@@ -738,6 +738,16 @@ namespace MiniEngine
         }
 	}
 
+	void SDLSystem::StartTextInput()
+	{
+		SDL_StartTextInput();
+	}
+
+	void SDLSystem::StopTextInput()
+	{
+		SDL_StopTextInput();
+	}
+
 	AudioPlayer::AudioPlayer()
 	{
 		if (!_sysAudioCounter)

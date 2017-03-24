@@ -257,6 +257,9 @@ namespace MiniEngine
 
 		static Platform GetPlatform();
 
+		static void StartTextInput();
+		static void StopTextInput();
+
 		class Android
 		{
         public:
