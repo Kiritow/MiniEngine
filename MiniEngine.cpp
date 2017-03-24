@@ -566,6 +566,11 @@ namespace MiniEngine
 		font.reset(temp, TTF_CloseFont);
 		return 0;
 	}
+	
+	bool Font::isReady()
+	{
+		return (font.get() != nullptr);
+	}
 
 	Texture Font::renderText(Renderer rnd, std::string Text, RGBA fg)
 	{

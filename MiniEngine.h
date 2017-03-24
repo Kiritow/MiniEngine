@@ -219,6 +219,7 @@ namespace MiniEngine
 		Font() = default;
 		Font(std::string FontFileName, int size) throw(ErrorViewer);
 		int use(std::string FontFileName, int size);
+		bool isReady();
 		Texture renderText(Renderer rnd, std::string Text, RGBA fg);
 		Texture renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
 		Texture renderTextShaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
