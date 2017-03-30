@@ -1216,8 +1216,8 @@ namespace MiniEngine
                 return 40;
             case SDL_DROPCOMPLETE:
                 return 41;
-			#endif 
-			
+			#endif
+
             case SDL_AUDIODEVICEADDED:
                 return 42;
             case SDL_AUDIODEVICEREMOVED:
@@ -1412,9 +1412,14 @@ bool canexecute(std::string Path)
 /// File Functions will be implied in platform specific source file.
 #endif
 
+int _miniengine_argc;
+char** _miniengine_argv;
+
  /// Default Setup Code
 int main(int argc, char* argv[])
 {
+    _miniengine_argc=argc;
+    _miniengine_argv=argv;
 	MiniEngine::SDLSystem::Init();
 	int ret = AppMain();
 	MiniEngine::SDLSystem::Quit();

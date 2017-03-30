@@ -437,3 +437,7 @@ int AppMain();
 
 /// MiniEngine Provides main
 int main(int argc,char* argv[]);
+
+/// MiniEngine Provided API: Get Start Parameters
+int GetArgc();
+char** GetArgv();
