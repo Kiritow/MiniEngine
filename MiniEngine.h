@@ -356,55 +356,7 @@ namespace MiniEngine
 		void pause(ChannelID id);
 		void resume(ChannelID id);
 		int stop(ChannelID id);
-
-	private:
-
 	};
-
-	class Event
-	{
-	public:
-		int gettype();
-	protected:
-		Event() = default;
-		SDL_Event e;
-	private:
-		friend class EventEngine;
-	};
-
-	class MouseButtonEvent : public Event
-	{
-	public:
-		int getx();
-		int gety();
-		int getbutton();
-	};
-
-	class EventEngine
-	{
-	public:
-		Event poll(bool mustNew = false);
-		Event wait();
-		Event waitfor(int ms);
-	};
-
-	namespace EventHandle
-	{
-		using DispatcherType = std::function<void(SDL_Event e, int& running, int& update)>;
-		int RegistDispatcher(int EventType,DispatcherType func);
-		int UnregistDispatcher(int callbackid);
-
-		using UpdaterType = std::function<void(Renderer& rnd)>;
-		int RegistUpdater(UpdaterType func);
-		int UnregistUpdater(int callbackid);
-
-		void Dispatcher(SDL_Event e, int& running, int& update);
-
-		void Updater(Renderer& rnd);
-
-		void Loop(Renderer& rnd);
-
-	}/// End of namespace MiniEngine::EventHandle
 
 	class StringEngine
 	{
