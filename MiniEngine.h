@@ -282,6 +282,26 @@ namespace MiniEngine
 		};
 	};
 
+	class Timer
+	{
+    public:
+        Timer();
+        /// Uint32 func(Uint32,void*) ...
+        Timer(SDL_TimerCallback callback,Uint32 interval,void* param);
+        int enable();
+        int disable();
+        bool isenable();
+        void detach();
+        ~Timer();
+    private:
+        SDL_TimerCallback _callback;
+        Uint32 _interval;
+        void* _param;
+        SDL_TimerID id;
+        bool _enabled;
+        bool _detached;
+	};
+
 	class AudioPlayer
 	{
 	public:
@@ -331,7 +351,6 @@ namespace MiniEngine
 	private:
 		Music m;
 	};
-
 
 	class Sound
 	{

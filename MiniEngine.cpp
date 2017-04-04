@@ -803,6 +803,63 @@ namespace MiniEngine
 		SDL_StopTextInput();
 	}
 
+    Timer::Timer()
+    {
+        _enabled=false;
+        _detached=false;
+        id=-1;
+    }
+
+    Timer::Timer(SDL_TimerCallback callback,Uint32 interval,void* param) : Timer()
+    {
+        _callback=callback;
+        _interval=interval;
+        _param=param;
+    }
+
+    int Timer::enable()
+    {
+        if(_enabled)
+        {
+            return -1;
+        }
+        else
+        {
+            id=SDL_AddTimer(_interval,_callback,_param);
+            if(id<0) return -2;
+            _enabled=true;
+            return 0;
+        }
+    }
+
+    int Timer::disable()
+    {
+        if(_enabled)
+        {
+            SDL_RemoveTimer(id);
+            _enabled=false;
+            id=-1;
+            return 0;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    void Timer::detach()
+    {
+        _detached=true;
+    }
+
+    Timer::~Timer()
+    {
+        if(!_detached)
+        {
+            disable();
+        }
+    }
+
 	AudioPlayer::AudioPlayer()
 	{
 		if (!_sysAudioCounter)
