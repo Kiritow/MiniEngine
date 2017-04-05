@@ -124,10 +124,10 @@ namespace MiniEngine
 
 	enum class RendererType
 	{
-		Software = SDL_RENDERER_SOFTWARE,
-		Accelerated = SDL_RENDERER_ACCELERATED,
-		PresentSync = SDL_RENDERER_PRESENTVSYNC,
-		TargetTexture = SDL_RENDERER_TARGETTEXTURE
+		Software,
+		Accelerated,
+		PresentSync,
+		TargetTexture
 	};
 
 	enum class FlipMode { None, Horizontal, Vertical };
@@ -178,7 +178,20 @@ namespace MiniEngine
 		Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw(ErrorViewer);
 		Renderer getRenderer() const;
 
-		void setRenderer(std::initializer_list<RendererType> RendererFlags);
+		template<typename... Args>
+		void setRenderer(RendererType Type,Args&&... args)
+		{
+            _internal_rndflagcalc=0;
+            _setRenderer(Type,std::forward(args...));
+		}
+
+		void setRenderer(RendererType Type)
+		{
+		    _internal_rndflagcalc=0;
+            _setRenderer(Type);
+		}
+
+		void setRenderer(std::initializer_list<RendererType>);
 
 		Rect getSize();
 		void setSize(Rect sizeRect);
@@ -207,8 +220,23 @@ namespace MiniEngine
 
 
 		_DECL_DEPRECATED Surface getSurface();
+    protected:
+        template<typename... Args>
+        void _setRenderer(RendererType Type,Args&&... args)
+        {
+            _internal_rndflagcalc|=_render_caster(Type);
+            _setRenderer(args...);
+        }
+
+        void _setRenderer(RendererType Type)
+        {
+            _internal_rndflagcalc|=_render_caster(Type);
+            _setRenderer_Real(_internal_rndflagcalc);
+        }
 	private:
 		void _setRenderer_Real(Uint32 flags);
+		Uint32 _internal_rndflagcalc;
+		Uint32 _render_caster(RendererType);
 		std::shared_ptr<SDL_Window> wnd;
 		Renderer winrnd;
 	};

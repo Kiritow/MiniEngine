@@ -435,10 +435,10 @@ namespace MiniEngine
 
 	void Window::setRenderer(std::initializer_list<RendererType> RendererFlags)
 	{
-		int flag = 0;
+		Uint32 flag = 0;
 		for (auto v : RendererFlags)
 		{
-			flag |= static_cast<int>(v);
+			flag |= _render_caster(v);
 		}
 		_setRenderer_Real(flag);
 	}
@@ -531,6 +531,24 @@ namespace MiniEngine
 		/// Don't Free This Surface
 		s.surf.reset(temp, [](SDL_Surface*) {});
 		return s;
+	}
+
+	Uint32 Window::_render_caster(RendererType Type)
+	{
+	    switch(Type)
+	    {
+        case RendererType::Accelerated:
+            return SDL_RENDERER_ACCELERATED;
+        case RendererType::PresentSync:
+            return SDL_RENDERER_PRESENTVSYNC;
+        case RendererType::Software:
+            return SDL_RENDERER_SOFTWARE;
+        case RendererType::TargetTexture:
+            return SDL_RENDERER_TARGETTEXTURE;
+	    }
+
+	    /// If an error occurs, return 0 by default.
+	    return 0;
 	}
 
 	void Window::_setRenderer_Real(Uint32 flags)
