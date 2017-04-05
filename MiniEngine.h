@@ -216,10 +216,27 @@ namespace MiniEngine
 	class Font
 	{
 	public:
+	    enum class Style { Normal, Bold, Italic, UnderLine, StrikeThrough };
+
 		Font() = default;
 		Font(std::string FontFileName, int size) throw(ErrorViewer);
 		int use(std::string FontFileName, int size);
 		bool isReady();
+
+		template<typename... Args>
+		void setFontStyle(Style style,Args&&... args)
+		{
+            _internal_fontcalc=0;
+            _setFontStyle(style,std::forward(args...));
+		}
+
+		void setFontStyle(Style style)
+		{
+            _real_setFontStyle(_style_caster(style));
+		}
+
+		std::tuple<Style> getFontStyles();
+
 		Texture renderText(Renderer rnd, std::string Text, RGBA fg);
 		Texture renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
 		Texture renderTextShaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
@@ -229,7 +246,23 @@ namespace MiniEngine
 		Texture renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
 		Texture renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
 		Texture renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg);
+    protected:
+		template<typename... Args>
+        void _setFontStyle(Style style,Args&&... args)
+        {
+            _internal_fontcalc|=_style_caster(style);
+            _setFontStyle(args...);
+        }
+
+        void _setFontStyle(Style style)
+        {
+            _internal_fontcalc|=_style_caster(style);
+            _real_setFontStyle(_internal_fontcalc);
+        }
 	private:
+	    void _real_setFontStyle(int);
+	    int _style_caster(Style);
+        int _internal_fontcalc;
 		std::shared_ptr<TTF_Font> font;
 	};
 

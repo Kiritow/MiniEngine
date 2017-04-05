@@ -579,6 +579,31 @@ namespace MiniEngine
 		return (font.get() != nullptr);
 	}
 
+    void Font::_real_setFontStyle(int Style)
+    {
+        TTF_SetFontStyle(font.get(),Style);
+    }
+
+    int Font::_style_caster(Style style)
+    {
+        switch(style)
+        {
+        case Style::Bold:
+            return TTF_STYLE_BOLD;
+        case Style::Italic:
+            return TTF_STYLE_ITALIC;
+        case Style::Normal:
+            return TTF_STYLE_NORMAL;
+        case Style::StrikeThrough:
+            return TTF_STYLE_STRIKETHROUGH;
+        case Style::UnderLine:
+            return TTF_STYLE_UNDERLINE;
+        }
+
+        /// If an error occurs, return 0 instead of -1.
+        return 0;
+    }
+
 	Texture Font::renderText(Renderer rnd, std::string Text, RGBA fg)
 	{
 		Surface surf;
