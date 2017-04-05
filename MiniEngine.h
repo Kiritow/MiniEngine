@@ -135,6 +135,7 @@ namespace MiniEngine
 	class Renderer
 	{
 	public:
+	    Renderer() = default;
 		int setColor(RGBA pack);
 		RGBA getColor();
 		int setBlendMode(BlendMode mode);
@@ -163,7 +164,6 @@ namespace MiniEngine
 		Texture loadTexture(std::string FileName) throw(ErrorViewer);
 		Texture createTexture(int Width, int Height) throw(ErrorViewer);
 
-		Renderer() = default;
 		bool isReady();
 	private:
 		std::shared_ptr<SDL_Renderer> rnd;
@@ -178,17 +178,17 @@ namespace MiniEngine
 		Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw(ErrorViewer);
 		Renderer getRenderer() const;
 
-		template<typename... Args>
-		void setRenderer(RendererType Type,Args&&... args)
-		{
-            _internal_rndflagcalc=0;
-            _setRenderer(Type,std::forward(args...));
-		}
-
 		void setRenderer(RendererType Type)
 		{
 		    _internal_rndflagcalc=0;
             _setRenderer(Type);
+		}
+
+		template<typename... Args>
+		void setRenderer(RendererType Type,Args&&... args)
+		{
+            _internal_rndflagcalc=0;
+            _setRenderer(Type,std::forward<RendererType>(args...));
 		}
 
 		void setRenderer(std::initializer_list<RendererType>);
