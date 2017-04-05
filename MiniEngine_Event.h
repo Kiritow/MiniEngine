@@ -16,11 +16,13 @@ public:
     void update(const EventBase&);
 };
 
+enum class MouseButton { Left, Middle, Right, X1, X2 };
+
 class MouseButtonEvent : public EventBase
 {
 public:
     int x,y;
-    int button;
+    MouseButton button;
     void update(const EventBase&);
 };
 
@@ -31,4 +33,5 @@ public:
 protected:
     virtual bool onMouseDown(const MouseButtonEvent&);
     virtual bool onMouseUp(const MouseButtonEvent&);
+    virtual bool onMouseMotion(const MouseMotionEvent&);
 };
