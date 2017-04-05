@@ -166,7 +166,7 @@ namespace MiniEngine
 
 		bool isReady();
 	private:
-		std::shared_ptr<SDL_Renderer> rnd;
+		std::weak_ptr<SDL_Renderer> rnd;
 		friend class Window;
 	};
 
@@ -238,6 +238,7 @@ namespace MiniEngine
 		Uint32 _internal_rndflagcalc;
 		Uint32 _render_caster(RendererType);
 		std::shared_ptr<SDL_Window> wnd;
+		std::shared_ptr<SDL_Renderer> rnd;
 		Renderer winrnd;
 	};
 
