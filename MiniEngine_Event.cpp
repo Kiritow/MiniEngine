@@ -24,6 +24,11 @@ namespace _MiniEngine_Internal
     }
 }/// End of namespace _MiniEngine_Internal
 
+EventBase::EventBase(SDL_Event Event)
+{
+    e=Event;
+}
+
 void EventBase::update(const EventBase& ev)
 {
     e=ev.e;

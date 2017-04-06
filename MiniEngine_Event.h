@@ -3,6 +3,9 @@
 
 class EventBase
 {
+public:
+    EventBase()=default;
+    EventBase(SDL_Event);
 protected:
     SDL_Event e;
     virtual void update(const EventBase&);
