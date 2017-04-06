@@ -222,77 +222,77 @@ namespace MiniEngine
 
 	int Renderer::setColor(RGBA pack)
 	{
-		return SDL_SetRenderDrawColor(rnd.get(), pack.r, pack.g, pack.b, pack.a);
+		return SDL_SetRenderDrawColor(rnd.lock().get(), pack.r, pack.g, pack.b, pack.a);
 	}
 
 	RGBA Renderer::getColor()
 	{
 		Uint8 r, g, b, a;
-		SDL_GetRenderDrawColor(rnd.get(), &r, &g, &b, &a);
+		SDL_GetRenderDrawColor(rnd.lock().get(), &r, &g, &b, &a);
 		RGBA pack(r, g, b, a);
 		return pack;
 	}
 
 	int Renderer::setBlendMode(BlendMode mode)
 	{
-		return SDL_SetRenderDrawBlendMode(rnd.get(), static_cast<SDL_BlendMode>(mode));
+		return SDL_SetRenderDrawBlendMode(rnd.lock().get(), static_cast<SDL_BlendMode>(mode));
 	}
 
 	BlendMode Renderer::getBlendMode()
 	{
 		SDL_BlendMode temp;
-		SDL_GetRenderDrawBlendMode(rnd.get(), &temp);
+		SDL_GetRenderDrawBlendMode(rnd.lock().get(), &temp);
 		return static_cast<BlendMode>(temp);
 	}
 
 	int Renderer::setTarget(Texture & t)
 	{
-		return SDL_SetRenderTarget(rnd.get(), t.text.get());
+		return SDL_SetRenderTarget(rnd.lock().get(), t.text.get());
 	}
 
 	int Renderer::setTarget()
 	{
-		return SDL_SetRenderTarget(rnd.get(), nullptr);
+		return SDL_SetRenderTarget(rnd.lock().get(), nullptr);
 	}
 
 	int Renderer::fillRect(Rect rect)
 	{
 		auto inr = rect.toSDLRect();
-		return SDL_RenderFillRect(rnd.get(), &inr);
+		return SDL_RenderFillRect(rnd.lock().get(), &inr);
 	}
 
 	int Renderer::drawRect(Rect rect)
 	{
 		auto inr = rect.toSDLRect();
-		return SDL_RenderDrawRect(rnd.get(), &inr);
+		return SDL_RenderDrawRect(rnd.lock().get(), &inr);
 	}
 
 	int Renderer::drawPoint(Point p)
 	{
-        return SDL_RenderDrawPoint(rnd.get(),p.x,p.y);
+        return SDL_RenderDrawPoint(rnd.lock().get(),p.x,p.y);
 	}
 
 	int Renderer::clear()
 	{
-		return SDL_RenderClear(rnd.get());
+		return SDL_RenderClear(rnd.lock().get());
 	}
 
 	void Renderer::update()
 	{
-		SDL_RenderPresent(rnd.get());
+		SDL_RenderPresent(rnd.lock().get());
 	}
 
 	int Renderer::copy(Texture t, Rect src, Rect dst)
 	{
 		SDL_Rect s = src.toSDLRect();
 		SDL_Rect d = dst.toSDLRect();
-		return SDL_RenderCopy(rnd.get(), t.text.get(), &s, &d);
+		return SDL_RenderCopy(rnd.lock().get(), t.text.get(), &s, &d);
 	}
 
 	int Renderer::copyTo(Texture t, Rect dst)
 	{
 		SDL_Rect d = dst.toSDLRect();
-		return SDL_RenderCopy(rnd.get(), t.text.get(), NULL, &d);
+		return SDL_RenderCopy(rnd.lock().get(), t.text.get(), NULL, &d);
 	}
 
 	int Renderer::copyTo(Texture t, Point lupoint)
@@ -303,12 +303,12 @@ namespace MiniEngine
 	int Renderer::copyFill(Texture t, Rect src)
 	{
 		SDL_Rect s = src.toSDLRect();
-		return SDL_RenderCopy(rnd.get(), t.text.get(), &s, NULL);
+		return SDL_RenderCopy(rnd.lock().get(), t.text.get(), &s, NULL);
 	}
 
 	int Renderer::copyFullFill(Texture t)
 	{
-		return SDL_RenderCopy(rnd.get(), t.text.get(), NULL, NULL);
+		return SDL_RenderCopy(rnd.lock().get(), t.text.get(), NULL, NULL);
 	}
 
 	int Renderer::supercopy(Texture t,bool srcfull,Rect src,bool dstfull,Rect dst,double angle,bool haspoint,Point center,FlipMode mode)
@@ -348,7 +348,7 @@ namespace MiniEngine
             break;
         }
 
-        return SDL_RenderCopyEx(rnd.get(),t.text.get(),pR1,pR2,angle,pPoint,flip);
+        return SDL_RenderCopyEx(rnd.lock().get(),t.text.get(),pR1,pR2,angle,pPoint,flip);
 	}
 
 	Surface Renderer::loadSurface(std::string FileName) throw(ErrorViewer)
@@ -368,7 +368,7 @@ namespace MiniEngine
 	Texture Renderer::render(Surface surf) throw(ErrorViewer)
 	{
 		Texture t;
-		SDL_Texture* temp = SDL_CreateTextureFromSurface(rnd.get(), surf.surf.get());
+		SDL_Texture* temp = SDL_CreateTextureFromSurface(rnd.lock().get(), surf.surf.get());
 		if (temp == nullptr)
 		{
 			ErrorViewer e;
@@ -383,7 +383,7 @@ namespace MiniEngine
 	Texture Renderer::loadTexture(std::string FileName) throw(ErrorViewer)
 	{
 		Texture t;
-		SDL_Texture* temp = IMG_LoadTexture(rnd.get(), FileName.c_str());
+		SDL_Texture* temp = IMG_LoadTexture(rnd.lock().get(), FileName.c_str());
 		if (temp == nullptr)
 		{
 			ErrorViewer e;
@@ -397,7 +397,7 @@ namespace MiniEngine
 
 	Texture Renderer::createTexture(int Width, int Height) throw(ErrorViewer)
 	{
-		SDL_Texture* temp = SDL_CreateTexture(rnd.get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, Width, Height);
+		SDL_Texture* temp = SDL_CreateTexture(rnd.lock().get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, Width, Height);
 		if (temp == NULL)
 		{
 			ErrorViewer e;
@@ -412,7 +412,7 @@ namespace MiniEngine
 
 	bool Renderer::isReady()
 	{
-		return (rnd.get() != nullptr);
+		return !rnd.expired();
 	}
 
 	Window::Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags) throw(ErrorViewer)
@@ -435,10 +435,10 @@ namespace MiniEngine
 
 	void Window::setRenderer(std::initializer_list<RendererType> RendererFlags)
 	{
-		int flag = 0;
+		Uint32 flag = 0;
 		for (auto v : RendererFlags)
 		{
-			flag |= static_cast<int>(v);
+			flag |= _render_caster(v);
 		}
 		_setRenderer_Real(flag);
 	}
@@ -533,9 +533,28 @@ namespace MiniEngine
 		return s;
 	}
 
+	Uint32 Window::_render_caster(RendererType Type)
+	{
+	    switch(Type)
+	    {
+        case RendererType::Accelerated:
+            return SDL_RENDERER_ACCELERATED;
+        case RendererType::PresentSync:
+            return SDL_RENDERER_PRESENTVSYNC;
+        case RendererType::Software:
+            return SDL_RENDERER_SOFTWARE;
+        case RendererType::TargetTexture:
+            return SDL_RENDERER_TARGETTEXTURE;
+	    }
+
+	    /// If an error occurs, return 0 by default.
+	    return 0;
+	}
+
 	void Window::_setRenderer_Real(Uint32 flags)
 	{
-		winrnd.rnd.reset(SDL_CreateRenderer(wnd.get(), -1, flags), SDL_DestroyRenderer);
+	    rnd.reset(SDL_CreateRenderer(wnd.get(), -1, flags), SDL_DestroyRenderer);
+	    winrnd.rnd=rnd;
 	}
 
 	int Window::showSimpleMessageBox(MessageBoxType type,std::string Title,std::string Message)
@@ -578,6 +597,31 @@ namespace MiniEngine
 	{
 		return (font.get() != nullptr);
 	}
+
+    void Font::_real_setFontStyle(int Style)
+    {
+        TTF_SetFontStyle(font.get(),Style);
+    }
+
+    int Font::_style_caster(Style style)
+    {
+        switch(style)
+        {
+        case Style::Bold:
+            return TTF_STYLE_BOLD;
+        case Style::Italic:
+            return TTF_STYLE_ITALIC;
+        case Style::Normal:
+            return TTF_STYLE_NORMAL;
+        case Style::StrikeThrough:
+            return TTF_STYLE_STRIKETHROUGH;
+        case Style::UnderLine:
+            return TTF_STYLE_UNDERLINE;
+        }
+
+        /// If an error occurs, return 0 instead of -1.
+        return 0;
+    }
 
 	Texture Font::renderText(Renderer rnd, std::string Text, RGBA fg)
 	{

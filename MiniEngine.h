@@ -124,10 +124,10 @@ namespace MiniEngine
 
 	enum class RendererType
 	{
-		Software = SDL_RENDERER_SOFTWARE,
-		Accelerated = SDL_RENDERER_ACCELERATED,
-		PresentSync = SDL_RENDERER_PRESENTVSYNC,
-		TargetTexture = SDL_RENDERER_TARGETTEXTURE
+		Software,
+		Accelerated,
+		PresentSync,
+		TargetTexture
 	};
 
 	enum class FlipMode { None, Horizontal, Vertical };
@@ -135,6 +135,7 @@ namespace MiniEngine
 	class Renderer
 	{
 	public:
+	    Renderer() = default;
 		int setColor(RGBA pack);
 		RGBA getColor();
 		int setBlendMode(BlendMode mode);
@@ -163,10 +164,9 @@ namespace MiniEngine
 		Texture loadTexture(std::string FileName) throw(ErrorViewer);
 		Texture createTexture(int Width, int Height) throw(ErrorViewer);
 
-		Renderer() = default;
 		bool isReady();
 	private:
-		std::shared_ptr<SDL_Renderer> rnd;
+		std::weak_ptr<SDL_Renderer> rnd;
 		friend class Window;
 	};
 
@@ -178,7 +178,20 @@ namespace MiniEngine
 		Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw(ErrorViewer);
 		Renderer getRenderer() const;
 
-		void setRenderer(std::initializer_list<RendererType> RendererFlags);
+		void setRenderer(RendererType Type)
+		{
+		    _internal_rndflagcalc=0;
+            _setRenderer(Type);
+		}
+
+		template<typename... Args>
+		void setRenderer(RendererType Type,Args&&... args)
+		{
+            _internal_rndflagcalc=0;
+            _setRenderer(Type,std::forward<RendererType>(args...));
+		}
+
+		void setRenderer(std::initializer_list<RendererType>);
 
 		Rect getSize();
 		void setSize(Rect sizeRect);
@@ -207,19 +220,52 @@ namespace MiniEngine
 
 
 		_DECL_DEPRECATED Surface getSurface();
+    protected:
+        template<typename... Args>
+        void _setRenderer(RendererType Type,Args&&... args)
+        {
+            _internal_rndflagcalc|=_render_caster(Type);
+            _setRenderer(args...);
+        }
+
+        void _setRenderer(RendererType Type)
+        {
+            _internal_rndflagcalc|=_render_caster(Type);
+            _setRenderer_Real(_internal_rndflagcalc);
+        }
 	private:
 		void _setRenderer_Real(Uint32 flags);
+		Uint32 _internal_rndflagcalc;
+		Uint32 _render_caster(RendererType);
 		std::shared_ptr<SDL_Window> wnd;
+		std::shared_ptr<SDL_Renderer> rnd;
 		Renderer winrnd;
 	};
 
 	class Font
 	{
 	public:
+	    enum class Style { Normal, Bold, Italic, UnderLine, StrikeThrough };
+
 		Font() = default;
 		Font(std::string FontFileName, int size) throw(ErrorViewer);
 		int use(std::string FontFileName, int size);
 		bool isReady();
+
+		template<typename... Args>
+		void setFontStyle(Style style,Args&&... args)
+		{
+            _internal_fontcalc=0;
+            _setFontStyle(style,std::forward(args...));
+		}
+
+		void setFontStyle(Style style)
+		{
+            _real_setFontStyle(_style_caster(style));
+		}
+
+		std::tuple<Style> getFontStyles();
+
 		Texture renderText(Renderer rnd, std::string Text, RGBA fg);
 		Texture renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
 		Texture renderTextShaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
@@ -229,7 +275,23 @@ namespace MiniEngine
 		Texture renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
 		Texture renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
 		Texture renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg);
+    protected:
+		template<typename... Args>
+        void _setFontStyle(Style style,Args&&... args)
+        {
+            _internal_fontcalc|=_style_caster(style);
+            _setFontStyle(args...);
+        }
+
+        void _setFontStyle(Style style)
+        {
+            _internal_fontcalc|=_style_caster(style);
+            _real_setFontStyle(_internal_fontcalc);
+        }
 	private:
+	    void _real_setFontStyle(int);
+	    int _style_caster(Style);
+        int _internal_fontcalc;
 		std::shared_ptr<TTF_Font> font;
 	};
 
