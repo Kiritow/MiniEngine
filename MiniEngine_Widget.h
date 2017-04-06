@@ -1,7 +1,6 @@
 #pragma once
 #include "MiniEngine.h"
-#include <functional>
-#include <vector>
+#include "MiniEngine_Event.h"
 
 namespace MiniEngine
 {
@@ -27,7 +26,6 @@ private:
     friend class Board;
 };
 
-
 class Drawable
 {
 public:
@@ -35,51 +33,19 @@ public:
     virtual ~Drawable()=default;
 };
 
-class Interactive
+class ButtonBase : public Drawable, public EventHandlerBase
 {
-public:
-    virtual int handle(SDL_Event e,int& running,int& update)=0;
-};
+protected:
+    bool onClick();
+    bool onMouseOver();
+    bool onMouseOut();
 
-class ButtonBase : public Drawable, public Interactive
-{
-public:
-    ButtonBase();
-    void setTextureNormal(Texture Normal);
-    void setTextureMouseover(Texture Mouseover);
-    void setTextureClicked(Texture Clicked);
-    void setRect(Rect SensorArea);
-    virtual void draw(Brush& brush);
-    virtual int handle(SDL_Event e,int& running,int& update);
-
-    std::function<void()> onmouseover,onclicked,onrelease,onmouseout;
+    /// Overrides
+    bool onMouseDown();
+    bool onMouseUp();
+    bool onMouseMotion();
 private:
-    int status;
-    Texture t1,t2,t3;
-    Rect rect;
-};
-
-class Board
-{
-public:
-    Board(Renderer Rnd,Rect Area);
-    Brush getBrush();
-    Rect getArea();
-
-    class _Control
-    {
-    public:
-        void add(Interactive* widget);
-        Interactive* at(int index);
-        int size();
-        bool remove(Interactive* widget);
-    private:
-        std::vector<Interactive*> vec;
-    }Control;
-
-private:
-    Rect area;
-    Brush brush;
+    bool status;
 };
 
 }/// End of namespace MiniEngine::Widget
