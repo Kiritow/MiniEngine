@@ -25,6 +25,14 @@ namespace MiniEngine
 		h = H;
 	}
 
+	Rect::Rect(SDL_Rect rect)
+	{
+        x=rect.x;
+        y=rect.y;
+        w=rect.w;
+        h=rect.h;
+	}
+
 	Rect::Rect()
 	{
 		x = y = w = h = 0;
@@ -272,6 +280,11 @@ namespace MiniEngine
         return SDL_RenderDrawPoint(rnd.lock().get(),p.x,p.y);
 	}
 
+	int Renderer::drawLine(Point a,Point b)
+	{
+        return SDL_RenderDrawLine(rnd.lock().get(),a.x,a.y,b.x,b.y);
+	}
+
 	int Renderer::clear()
 	{
 		return SDL_RenderClear(rnd.lock().get());
@@ -409,6 +422,47 @@ namespace MiniEngine
 		t.updateInfo();
 		return t;
 	}
+
+	int Renderer::setViewport(Rect viewPort)
+	{
+	    SDL_Rect rect=viewPort.toSDLRect();
+	    return SDL_RenderSetViewport(rnd.lock().get(),&rect);
+	}
+
+	int Renderer::setViewport()
+	{
+        return SDL_RenderSetViewport(rnd.lock().get(),NULL);
+	}
+
+	Rect Renderer::getViewport()
+	{
+	    SDL_Rect rect;
+        SDL_RenderGetViewport(rnd.lock().get(),&rect);
+        return Rect(rect);
+	}
+
+	int Renderer::setClipRect(Rect cliparea)
+	{
+        SDL_Rect rect=cliparea.toSDLRect();
+        return SDL_RenderSetClipRect(rnd.lock().get(),&rect);
+	}
+
+	Rect Renderer::getClipRect()
+	{
+	    SDL_Rect rect;
+	    SDL_RenderGetClipRect(rnd.lock().get(),&rect);
+	    return Rect(rect);
+	}
+
+    bool Renderer::isClipEnabled()
+    {
+        return SDL_RenderIsClipEnabled(rnd.lock().get())==SDL_TRUE;
+    }
+
+    void Renderer::disableClip()
+    {
+        SDL_RenderSetClipRect(rnd.lock().get(),NULL);
+    }
 
 	bool Renderer::isReady()
 	{
