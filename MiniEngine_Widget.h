@@ -15,7 +15,7 @@ class PosInfo
 public:
     double x,y;
     double w,h;
-    Rect getRect(Rect SizeRect);
+    Rect getRect(Rect Area);
 };
 
 class PointInfo
@@ -38,9 +38,9 @@ public:
     int copyFill(Texture t,Rect src);
     int copyFullFill(Texture t);
     Rect getArea();
+    void setArea(Rect Area);
 protected:
     Brush(Renderer Rnd);
-    void setArea(Rect Area);
 private:
     Rect area;
     friend class Frame;
@@ -70,36 +70,49 @@ private:
     Brush brush;
 };
 
-class Board : public BoardBase
-{
-public:
-    void add(BoardBase*);
-    int remove(BoardBase*);
-    virtual void draw(const Brush&);
-    virtual bool event(const EventBase& ev) override;
-    Frame* getFrame();
-    PosInfo getPosInfo();
-private:
-    std::list<BoardBase*> _lst;
-    PosInfo info;
-};
-
 class WidgetBase : public BoardBase
 {
 public:
     Board* getBoard();
-protected:
     PosInfo info;
+private:
+    Board* _parent;
+    friend class Board;
 };
+
+class Board : public BoardBase
+{
+public:
+    void add(Board*);
+    void add(WidgetBase*);
+    int remove(Board*);
+    int remove(WidgetBase*);
+    virtual void draw(const Brush&);
+    virtual bool event(const EventBase& ev) override;
+    Board* getParent();
+    Frame* getFrame();
+    PosInfo getPosInfo();
+private:
+    std::list<Board*> _blst;
+    std::list<WidgetBase*> _wlst;
+    PosInfo info;
+    Board* _parent;
+    Frame* _frame;
+    friend class Frame;
+};
+
+
 
 class ButtonBase : public WidgetBase
 {
 protected:
-    bool onClick();
-    bool onMouseOver();
-    bool onMouseOut();
+    ButtonBase();
+    void onPressed();
+    void onClick();
+    void onMouseOver();
+    void onMouseOut();
 private:
-    /// Overrides
+    /// Overrides, called by EventHandler::event()
     virtual bool onMouseDown(const MouseButtonEvent&) override;
     virtual bool onMouseUp(const MouseButtonEvent&) override;
     virtual bool onMouseMotion(const MouseMotionEvent&) override;
@@ -116,6 +129,20 @@ public:
 private:
     std::string _word;
     Texture _text;
+};
+
+class ColorButton : public ButtonBase
+{
+public:
+    RGBA normal,active,clicked;
+    virtual void draw(const Brush&) override;
+protected:
+    void onPressed();
+    void onClick();
+    void onMouseOver();
+    void onMouseOut();
+private:
+    int _colorstatus;
 };
 
 }/// End of namespace MiniEngine::Widget

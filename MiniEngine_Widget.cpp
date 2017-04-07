@@ -6,14 +6,15 @@ namespace MiniEngine
 namespace Widget
 {
 
-Rect PosInfo::getRect(Rect SizeRect)
+Rect PosInfo::getRect(Rect Area)
 {
-    SizeRect.x*=x;
-    SizeRect.y*=y;
-    SizeRect.w*=w;
-    SizeRect.h*=h;
-    return SizeRect;
+    Area.x*=x;
+    Area.y*=y;
+    Area.w*=w;
+    Area.h*=h;
+    return Area;
 }
+
 
 void Brush::setArea(Rect Area)
 {
@@ -135,11 +136,13 @@ Frame::Frame(Renderer rnd,Rect Area) : brush(rnd)
 void Frame::add(Board* p)
 {
     _lst.push_back(p);
+    p->_frame=this;
 }
 
 int Frame::remove(Board* p)
 {
     _lst.remove(p);
+    p->_frame=nullptr;
     return 0;
 }
 
@@ -206,14 +209,29 @@ void Frame::needUpdate()
 
 
 
-void Board::add(BoardBase* p)
+void Board::add(Board* p)
 {
-    _lst.push_back(p);
+    _blst.push_back(p);
+    p->_parent=this;
 }
 
-int Board::remove(BoardBase* p)
+int Board::remove(Board* p)
 {
-    _lst.remove(p);
+    _blst.remove(p);
+    p->_parent=nullptr;
+    return 0;
+}
+
+void Board::add(WidgetBase* p)
+{
+    _wlst.push_back(p);
+    p->_parent=this;
+}
+
+int Board::remove(WidgetBase* p)
+{
+    _wlst.remove(p);
+    p->_parent=nullptr;
     return 0;
 }
 
@@ -225,34 +243,62 @@ PosInfo Board::getPosInfo()
 void Board::draw(const Brush& b)
 {
     /// FIXME: Bug Found while trying to draw a Board in Board.
-    for(auto& p:_lst)
+    for(auto& p:_wlst)
     {
         p->draw(b);
+    }
+
+    Brush nb=b;
+    nb.setArea(info.getRect(nb.getArea()));
+    for(auto& p:_blst)
+    {
+        p->draw(nb);
     }
 }
 
 bool Board::event(const EventBase& ev) /// virtual override
 {
+    for(auto& p:_wlst)
+    {
+        if(p->event(ev)) return true;
+    }
+
+    for(auto& p:_blst)
+    {
+        if(p->event(ev)) return true;
+    }
+
     return false;
 }
 
-bool ButtonBase::onClick()
+ButtonBase::ButtonBase()
 {
-    return false;
+    _status=0;
 }
 
-bool ButtonBase::onMouseOver()
+void ButtonBase::onPressed()
 {
-    return false;
+
 }
 
-bool ButtonBase::onMouseOut()
+void ButtonBase::onClick()
 {
-    return false;
+
+}
+
+void ButtonBase::onMouseOver()
+{
+
+}
+
+void ButtonBase::onMouseOut()
+{
+
 }
 
 bool ButtonBase::onMouseDown(const MouseButtonEvent& ev)
 {
+
     return false;
 }
 
@@ -280,7 +326,22 @@ std::string TextButton::getText()
 
 void TextButton::draw(const Brush&)
 {
+    /// FIXME: Unfinished TextButton::draw() due to Font loading in Frame.
     printf("TextButton::draw()\n");
+}
+
+void ColorButton::draw(const Brush& b)
+{
+    switch(_colorstatus)
+    {
+    case 0:/// Normal
+        /// How to fill rect with PosInfo and Brush...
+        break;
+    case 1:/// Active (MouseOver)
+        break;
+    case 2:/// Pressed Down (MouseUp)
+        break;
+    }
 }
 
 
