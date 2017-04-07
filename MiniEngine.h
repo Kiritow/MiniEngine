@@ -20,6 +20,7 @@ namespace MiniEngine
 	public:
 		int x, y, w, h;
 		Rect(int X, int Y, int W, int H);
+		Rect(SDL_Rect);
 		Rect();
 		SDL_Rect toSDLRect();
 	};
@@ -147,6 +148,7 @@ namespace MiniEngine
 		int fillRect(Rect rect);
 		int drawRect(Rect rect);
 		int drawPoint(Point p);
+		int drawLine(Point a,Point b);
 
 		int clear();
 		void update();
@@ -163,6 +165,15 @@ namespace MiniEngine
 		Texture render(Surface surf) throw (ErrorViewer);
 		Texture loadTexture(std::string FileName) throw(ErrorViewer);
 		Texture createTexture(int Width, int Height) throw(ErrorViewer);
+
+		int setViewport(Rect viewport);
+		int setViewport();
+		Rect getViewport();
+
+		int setClipRect(Rect cliprect);
+		Rect getClipRect();
+		bool isClipEnabled();
+		void disableClip();
 
 		bool isReady();
 	private:
