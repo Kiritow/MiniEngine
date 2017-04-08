@@ -454,11 +454,6 @@ namespace MiniEngine
 	    return Rect(rect);
 	}
 
-    bool Renderer::isClipEnabled()
-    {
-        return SDL_RenderIsClipEnabled(rnd.lock().get())==SDL_TRUE;
-    }
-
     void Renderer::disableClip()
     {
         SDL_RenderSetClipRect(rnd.lock().get(),NULL);
