@@ -1,9 +1,20 @@
 #pragma once
+
+#ifdef _MSC_VER
+/// Visual Studio (VC++ Compiler)
+#include <SDL.h>
+#undef main
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
+#else
+/// CodeBlocks (MinGW Compiler)
 #include <SDL2/SDL.h>
 #undef main
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
+#endif
 
 #include <string>
 #include <memory>
