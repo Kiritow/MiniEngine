@@ -150,6 +150,11 @@ namespace MiniEngine
         op.reset(SDL_RWFromMem(mem,size),[](SDL_RWops* p){SDL_RWclose(p);});
     }
 
+    int Surface::savePNG(const std::string& filename)
+    {
+        return IMG_SavePNG(surf.get(),filename.c_str());
+    }
+
 	Texture::Texture()
 	{
         updateInfo();

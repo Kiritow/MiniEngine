@@ -85,7 +85,6 @@ namespace MiniEngine
         std::shared_ptr<SDL_RWops> op;
 	};
 
-
 	enum class BlendMode
 	{
 		None = SDL_BLENDMODE_NONE,
@@ -98,6 +97,7 @@ namespace MiniEngine
 	{
 	public:
 		~Surface() = default;
+        int savePNG(const std::string& filename);
 	protected:
 		Surface() = default;
 	private:
