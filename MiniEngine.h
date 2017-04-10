@@ -172,7 +172,7 @@ namespace MiniEngine
 
 		int setClipRect(Rect cliprect);
 		Rect getClipRect();
-		bool isClipEnabled();
+		//bool isClipEnabled();
 		void disableClip();
 
 		bool isReady();

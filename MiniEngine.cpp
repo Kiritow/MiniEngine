@@ -454,10 +454,12 @@ namespace MiniEngine
 	    return Rect(rect);
 	}
 
+	/*
     bool Renderer::isClipEnabled()
     {
         return SDL_RenderIsClipEnabled(rnd.lock().get())==SDL_TRUE;
     }
+    */
 
     void Renderer::disableClip()
     {
@@ -607,6 +609,7 @@ namespace MiniEngine
 
 	void Window::_setRenderer_Real(Uint32 flags)
 	{
+	    rnd.reset();
 	    rnd.reset(SDL_CreateRenderer(wnd.get(), -1, flags), SDL_DestroyRenderer);
 	    winrnd.rnd=rnd;
 	}
