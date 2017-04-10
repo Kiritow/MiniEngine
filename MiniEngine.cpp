@@ -129,6 +129,27 @@ namespace MiniEngine
 		return str.c_str();
 	}
 
+	RWOP::RWOP(FILE* fp,bool autoclose)
+	{
+	    SDL_bool b=autoclose?SDL_TRUE:SDL_FALSE;
+        op.reset(SDL_RWFromFP(fp,b),[](SDL_RWops* p){SDL_RWclose(p);});
+	}
+
+	RWOP::RWOP(const std::string& filename,const std::string& openmode)
+	{
+        op.reset(SDL_RWFromFile(filename.c_str(),openmode.c_str()),[](SDL_RWops* p){SDL_RWclose(p);});
+	}
+
+    RWOP::RWOP(const void* mem,int size)
+    {
+        op.reset(SDL_RWFromConstMem(mem,size),[](SDL_RWops* p){SDL_RWclose(p);});
+    }
+
+    RWOP::RWOP(void* mem,int size)
+    {
+        op.reset(SDL_RWFromMem(mem,size),[](SDL_RWops* p){SDL_RWclose(p);});
+    }
+
 	Texture::Texture()
 	{
         updateInfo();

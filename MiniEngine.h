@@ -72,6 +72,20 @@ namespace MiniEngine
 		std::string str;
 	};
 
+    class RWOP
+	{
+    public:
+        RWOP(FILE* fp,bool autoclose);
+        RWOP(const std::string& filename,const std::string& openmode);
+        RWOP(const void* mem,int size);
+        RWOP(void* mem,int size);
+        RWOP()=default;
+        ~RWOP()=default;
+    private:
+        std::shared_ptr<SDL_RWops> op;
+	};
+
+
 	enum class BlendMode
 	{
 		None = SDL_BLENDMODE_NONE,
