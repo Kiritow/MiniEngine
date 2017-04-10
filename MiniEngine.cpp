@@ -129,6 +129,32 @@ namespace MiniEngine
 		return str.c_str();
 	}
 
+	RWOP::RWOP(FILE* fp,bool autoclose)
+	{
+	    SDL_bool b=autoclose?SDL_TRUE:SDL_FALSE;
+        op.reset(SDL_RWFromFP(fp,b),[](SDL_RWops* p){SDL_RWclose(p);});
+	}
+
+	RWOP::RWOP(const std::string& filename,const std::string& openmode)
+	{
+        op.reset(SDL_RWFromFile(filename.c_str(),openmode.c_str()),[](SDL_RWops* p){SDL_RWclose(p);});
+	}
+
+    RWOP::RWOP(const void* mem,int size)
+    {
+        op.reset(SDL_RWFromConstMem(mem,size),[](SDL_RWops* p){SDL_RWclose(p);});
+    }
+
+    RWOP::RWOP(void* mem,int size)
+    {
+        op.reset(SDL_RWFromMem(mem,size),[](SDL_RWops* p){SDL_RWclose(p);});
+    }
+
+    int Surface::savePNG(const std::string& filename)
+    {
+        return IMG_SavePNG(surf.get(),filename.c_str());
+    }
+
 	Texture::Texture()
 	{
         updateInfo();
@@ -435,10 +461,10 @@ namespace MiniEngine
 
 	void Window::setRenderer(std::initializer_list<RendererType> RendererFlags)
 	{
-		int flag = 0;
+		Uint32 flag = 0;
 		for (auto v : RendererFlags)
 		{
-			flag |= static_cast<int>(v);
+			flag |= _render_caster(v);
 		}
 		_setRenderer_Real(flag);
 	}
@@ -533,6 +559,24 @@ namespace MiniEngine
 		return s;
 	}
 
+	Uint32 Window::_render_caster(RendererType Type)
+	{
+	    switch(Type)
+	    {
+        case RendererType::Accelerated:
+            return SDL_RENDERER_ACCELERATED;
+        case RendererType::PresentSync:
+            return SDL_RENDERER_PRESENTVSYNC;
+        case RendererType::Software:
+            return SDL_RENDERER_SOFTWARE;
+        case RendererType::TargetTexture:
+            return SDL_RENDERER_TARGETTEXTURE;
+	    }
+
+	    /// If an error occurs, return 0 by default.
+	    return 0;
+	}
+
 	void Window::_setRenderer_Real(Uint32 flags)
 	{
 		winrnd.rnd.reset(SDL_CreateRenderer(wnd.get(), -1, flags), SDL_DestroyRenderer);
@@ -578,6 +622,31 @@ namespace MiniEngine
 	{
 		return (font.get() != nullptr);
 	}
+
+    void Font::_real_setFontStyle(int Style)
+    {
+        TTF_SetFontStyle(font.get(),Style);
+    }
+
+    int Font::_style_caster(Style style)
+    {
+        switch(style)
+        {
+        case Style::Bold:
+            return TTF_STYLE_BOLD;
+        case Style::Italic:
+            return TTF_STYLE_ITALIC;
+        case Style::Normal:
+            return TTF_STYLE_NORMAL;
+        case Style::StrikeThrough:
+            return TTF_STYLE_STRIKETHROUGH;
+        case Style::UnderLine:
+            return TTF_STYLE_UNDERLINE;
+        }
+
+        /// If an error occurs, return 0 instead of -1.
+        return 0;
+    }
 
 	Texture Font::renderText(Renderer rnd, std::string Text, RGBA fg)
 	{
