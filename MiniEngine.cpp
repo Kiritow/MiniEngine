@@ -1346,3 +1346,13 @@ int main(int argc, char* argv[])
 	MiniEngine::SDLSystem::Quit();
 	return ret;
 }
+
+int GetArgc()
+{
+    return _miniengine_argc;
+}
+
+char** GetArgv()
+{
+    return _miniengine_argv;
+}
