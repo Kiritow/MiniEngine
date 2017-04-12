@@ -102,6 +102,8 @@ namespace MiniEngine
 	public:
 		~Surface() = default;
         int savePNG(const std::string& filename);
+        int getw();
+        int geth();
 	protected:
 		Surface() = default;
 	private:

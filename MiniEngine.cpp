@@ -187,6 +187,32 @@ namespace MiniEngine
         return _surf;
     }
 
+    int Surface::getw()
+    {
+        if(_get()!=nullptr)
+        {
+            return _get()->w;
+        }
+        else
+        {
+            /// return -1 on null surface pointer
+            return -1;
+        }
+    }
+
+    int Surface::geth()
+    {
+        if(_get()!=nullptr)
+        {
+            return _get()->h;
+        }
+        else
+        {
+            /// return -1 on null surface pointer
+            return -1;
+        }
+    }
+
     int Surface::savePNG(const std::string& filename)
     {
         return IMG_SavePNG(_get(),filename.c_str());
