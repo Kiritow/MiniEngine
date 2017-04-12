@@ -100,6 +100,12 @@ namespace MiniEngine
         int geth();
         BlendMode getBlendMode();
         int setBlendMode(BlendMode mode);
+
+        int blit(Surface s,Rect src,Rect dst);
+        int blitTo(Surface t, Rect dst);
+		int blitTo(Surface t, Point lupoint);
+		int blitFill(Surface t, Rect src);
+		int blitFullFill(Surface t);
 	protected:
 		Surface() = default;
 	private:

@@ -266,6 +266,35 @@ namespace MiniEngine
         return IMG_SavePNG(_get(),filename.c_str());
     }
 
+    int Surface::blit(Surface s,Rect src,Rect dst)
+    {
+        SDL_Rect rsrc=src.toSDLRect();
+        SDL_Rect rdst=dst.toSDLRect();
+        return SDL_BlitSurface(s._get(),&rsrc,_get(),&rdst);
+    }
+
+    int Surface::blitTo(Surface s,Rect dst)
+    {
+        SDL_Rect rdst=dst.toSDLRect();
+        return SDL_BlitSurface(s._get(),NULL,_get(),&rdst);
+    }
+
+    int Surface::blitTo(Surface s,Point lupoint)
+    {
+        return blitTo(s,Rect(lupoint.x,lupoint.y,s.getw(),s.geth()));
+    }
+
+    int Surface::blitFill(Surface s,Rect src)
+    {
+        SDL_Rect rsrc=src.toSDLRect();
+        return SDL_BlitSurface(s._get(),&rsrc,_get(),NULL);
+    }
+
+    int Surface::blitFullFill(Surface s)
+    {
+        return SDL_BlitSurface(s._get(),NULL,_get(),NULL);
+    }
+
     void Texture::_set(SDL_Texture* p)//private
     {
         _text.reset(p,SDL_DestroyTexture);
