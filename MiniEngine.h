@@ -82,7 +82,11 @@ namespace MiniEngine
         RWOP()=default;
         ~RWOP()=default;
     private:
-        std::shared_ptr<SDL_RWops> op;
+        std::shared_ptr<SDL_RWops> _op;
+        SDL_RWops* _get();
+        void _clear();
+        void _set(SDL_RWops*);
+        friend class Renderer;
 	};
 
 	enum class BlendMode
@@ -101,7 +105,12 @@ namespace MiniEngine
 	protected:
 		Surface() = default;
 	private:
-		std::shared_ptr<SDL_Surface> surf;
+	    std::shared_ptr<SDL_Surface> _surf;
+        void _set(SDL_Surface*);
+        void _clear();
+        SDL_Surface* _get();
+        std::shared_ptr<SDL_Surface>& _getex();
+
 		friend class Window;
 		friend class Renderer;
 		friend class Font;
@@ -131,7 +140,10 @@ namespace MiniEngine
 		/// updateInfo() must be called after Texture is changed.
 		void updateInfo();
 	private:
-		std::shared_ptr<SDL_Texture> text;
+		std::shared_ptr<SDL_Texture> _text;
+		void _set(SDL_Texture*);
+		void _clear();
+		SDL_Texture* _get();
 		Rect rect;
 		friend class Renderer;
 	};
@@ -174,13 +186,19 @@ namespace MiniEngine
 		int supercopy(Texture t,bool srcfull,Rect src,bool dstfull,Rect dst,double angle,bool haspoint,Point center,FlipMode mode);
 
 		Surface loadSurface(std::string FileName) throw(ErrorViewer);
+		Surface loadSurfaceRW(RWOP rwop) throw(ErrorViewer);
 		Texture render(Surface surf) throw (ErrorViewer);
 		Texture loadTexture(std::string FileName) throw(ErrorViewer);
+		Texture loadTextureRW(RWOP rwop) throw(ErrorViewer);
 		Texture createTexture(int Width, int Height) throw(ErrorViewer);
 
 		bool isReady();
 	private:
-		std::shared_ptr<SDL_Renderer> rnd;
+		std::shared_ptr<SDL_Renderer> _rnd;
+		void _set(SDL_Renderer*);
+		void _clear();
+		SDL_Renderer* _get();
+
 		friend class Window;
 	};
 
@@ -251,7 +269,12 @@ namespace MiniEngine
 		void _setRenderer_Real(Uint32 flags);
 		Uint32 _internal_rndflagcalc;
 		Uint32 _render_caster(RendererType);
-		std::shared_ptr<SDL_Window> wnd;
+
+		std::shared_ptr<SDL_Window> _wnd;
+		void _set(SDL_Window*);
+		void _clear();
+		SDL_Window* _get();
+
 		Renderer winrnd;
 	};
 
@@ -305,7 +328,11 @@ namespace MiniEngine
 	    void _real_setFontStyle(int);
 	    int _style_caster(Style);
         int _internal_fontcalc;
-		std::shared_ptr<TTF_Font> font;
+
+		std::shared_ptr<TTF_Font> _font;
+		void _set(TTF_Font*);
+		void _clear();
+		TTF_Font* _get();
 	};
 
 	enum class Platform { Unknown,Windows,MacOS,Linux,iOS,Android };
@@ -402,7 +429,10 @@ namespace MiniEngine
 	protected:
 		Music() = default;
 	private:
-		std::shared_ptr<Mix_Music> music;
+		std::shared_ptr<Mix_Music> _music;
+        void _set(Mix_Music*);
+        void _clear();
+        Mix_Music* _get();
 		friend class MusicPlayer;
 	};
 
@@ -433,7 +463,10 @@ namespace MiniEngine
 	protected:
 		Sound() = default;
 	private:
-		std::shared_ptr<Mix_Chunk> sound;
+		std::shared_ptr<Mix_Chunk> _sound;
+		void _set(Mix_Chunk*);
+		void _clear();
+		Mix_Chunk* _get();
 		friend class SoundPlayer;
 	};
 
