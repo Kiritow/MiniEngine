@@ -89,13 +89,7 @@ namespace MiniEngine
         friend class Renderer;
 	};
 
-	enum class BlendMode
-	{
-		None = SDL_BLENDMODE_NONE,
-		Blend = SDL_BLENDMODE_BLEND,
-		Add = SDL_BLENDMODE_ADD,
-		Mod = SDL_BLENDMODE_MOD
-	};
+	enum class BlendMode { None,Blend,Add,Mod };
 
 	class Surface
 	{
@@ -104,6 +98,8 @@ namespace MiniEngine
         int savePNG(const std::string& filename);
         int getw();
         int geth();
+        BlendMode getBlendMode();
+        int setBlendMode(BlendMode mode);
 	protected:
 		Surface() = default;
 	private:
@@ -150,13 +146,7 @@ namespace MiniEngine
 		friend class Renderer;
 	};
 
-	enum class RendererType
-	{
-		Software,
-		Accelerated,
-		PresentSync,
-		TargetTexture
-	};
+	enum class RendererType { Software, Accelerated, PresentSync, TargetTexture };
 
 	enum class FlipMode { None, Horizontal, Vertical };
 
@@ -204,7 +194,7 @@ namespace MiniEngine
 		friend class Window;
 	};
 
-	enum class MessageBoxType { Error,Warning,Information };
+	enum class MessageBoxType { Error, Warning, Information };
 
 	class Window
 	{

@@ -17,6 +17,41 @@
 
 namespace MiniEngine
 {
+    namespace _internal
+    {
+        BlendMode getBlendModeFromSDLBlendMode(SDL_BlendMode mode)
+        {
+            switch(mode)
+            {
+            case SDL_BLENDMODE_ADD:
+                return BlendMode::Add;
+            case SDL_BLENDMODE_BLEND:
+                return BlendMode::Blend;
+            case SDL_BLENDMODE_MOD:
+                return BlendMode::Mod;
+            case SDL_BLENDMODE_NONE:
+            default:/// return BlendMode::None on default.
+                return BlendMode::None;
+            }
+        }
+
+        SDL_BlendMode getSDLBlendModeFromBlendMode(BlendMode mode)
+        {
+            switch(mode)
+            {
+            case BlendMode::Add:
+                return SDL_BLENDMODE_ADD;
+            case BlendMode::Blend:
+                return SDL_BLENDMODE_BLEND;
+            case BlendMode::Mod:
+                return SDL_BLENDMODE_MOD;
+            case BlendMode::None:
+            default:/// return SDL_BLENDMODE_NONE on default.
+                return SDL_BLENDMODE_NONE;
+            }
+        }
+    }/// End of namespace _internal
+
 	Rect::Rect(int X, int Y, int W, int H)
 	{
 		x = X;
@@ -213,6 +248,19 @@ namespace MiniEngine
         }
     }
 
+    BlendMode Surface::getBlendMode()
+    {
+        SDL_BlendMode temp;
+        /// FIXME: return value are ignored.
+        SDL_GetSurfaceBlendMode(_get(),&temp);
+        return _internal::getBlendModeFromSDLBlendMode(temp);
+    }
+
+    int Surface::setBlendMode(BlendMode mode)
+    {
+        return SDL_SetSurfaceBlendMode(_get(),_internal::getSDLBlendModeFromBlendMode(mode));
+    }
+
     int Surface::savePNG(const std::string& filename)
     {
         return IMG_SavePNG(_get(),filename.c_str());
@@ -262,14 +310,14 @@ namespace MiniEngine
 
 	int Texture::setBlendMode(BlendMode mode)
 	{
-		return SDL_SetTextureBlendMode(_get(), static_cast<SDL_BlendMode>(mode));
+		return SDL_SetTextureBlendMode(_get(), _internal::getSDLBlendModeFromBlendMode(mode));
 	}
 
 	BlendMode Texture::getBlendMode()
 	{
 		SDL_BlendMode temp;
 		SDL_GetTextureBlendMode(_get(), &temp);
-		return static_cast<BlendMode>(temp);
+		return _internal::getBlendModeFromSDLBlendMode(temp);
 	}
 
 	/// Alpha:  0: Transparent 255: opaque
@@ -356,15 +404,17 @@ namespace MiniEngine
 
 	int Renderer::setBlendMode(BlendMode mode)
 	{
-		return SDL_SetRenderDrawBlendMode(_get(), static_cast<SDL_BlendMode>(mode));
+		return SDL_SetRenderDrawBlendMode(_get(), _internal::getSDLBlendModeFromBlendMode(mode));
 	}
 
 	BlendMode Renderer::getBlendMode()
 	{
 		SDL_BlendMode temp;
 		SDL_GetRenderDrawBlendMode(_get(), &temp);
-		return static_cast<BlendMode>(temp);
+		return _internal::getBlendModeFromSDLBlendMode(temp);
 	}
+
+
 
 	int Renderer::setTarget(Texture & t)
 	{
