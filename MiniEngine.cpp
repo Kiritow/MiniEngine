@@ -1075,6 +1075,20 @@ namespace MiniEngine
         }
 	}
 
+	int SDLSystem::GetPowerLifeLeft()
+	{
+        int i;
+        SDL_GetPowerInfo(&i,NULL);
+        return i;
+	}
+
+	int SDLSystem::GetPowerPrecentageLeft()
+	{
+        int i;
+        SDL_GetPowerInfo(NULL,&i);
+        return i;
+	}
+
 	Platform SDLSystem::GetPlatform()
 	{
         std::string s(SDL_GetPlatform());

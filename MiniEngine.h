@@ -368,6 +368,8 @@ namespace MiniEngine
 		static void Delay(int ms);
 
 		static PowerState GetPowerState();
+		static int GetPowerLifeLeft();
+		static int GetPowerPrecentageLeft();
 
 		static Platform GetPlatform();
 
