@@ -106,6 +106,21 @@ namespace MiniEngine
 		int blitTo(Surface t, Point lupoint);
 		int blitFill(Surface t, Rect src);
 		int blitFullFill(Surface t);
+
+        int setAlphaMode(int alpha);
+		int getAlphaMode();
+
+		ColorMode getColorMode();
+		int setColorMode(ColorMode mode);
+		RGBA getRGBA();
+		void setRGBA(RGBA pack);
+
+		bool mustlock();
+        int lock();
+        void unlock();
+
+        static Surface createSurface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer);
+
 	protected:
 		Surface() = default;
 	private:

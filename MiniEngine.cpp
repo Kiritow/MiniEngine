@@ -295,6 +295,75 @@ namespace MiniEngine
         return SDL_BlitSurface(s._get(),NULL,_get(),NULL);
     }
 
+    int Surface::setAlphaMode(int alpha)
+    {
+        return SDL_SetSurfaceAlphaMod(_get(),alpha);
+    }
+
+    int Surface::getAlphaMode()
+    {
+        Uint8 al;
+        SDL_GetSurfaceAlphaMod(_get(),&al);
+        return al;
+    }
+
+    int Surface::setColorMode(ColorMode mode)
+    {
+        return SDL_SetSurfaceColorMod(_get(),mode.r,mode.g,mode.b);
+    }
+
+    ColorMode Surface::getColorMode()
+    {
+        Uint8 r,g,b;
+        SDL_GetSurfaceColorMod(_get(),&r,&g,&b);
+        ColorMode mode;
+        mode.r=r;
+        mode.g=g;
+        mode.b=b;
+        return mode;
+    }
+
+    void Surface::setRGBA(RGBA pack)
+    {
+        setColorMode(pack.toColorMode());
+        setAlphaMode(pack.a);
+    }
+
+    RGBA Surface::getRGBA()
+    {
+        return RGBA(getColorMode(),getAlphaMode());
+    }
+
+    bool Surface::mustlock()
+    {
+        return SDL_MUSTLOCK(_get());
+    }
+
+    int Surface::lock()
+    {
+        return SDL_LockSurface(_get());
+    }
+
+    void Surface::unlock()
+    {
+        SDL_UnlockSurface(_get());
+    }
+
+    //static
+    Surface Surface::createSurface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer)
+    {
+        SDL_Surface* temp=SDL_CreateRGBSurface(0,width,height,depth,Rmask,Gmask,Bmask,Amask);
+        if(temp==nullptr)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+        Surface surf;
+        surf._set(temp);
+        return surf;
+    }
+
     void Texture::_set(SDL_Texture* p)//private
     {
         _text.reset(p,SDL_DestroyTexture);
