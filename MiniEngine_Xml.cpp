@@ -15,7 +15,7 @@ XMLDB::~XMLDB()
     close();
 }
 
-int XMLDB::open(const std::string& XMLFileName)
+int XMLDB::open(const std::string& XMLFileName,bool saveOnClose)
 {
     if(_opened) return -2;
 
@@ -23,9 +23,12 @@ int XMLDB::open(const std::string& XMLFileName)
     {
         rapidxml::file<> temp(XMLFileName.c_str());
         _doc.parse<0>(temp.data());
+        _rootnode=_doc.first_node("Database");
+        _dbinfo=_rootnode->first_node("DBInfo");
         _filename=XMLFileName;
         _opened=true;
         _changed=false;
+        _autosave_onclose=saveOnClose;
     }
     catch(...)
     {
@@ -35,18 +38,43 @@ int XMLDB::open(const std::string& XMLFileName)
     return 0;
 }
 
+int XMLDB::create(const std::string& XMLFileName)
+{
+    if(_opened) return -2;
+    _rootnode=_doc.allocate_node(rapidxml::node_element,"Database");
+    _dbinfo=_doc.allocate_node(rapidxml::node_element,"DBInfo");
+    _tbinfo=_doc.allocate_node(rapidxml::node_element,"TableInfo");
+    _tbroot=_doc.allocate_node(rapidxml::node_element,"Tables");
+
+    _dbinfo->append_node(_tbinfo);
+
+    _rootnode->append_node(_dbinfo);
+    _rootnode->append_node(_tbroot);
+
+    _doc.append_node(_rootnode);
+
+    _opened=true;
+    _changed=true;
+    _autosave_onclose=true;
+    _filename=XMLFileName;
+    return 0;
+}
+
 int XMLDB::save()
 {
     if(!_opened) return -2;
     if(!_changed) return 0;
     std::ofstream ofs(_filename);
     ofs<<_doc;
+    _changed=false;
     return 0;
 }
 
 int XMLDB::close()
 {
     if(!_opened) return 0;
+
+    if(_autosave_onclose) save();
 
     _doc.clear();
     _filename.clear();
@@ -59,87 +87,65 @@ bool XMLDB::isopen() const
     return _opened;
 }
 
-rapidxml::xml_node<>* XMLDB::getDBroot(const std::string& dbname)
+void XMLDB::setChanged()
 {
-    for(rapidxml::xml_node<>* root=_doc.first_node("Database");root!=nullptr;root=root->next_sibling("Database"))
-    {
-        rapidxml::xml_attribute<>* attr=root->first_attribute("name");
-        if(attr==nullptr||dbname!=attr->value()) continue;
-        else return root;
-    }
-
-    return nullptr;
+    _changed=true;
 }
 
+// protected
+bool XMLDB::isNameUnique(const std::string& tbname)
+{
+    return _tbroot->first_node(tbname.c_str()) == nullptr;
+}
+
+int XMLDB::newTB(const std::string& tbname,const std::vector<std::string>& colname)
+{
+    if(tbname.empty()) return -1;
+    if(!isNameUnique(tbname)) return -2;
+
+    char* stra=_doc.allocate_string(tbname.c_str());
+    node* newtb=_doc.allocate_node(rapidxml::node_element,stra);
+
+    node* newinfo=_doc.allocate_node(rapidxml::node_element,stra);
+    for(size_t i=0;i<colname.size();i++)
+    {
+        newinfo->append_node(_doc.allocate_node(rapidxml::node_element,"col",_doc.allocate_string(colname.at(i).c_str())));
+    }
+
+    _tbinfo->append_node(newinfo);
+    _tbroot->append_node(newtb);
+
+    return 0;
+}
+
+int XMLDB::dropTB(const std::string& tbname)
+{
+    node* tbnode=getTBroot(tbname);
+    _tbroot->remove_node(tbnode);
+    _tbinfo->remove_node(_tbinfo->first_node(tbname.c_str()));
+    setChanged();
+    return 0;
+}
+
+int XMLDB::dropAllTB()
+{
+    _tbroot->remove_all_nodes();
+    _tbinfo->remove_all_nodes();
+    setChanged();
+    return 0;
+}
+
+// protected
+XMLDB::node* XMLDB::getTBroot(const std::string& tbname)
+{
+    return _tbroot->first_node(tbname.c_str());
+}
+
+//experimental
 rapidxml::xml_document<>* XMLDB::getdoc()
 {
     return &_doc;
 }
 
-XMLController::XMLController()
-{
-    _pdb=nullptr;
-}
-
-XMLController::~XMLController()
-{
-
-}
-
-int XMLController::connect(const XMLDB& xmldb)
-{
-    if(!xmldb.isopen())
-    {
-        return -1;
-    }
-    _pdb=const_cast<XMLDB*>(&xmldb);
-    return 0;
-}
-
-int XMLController::usedb(const std::string& dbname)
-{
-    rapidxml::xml_node<>* node=_pdb->getDBroot(dbname);
-    if(node==nullptr)
-    {
-        return -1;
-    }
-    else
-    {
-        _dbroot=node;
-        return 0;
-    }
-    return 0;
-}
-
-int XMLController::createdb(const std::string& dbname,std::vector<std::string>& colname)
-{
-    if(dbname.empty()) return -1;
-
-    if(_pdb->getDBroot(dbname)!=nullptr)
-    {
-        /// Invalid Name (Same as another database).
-        return -2;
-    }
-    rapidxml::xml_node<>* newnode=_pdb->getdoc()->allocate_node(rapidxml::node_element,"Database");
-    if(newnode==nullptr) return -3;
-    rapidxml::xml_attribute<>* newattr=_pdb->getdoc()->allocate_attribute("name",dbname.c_str());
-    if(newattr==nullptr)
-    {
-        /// FIXME: What will happen to newnode?
-        return -4;
-    }
-    rapidxml::xml_node<>* dbinfonode=_pdb->getdoc()->allocate_node(rapidxml::node_element,"DBInfo");
-    if(dbinfonode==nullptr) return -5;
-    for(size_t i=0;i<colname.size();i++)
-    {
-        rapidxml::xml_node<>* ntnode=_pdb->getdoc()->allocate_node(rapidxml::node_element,"colname",colname.at(i).c_str());
-        if(ntnode==nullptr) return -6;
-        dbinfonode->append_node(ntnode);
-    }
-    newnode->append_node(dbinfonode);
-    newnode->append_attribute(newattr);
-
-    return 0;
-}
 
 }///End of namespace MiniEngine

@@ -15,41 +15,61 @@ namespace MiniEngine
 class XMLDB : public MiniEngine::NonCopyable
 {
 public:
+    typedef rapidxml::xml_node<> node;
+    typedef rapidxml::xml_attribute<> attribute;
+    typedef rapidxml::xml_document<> document;
+
     XMLDB();
     ~XMLDB();
-    int open(const std::string& XMLFileName);
+    int open(const std::string& XMLFileName,bool saveOnClose);
+    int create(const std::string& XMLFileName);
     int save();
     int close();
     bool isopen() const;
 
-    rapidxml::xml_node<>* getDBroot(const std::string& dbname);
+    /// Create a table with colname, returns table node
+    int newTB(const std::string& tbname,const std::vector<std::string>& colname);
+    /// Insert a col before a index (use -1 for push back)
+    int newTBCol(const std::string& tbname,const std::string& newColname,int insertBefore);
 
-    /// Directly Get Document
-    rapidxml::xml_document<>* getdoc();
+    int newTBRow(const std::string& tbname,const std::vector<std::string>& rowval,int insertBefore);
+
+    int setTBRow(const std::string& tbname,int rowid,const std::vector<std::string>& rowval);
+
+    int getTBRow(const std::string& tbname,int rowid,std::vector<std::string>& out_rowval);
+
+    int dropTBRow(const std::string& tbname,int rowid);
+
+    /// Get Table Col Size
+    int getTBColsize(const std::string& tbname);
+    /// Drop a table
+    int dropTB(const std::string& tbname);
+    /// Drop all table
+    int dropAllTB();
+
+    /// Directly Get Document (Experimental)
+    document* getdoc();
+    /// Announce something changed
+    void setChanged();
+protected:
+    bool isNameUnique(const std::string& tbname);
+    /// Get root node of a table
+    node* getTBroot(const std::string& tbname);
 private:
-    rapidxml::xml_document<> _doc;
+    document _doc;
+
+    node* _rootnode;
+
+    node* _dbinfo;
+    node* _tbinfo;
+
+    node* _tbroot;
+
     bool _changed;
     bool _opened;
+    bool _autosave_onclose;
     std::string _filename;
 };
 
-class XMLController
-{
-public:
-    XMLController();
-    ~XMLController();
-    int connect(const XMLDB& xmldb);
-    int usedb(const std::string& dbname);
-    int createdb(const std::string& dbname,std::vector<std::string>& colname);
-    int dropdb(const std::string& dbname);
-    int close();
-
-    int execute(const std::string& command);
-    int execute(const std::string& command,std::vector<std::string>& vec);
-private:
-    XMLDB* _pdb;
-    std::string _dbname;
-    rapidxml::xml_node<>* _dbroot;
-};
 
 }/// End of namespace MiniEngine
