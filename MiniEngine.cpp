@@ -295,6 +295,35 @@ namespace MiniEngine
         return SDL_BlitSurface(s._get(),NULL,_get(),NULL);
     }
 
+    int Surface::blitScaled(Surface s,Rect src,Rect dst)
+    {
+        SDL_Rect rsrc=src.toSDLRect();
+        SDL_Rect rdst=dst.toSDLRect();
+        return SDL_BlitScaled(s._get(),&rsrc,_get(),&rdst);
+    }
+
+    int Surface::blitScaledTo(Surface s,Rect dst)
+    {
+        SDL_Rect rdst=dst.toSDLRect();
+        return SDL_BlitScaled(s._get(),NULL,_get(),&rdst);
+    }
+
+    int Surface::blitScaledTo(Surface s,Point lupoint)
+    {
+        return blitScaledTo(s,Rect(lupoint.x,lupoint.y,s.getw(),s.geth()));
+    }
+
+    int Surface::blitScaledFill(Surface s,Rect src)
+    {
+        SDL_Rect rsrc=src.toSDLRect();
+        return SDL_BlitScaled(s._get(),&rsrc,_get(),NULL);
+    }
+
+    int Surface::blitScaledFullFill(Surface s)
+    {
+        return SDL_BlitScaled(s._get(),NULL,_get(),NULL);
+    }
+
     int Surface::setAlphaMode(int alpha)
     {
         return SDL_SetSurfaceAlphaMod(_get(),alpha);

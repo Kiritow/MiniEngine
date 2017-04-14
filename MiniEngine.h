@@ -107,6 +107,12 @@ namespace MiniEngine
 		int blitFill(Surface t, Rect src);
 		int blitFullFill(Surface t);
 
+		int blitScaled(Surface s,Rect src,Rect dst);
+		int blitScaledTo(Surface t, Rect dst);
+		int blitScaledTo(Surface t, Point lupoint);
+		int blitScaledFill(Surface t, Rect src);
+		int blitScaledFullFill(Surface t);
+
         int setAlphaMode(int alpha);
 		int getAlphaMode();
 
