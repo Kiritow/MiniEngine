@@ -2,47 +2,57 @@
 #include <cstring>
 #include <cstdio>
 
-SQLStatement::SQLStatement()
+// private
+void SQLStatement::_set(sqlite3_stmt* p)
 {
-    _st=nullptr;
+    _st.reset(p,sqlite3_finalize);
 }
 
-SQLStatement::~SQLStatement()
+// private
+sqlite3_stmt* SQLStatement::_get() const
 {
-    sqlite3_finalize(_st);
+    return _st.get();
 }
 
 void SQLStatement::_setStmt(sqlite3_stmt* p)
 {
-    _st=p;
+    _set(p);
 }
 
 sqlite3_stmt* SQLStatement::_getStmt() const
 {
-    return _st;
+    return _get();
+}
+
+bool SQLStatement::isReady() const
+{
+    return _get()!=nullptr;
 }
 
 
-SQLDB::SQLDB()
+void SQLDB::_set(sqlite3* p)
 {
-    _db=nullptr;
+    _db.reset(p,sqlite3_close);
 }
 
-SQLDB::~SQLDB()
+sqlite3* SQLDB::_get()
 {
-    sqlite3_close(_db);
+    return _db.get();
 }
 
 int SQLDB::open(const std::string& filename)
 {
-    return sqlite3_open(filename.c_str(),&_db);
+    sqlite3* _temp=nullptr;
+    int ret=sqlite3_open(filename.c_str(),&_temp);
+    _set(_temp);
+    return ret;
 }
 
 SQLStatement SQLDB::prepare(const std::string& SQLCommand)
 {
     SQLStatement stmt;
     sqlite3_stmt* pstmt=nullptr;
-    int ret=sqlite3_prepare(_db,SQLCommand.c_str(),SQLCommand.size(),&pstmt,NULL);
+    int ret=sqlite3_prepare(_get(),SQLCommand.c_str(),SQLCommand.size(),&pstmt,NULL);
     if(ret<0) return stmt;
     stmt._setStmt(pstmt);
     return stmt;
@@ -56,7 +66,7 @@ int SQLDB::step(const SQLStatement& Statement)
 int SQLDB::exec(const std::string& SQLCommand,SQLCallback callback,void* param)
 {
     char* errmsg=nullptr;
-    int ret=sqlite3_exec(_db,SQLCommand.c_str(),callback,param,&errmsg);
+    int ret=sqlite3_exec(_get(),SQLCommand.c_str(),callback,param,&errmsg);
     printf("ErrMsg: %s\n",errmsg);
     return ret;
 }
