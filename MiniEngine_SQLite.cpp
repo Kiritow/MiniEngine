@@ -1,4 +1,4 @@
-#include "sqlite_wrapper.h"
+#include "MiniEngine_SQLite.h"
 #include <cstring>
 #include <cstdio>
 
