@@ -644,6 +644,8 @@ namespace MiniEngine
         case FlipMode::Vertical:
             flip=SDL_FLIP_VERTICAL;
             break;
+        default:
+            flip=SDL_FLIP_NONE;
         }
 
         return SDL_RenderCopyEx(_get(),t._get(),pR1,pR2,angle,pPoint,flip);
