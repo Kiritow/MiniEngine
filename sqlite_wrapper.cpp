@@ -2,6 +2,12 @@
 #include <cstring>
 #include <cstdio>
 
+namespace MiniEngine
+{
+
+namespace SQL
+{
+
 // private
 void SQLStatement::_set(sqlite3_stmt* p)
 {
@@ -65,8 +71,19 @@ int SQLDB::step(const SQLStatement& Statement)
 
 int SQLDB::exec(const std::string& SQLCommand,SQLCallback callback,void* param)
 {
-    char* errmsg=nullptr;
-    int ret=sqlite3_exec(_get(),SQLCommand.c_str(),callback,param,&errmsg);
-    printf("ErrMsg: %s\n",errmsg);
-    return ret;
+    return sqlite3_exec(_get(),SQLCommand.c_str(),callback,param,&_errmsg);
 }
+
+const char* SQLDB::getErrorMsg()
+{
+    return _errmsg;
+}
+
+void SQLDB::clearError()
+{
+    _errmsg=nullptr;
+}
+
+}/// End of namespace MiniEngine::SQL
+
+}/// End of namespace MiniEngine

@@ -3,6 +3,12 @@
 #include <string>
 #include <memory>
 
+namespace MiniEngine
+{
+
+namespace SQL
+{
+
 class SQLStatement
 {
 public:
@@ -32,10 +38,15 @@ public:
     SQLStatement prepare(const std::string& SQLCommand);
     int step(const SQLStatement& Statement);
     int exec(const std::string& SQLCommand,SQLCallback callback,void* param);
+    const char* getErrorMsg();
+    void clearError();
 private:
     sqlite3* _get();
     void _set(sqlite3*);
     std::shared_ptr<sqlite3> _db;
+    char* _errmsg;
 };
 
+}/// End of namespace MiniEngine::SQL
 
+}/// End of namespace MiniEngine
