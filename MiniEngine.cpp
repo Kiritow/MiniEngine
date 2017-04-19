@@ -644,6 +644,8 @@ namespace MiniEngine
         case FlipMode::Vertical:
             flip=SDL_FLIP_VERTICAL;
             break;
+        default:
+            flip=SDL_FLIP_NONE;
         }
 
         return SDL_RenderCopyEx(_get(),t._get(),pR1,pR2,angle,pPoint,flip);
@@ -1255,14 +1257,28 @@ namespace MiniEngine
 		SDL_StopTextInput();
 	}
 
+	/// Global Executor For class Timer
+	Uint32 _global_timer_executor(Uint32 interval,void* param)
+	{
+	    printf("DEBUG: Global Timer Executor.\n");
+        auto p=reinterpret_cast<std::function<Uint32(Uint32 interval)>*>(param);
+        return (*p)(interval);
+	}
+
     Timer::Timer()
     {
         _enabled=false;
         _detached=false;
+        _delete_on_disable=false;
         id=-1;
     }
 
     Timer::Timer(SDL_TimerCallback callback,Uint32 interval,void* param) : Timer()
+    {
+        _real_timer_call(callback,interval,param);
+    }
+
+    void Timer::_real_timer_call(SDL_TimerCallback callback,Uint32 interval,void* param)
     {
         _callback=callback;
         _interval=interval;
@@ -1291,6 +1307,15 @@ namespace MiniEngine
             SDL_RemoveTimer(id);
             _enabled=false;
             id=-1;
+            _callback=nullptr;
+
+            if(_delete_on_disable)
+            {
+                _delete_delegator(reinterpret_cast<std::function<Uint32(Uint32 interval)>*>(_param));
+                _delete_on_disable=false;
+            }
+
+            _param=nullptr;
             return 0;
         }
         else
@@ -1310,6 +1335,12 @@ namespace MiniEngine
         {
             disable();
         }
+    }
+
+    //static
+    void Timer::_delete_delegator(std::function<Uint32(Uint32)>* param)
+    {
+        delete param;
     }
 
 	AudioPlayer::AudioPlayer()

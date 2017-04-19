@@ -426,24 +426,43 @@ namespace MiniEngine
 		};
 	};
 
+	Uint32 _global_timer_executor(Uint32 interval,void* param);
+
 	class Timer
 	{
     public:
         Timer();
         /// Uint32 func(Uint32,void*) ...
+        template<typename Callable,typename... Args>
+        Timer(Callable&& callable,Uint32 interval,Args&&... args) : Timer()
+        {
+            auto realCall=[&](Uint32 interval)->Uint32{return callable(interval,args...);};
+            auto pfunc=new std::function<Uint32(Uint32 interval)>(realCall);
+            _real_timer_call(_global_timer_executor,interval,pfunc);
+        }
+
+        /// Restore For Capability
         Timer(SDL_TimerCallback callback,Uint32 interval,void* param);
+
         int enable();
         int disable();
         bool isenable();
         void detach();
         ~Timer();
+
+        static void _delete_delegator(std::function<Uint32(Uint32)>* Delegator);
     private:
+
+        void _real_timer_call(SDL_TimerCallback callback,Uint32 interval,void* param);
+
         SDL_TimerCallback _callback;
         Uint32 _interval;
         void* _param;
         SDL_TimerID id;
         bool _enabled;
         bool _detached;
+        /// Reserved Variable For Template variable Parameter
+        bool _delete_on_disable;
 	};
 
 	class AudioPlayer
