@@ -36,6 +36,13 @@ bool SQLStatement::isReady() const
 }
 
 
+int _global_sqldb_executor(void* ExParam,int colNum,char** colVal,char** colName)
+{
+    auto p=reinterpret_cast<std::function<int(int,char**,char**)>*>(ExParam);
+    return (*p)(colNum,colVal,colName);
+}
+
+
 void SQLDB::_set(sqlite3* p)
 {
     _db.reset(p,sqlite3_close);
@@ -69,7 +76,17 @@ int SQLDB::step(const SQLStatement& Statement)
     return sqlite3_step(Statement._getStmt());
 }
 
+int SQLDB::exec(const std::string& SQLCommand)
+{
+    return _exec_real(SQLCommand,nullptr,nullptr);
+}
+
 int SQLDB::exec(const std::string& SQLCommand,SQLCallback callback,void* param)
+{
+    return _exec_real(SQLCommand,callback,param);
+}
+
+int SQLDB::_exec_real(const std::string& SQLCommand,SQLCallback callback,void* param)
 {
     return sqlite3_exec(_get(),SQLCommand.c_str(),callback,param,&_errmsg);
 }
