@@ -509,9 +509,9 @@ namespace MiniEngine
 		rect.x = rect.y = 0;
 	}
 
-	void Renderer::_set(SDL_Renderer* p)
+	void Renderer::_set_sp(std::shared_ptr<SDL_Renderer>& p)
 	{
-        _rnd.reset(p,SDL_DestroyRenderer);
+        _rnd=p;
 	}
 
 	void Renderer::_clear()
@@ -521,7 +521,7 @@ namespace MiniEngine
 
 	SDL_Renderer* Renderer::_get()
 	{
-        return _rnd.get();
+        return _rnd.lock().get();
 	}
 
 	int Renderer::setColor(RGBA pack)
@@ -749,44 +749,44 @@ namespace MiniEngine
 	int Renderer::setViewport(Rect viewPort)
 	{
 	    SDL_Rect rect=viewPort.toSDLRect();
-	    return SDL_RenderSetViewport(rnd.lock().get(),&rect);
+	    return SDL_RenderSetViewport(_get(),&rect);
 	}
 
 	int Renderer::setViewport()
 	{
-        return SDL_RenderSetViewport(rnd.lock().get(),NULL);
+        return SDL_RenderSetViewport(_get(),NULL);
 	}
 
 	Rect Renderer::getViewport()
 	{
 	    SDL_Rect rect;
-        SDL_RenderGetViewport(rnd.lock().get(),&rect);
+        SDL_RenderGetViewport(_get(),&rect);
         return Rect(rect);
 	}
 
 	int Renderer::setClipRect(Rect cliparea)
 	{
         SDL_Rect rect=cliparea.toSDLRect();
-        return SDL_RenderSetClipRect(rnd.lock().get(),&rect);
+        return SDL_RenderSetClipRect(_get(),&rect);
 	}
 
 	Rect Renderer::getClipRect()
 	{
 	    SDL_Rect rect;
-	    SDL_RenderGetClipRect(rnd.lock().get(),&rect);
+	    SDL_RenderGetClipRect(_get(),&rect);
 	    return Rect(rect);
 	}
 
 	/*
     bool Renderer::isClipEnabled()
     {
-        return SDL_RenderIsClipEnabled(rnd.lock().get())==SDL_TRUE;
+        return SDL_RenderIsClipEnabled(_get())==SDL_TRUE;
     }
     */
 
     void Renderer::disableClip()
     {
-        SDL_RenderSetClipRect(rnd.lock().get(),NULL);
+        SDL_RenderSetClipRect(_get(),NULL);
     }
 
 	bool Renderer::isReady()
@@ -947,13 +947,13 @@ namespace MiniEngine
 
 	void Window::_setRenderer_Real(Uint32 flags)
 	{
-<<<<<<< HEAD
-	    rnd.reset();
-	    rnd.reset(SDL_CreateRenderer(wnd.get(), -1, flags), SDL_DestroyRenderer);
-	    winrnd.rnd=rnd;
-=======
-		winrnd._rnd.reset(SDL_CreateRenderer(_get(), -1, flags), SDL_DestroyRenderer);
->>>>>>> mingw-dev
+	    /// Release Previous Renderer
+	    _rnd.reset();
+	    /// Set New Renderer
+	    _rnd.reset(SDL_CreateRenderer(_get(), -1, flags), SDL_DestroyRenderer);
+
+	    /// Set Link of class Renderer with _rnd (in class Window)
+	    winrnd._set_sp(_rnd);
 	}
 
 	int Window::showSimpleMessageBox(MessageBoxType type,std::string Title,std::string Message)

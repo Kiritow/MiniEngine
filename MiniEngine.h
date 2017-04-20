@@ -235,8 +235,8 @@ namespace MiniEngine
 
 		bool isReady();
 	private:
-		std::weak_ptr<SDL_Renderer> rnd;
-		void _set(SDL_Renderer*);
+		std::weak_ptr<SDL_Renderer> _rnd;
+		void _set_sp(std::shared_ptr<SDL_Renderer>& p);
 		void _clear();
 		SDL_Renderer* _get();
 		friend class Window;
@@ -244,7 +244,7 @@ namespace MiniEngine
 
 	enum class MessageBoxType { Error, Warning, Information };
 
-	class Window
+	class Window : public NonCopyable
 	{
 	public:
 		Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw(ErrorViewer);
