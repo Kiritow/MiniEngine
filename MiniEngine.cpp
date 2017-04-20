@@ -17,6 +17,41 @@
 
 namespace MiniEngine
 {
+    namespace _internal
+    {
+        BlendMode getBlendModeFromSDLBlendMode(SDL_BlendMode mode)
+        {
+            switch(mode)
+            {
+            case SDL_BLENDMODE_ADD:
+                return BlendMode::Add;
+            case SDL_BLENDMODE_BLEND:
+                return BlendMode::Blend;
+            case SDL_BLENDMODE_MOD:
+                return BlendMode::Mod;
+            case SDL_BLENDMODE_NONE:
+            default:/// return BlendMode::None on default.
+                return BlendMode::None;
+            }
+        }
+
+        SDL_BlendMode getSDLBlendModeFromBlendMode(BlendMode mode)
+        {
+            switch(mode)
+            {
+            case BlendMode::Add:
+                return SDL_BLENDMODE_ADD;
+            case BlendMode::Blend:
+                return SDL_BLENDMODE_BLEND;
+            case BlendMode::Mod:
+                return SDL_BLENDMODE_MOD;
+            case BlendMode::None:
+            default:/// return SDL_BLENDMODE_NONE on default.
+                return SDL_BLENDMODE_NONE;
+            }
+        }
+    }/// End of namespace _internal
+
 	Rect::Rect(int X, int Y, int W, int H)
 	{
 		x = X;
@@ -137,6 +172,252 @@ namespace MiniEngine
 		return str.c_str();
 	}
 
+	// private
+    void RWOP::_set(SDL_RWops* p)
+    {
+        _op.reset(p,[](SDL_RWops* p){SDL_RWclose(p);});
+    }
+
+    // private
+    SDL_RWops* RWOP::_get()
+    {
+        return _op.get();
+    }
+
+    void RWOP::_clear()
+    {
+        _op.reset();
+    }
+
+	RWOP::RWOP(FILE* fp,bool autoclose)
+	{
+	    SDL_bool b=autoclose?SDL_TRUE:SDL_FALSE;
+	    _set(SDL_RWFromFP(fp,b));
+	}
+
+	RWOP::RWOP(const std::string& filename,const std::string& openmode)
+	{
+	    _set(SDL_RWFromFile(filename.c_str(),openmode.c_str()));
+	}
+
+    RWOP::RWOP(const void* mem,int size)
+    {
+        _set(SDL_RWFromConstMem(mem,size));
+    }
+
+    RWOP::RWOP(void* mem,int size)
+    {
+        _set(SDL_RWFromMem(mem,size));
+    }
+
+    void Surface::_set(SDL_Surface* p)//private
+    {
+        _surf.reset(p,SDL_FreeSurface);
+    }
+
+    void Surface::_clear()//private
+    {
+        _surf.reset();
+    }
+
+    SDL_Surface* Surface::_get()//private
+    {
+        return _surf.get();
+    }
+
+    std::shared_ptr<SDL_Surface>& Surface::_getex()
+    {
+        return _surf;
+    }
+
+    int Surface::getw()
+    {
+        if(_get()!=nullptr)
+        {
+            return _get()->w;
+        }
+        else
+        {
+            /// return -1 on null surface pointer
+            return -1;
+        }
+    }
+
+    int Surface::geth()
+    {
+        if(_get()!=nullptr)
+        {
+            return _get()->h;
+        }
+        else
+        {
+            /// return -1 on null surface pointer
+            return -1;
+        }
+    }
+
+    BlendMode Surface::getBlendMode()
+    {
+        SDL_BlendMode temp;
+        /// FIXME: return value are ignored.
+        SDL_GetSurfaceBlendMode(_get(),&temp);
+        return _internal::getBlendModeFromSDLBlendMode(temp);
+    }
+
+    int Surface::setBlendMode(BlendMode mode)
+    {
+        return SDL_SetSurfaceBlendMode(_get(),_internal::getSDLBlendModeFromBlendMode(mode));
+    }
+
+    int Surface::savePNG(const std::string& filename)
+    {
+        return IMG_SavePNG(_get(),filename.c_str());
+    }
+
+    int Surface::blit(Surface s,Rect src,Rect dst)
+    {
+        SDL_Rect rsrc=src.toSDLRect();
+        SDL_Rect rdst=dst.toSDLRect();
+        return SDL_BlitSurface(s._get(),&rsrc,_get(),&rdst);
+    }
+
+    int Surface::blitTo(Surface s,Rect dst)
+    {
+        SDL_Rect rdst=dst.toSDLRect();
+        return SDL_BlitSurface(s._get(),NULL,_get(),&rdst);
+    }
+
+    int Surface::blitTo(Surface s,Point lupoint)
+    {
+        return blitTo(s,Rect(lupoint.x,lupoint.y,s.getw(),s.geth()));
+    }
+
+    int Surface::blitFill(Surface s,Rect src)
+    {
+        SDL_Rect rsrc=src.toSDLRect();
+        return SDL_BlitSurface(s._get(),&rsrc,_get(),NULL);
+    }
+
+    int Surface::blitFullFill(Surface s)
+    {
+        return SDL_BlitSurface(s._get(),NULL,_get(),NULL);
+    }
+
+    int Surface::blitScaled(Surface s,Rect src,Rect dst)
+    {
+        SDL_Rect rsrc=src.toSDLRect();
+        SDL_Rect rdst=dst.toSDLRect();
+        return SDL_BlitScaled(s._get(),&rsrc,_get(),&rdst);
+    }
+
+    int Surface::blitScaledTo(Surface s,Rect dst)
+    {
+        SDL_Rect rdst=dst.toSDLRect();
+        return SDL_BlitScaled(s._get(),NULL,_get(),&rdst);
+    }
+
+    int Surface::blitScaledTo(Surface s,Point lupoint)
+    {
+        return blitScaledTo(s,Rect(lupoint.x,lupoint.y,s.getw(),s.geth()));
+    }
+
+    int Surface::blitScaledFill(Surface s,Rect src)
+    {
+        SDL_Rect rsrc=src.toSDLRect();
+        return SDL_BlitScaled(s._get(),&rsrc,_get(),NULL);
+    }
+
+    int Surface::blitScaledFullFill(Surface s)
+    {
+        return SDL_BlitScaled(s._get(),NULL,_get(),NULL);
+    }
+
+    int Surface::setAlphaMode(int alpha)
+    {
+        return SDL_SetSurfaceAlphaMod(_get(),alpha);
+    }
+
+    int Surface::getAlphaMode()
+    {
+        Uint8 al;
+        SDL_GetSurfaceAlphaMod(_get(),&al);
+        return al;
+    }
+
+    int Surface::setColorMode(ColorMode mode)
+    {
+        return SDL_SetSurfaceColorMod(_get(),mode.r,mode.g,mode.b);
+    }
+
+    ColorMode Surface::getColorMode()
+    {
+        Uint8 r,g,b;
+        SDL_GetSurfaceColorMod(_get(),&r,&g,&b);
+        ColorMode mode;
+        mode.r=r;
+        mode.g=g;
+        mode.b=b;
+        return mode;
+    }
+
+    void Surface::setRGBA(RGBA pack)
+    {
+        setColorMode(pack.toColorMode());
+        setAlphaMode(pack.a);
+    }
+
+    RGBA Surface::getRGBA()
+    {
+        return RGBA(getColorMode(),getAlphaMode());
+    }
+
+    bool Surface::mustlock()
+    {
+        return SDL_MUSTLOCK(_get());
+    }
+
+    int Surface::lock()
+    {
+        return SDL_LockSurface(_get());
+    }
+
+    void Surface::unlock()
+    {
+        SDL_UnlockSurface(_get());
+    }
+
+    //static
+    Surface Surface::createSurface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer)
+    {
+        SDL_Surface* temp=SDL_CreateRGBSurface(0,width,height,depth,Rmask,Gmask,Bmask,Amask);
+        if(temp==nullptr)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+        Surface surf;
+        surf._set(temp);
+        return surf;
+    }
+
+    void Texture::_set(SDL_Texture* p)//private
+    {
+        _text.reset(p,SDL_DestroyTexture);
+        updateInfo();
+    }
+
+    void Texture::_clear()//private
+    {
+        _text.reset();
+        updateInfo();
+    }
+
+    SDL_Texture* Texture::_get()//private
+    {
+        return _text.get();
+    }
+
 	Texture::Texture()
 	{
         updateInfo();
@@ -159,19 +440,19 @@ namespace MiniEngine
 
 	bool Texture::isReady()
 	{
-		return (text.get() != nullptr);
+		return (_get() != nullptr);
 	}
 
 	int Texture::setBlendMode(BlendMode mode)
 	{
-		return SDL_SetTextureBlendMode(text.get(), static_cast<SDL_BlendMode>(mode));
+		return SDL_SetTextureBlendMode(_get(), _internal::getSDLBlendModeFromBlendMode(mode));
 	}
 
 	BlendMode Texture::getBlendMode()
 	{
 		SDL_BlendMode temp;
-		SDL_GetTextureBlendMode(text.get(), &temp);
-		return static_cast<BlendMode>(temp);
+		SDL_GetTextureBlendMode(_get(), &temp);
+		return _internal::getBlendModeFromSDLBlendMode(temp);
 	}
 
 	/// Alpha:  0: Transparent 255: opaque
@@ -179,13 +460,13 @@ namespace MiniEngine
 	int Texture::setAlphaMode(int alpha)
 	{
 		Uint8 temp = std::max(std::min(alpha, 255), 0);
-		return SDL_SetTextureAlphaMod(text.get(), temp);
+		return SDL_SetTextureAlphaMod(_get(), temp);
 	}
 
 	int Texture::getAlphaMode()
 	{
 		Uint8 temp;
-		SDL_GetTextureAlphaMod(text.get(), &temp);
+		SDL_GetTextureAlphaMod(_get(), &temp);
 		return temp;
 	}
 
@@ -193,7 +474,7 @@ namespace MiniEngine
 	{
 		ColorMode pack;
 		Uint8 r, g, b;
-		SDL_GetTextureColorMod(text.get(), &r, &g, &b);
+		SDL_GetTextureColorMod(_get(), &r, &g, &b);
 		pack.r = r;
 		pack.g = g;
 		pack.b = b;
@@ -202,7 +483,7 @@ namespace MiniEngine
 
 	int Texture::setColorMode(ColorMode mode)
 	{
-		return SDL_SetTextureColorMod(text.get(), mode.r, mode.g, mode.b);
+		return SDL_SetTextureColorMod(_get(), mode.r, mode.g, mode.b);
 	}
 
 	RGBA Texture::getRGBA()
@@ -218,94 +499,109 @@ namespace MiniEngine
 
 	/// updateInfo() must be called after Texture is changed.
 
-	void Texture::updateInfo()
+	void Texture::updateInfo()//protected
 	{
-	    if(text.get()==nullptr)
+	    if(_get()==nullptr)
         {
             rect.x=rect.y=rect.w=rect.h=0;
         }
-		SDL_QueryTexture(text.get(), NULL, NULL, &rect.w, &rect.h);
+		SDL_QueryTexture(_get(), NULL, NULL, &rect.w, &rect.h);
 		rect.x = rect.y = 0;
+	}
+
+	void Renderer::_set(SDL_Renderer* p)
+	{
+        _rnd.reset(p,SDL_DestroyRenderer);
+	}
+
+	void Renderer::_clear()
+	{
+        _rnd.reset();
+	}
+
+	SDL_Renderer* Renderer::_get()
+	{
+        return _rnd.get();
 	}
 
 	int Renderer::setColor(RGBA pack)
 	{
-		return SDL_SetRenderDrawColor(rnd.lock().get(), pack.r, pack.g, pack.b, pack.a);
+		return SDL_SetRenderDrawColor(_get(), pack.r, pack.g, pack.b, pack.a);
 	}
 
 	RGBA Renderer::getColor()
 	{
 		Uint8 r, g, b, a;
-		SDL_GetRenderDrawColor(rnd.lock().get(), &r, &g, &b, &a);
+		SDL_GetRenderDrawColor(_get(), &r, &g, &b, &a);
 		RGBA pack(r, g, b, a);
 		return pack;
 	}
 
 	int Renderer::setBlendMode(BlendMode mode)
 	{
-		return SDL_SetRenderDrawBlendMode(rnd.lock().get(), static_cast<SDL_BlendMode>(mode));
+		return SDL_SetRenderDrawBlendMode(_get(), _internal::getSDLBlendModeFromBlendMode(mode));
 	}
 
 	BlendMode Renderer::getBlendMode()
 	{
 		SDL_BlendMode temp;
-		SDL_GetRenderDrawBlendMode(rnd.lock().get(), &temp);
-		return static_cast<BlendMode>(temp);
+		SDL_GetRenderDrawBlendMode(_get(), &temp);
+		return _internal::getBlendModeFromSDLBlendMode(temp);
 	}
 
 	int Renderer::setTarget(Texture & t)
 	{
-		return SDL_SetRenderTarget(rnd.lock().get(), t.text.get());
+		return SDL_SetRenderTarget(_get(), t._get());
 	}
 
 	int Renderer::setTarget()
 	{
-		return SDL_SetRenderTarget(rnd.lock().get(), nullptr);
+		return SDL_SetRenderTarget(_get(), nullptr);
 	}
 
 	int Renderer::fillRect(Rect rect)
 	{
 		auto inr = rect.toSDLRect();
-		return SDL_RenderFillRect(rnd.lock().get(), &inr);
+		return SDL_RenderFillRect(_get(), &inr);
 	}
 
 	int Renderer::drawRect(Rect rect)
 	{
 		auto inr = rect.toSDLRect();
-		return SDL_RenderDrawRect(rnd.lock().get(), &inr);
+		return SDL_RenderDrawRect(_get(), &inr);
 	}
 
 	int Renderer::drawPoint(Point p)
 	{
-        return SDL_RenderDrawPoint(rnd.lock().get(),p.x,p.y);
+        return SDL_RenderDrawPoint(_get(),p.x,p.y);
 	}
 
 	int Renderer::drawLine(Point a,Point b)
 	{
-        return SDL_RenderDrawLine(rnd.lock().get(),a.x,a.y,b.x,b.y);
+        return SDL_RenderDrawLine(_get(),a.x,a.y,b.x,b.y);
 	}
 
 	int Renderer::clear()
 	{
-		return SDL_RenderClear(rnd.lock().get());
+		return SDL_RenderClear(_get());
 	}
 
 	void Renderer::update()
 	{
-		SDL_RenderPresent(rnd.lock().get());
+		SDL_RenderPresent(_get());
 	}
 
 	int Renderer::copy(Texture t, Rect src, Rect dst)
 	{
 		SDL_Rect s = src.toSDLRect();
 		SDL_Rect d = dst.toSDLRect();
-		return SDL_RenderCopy(rnd.lock().get(), t.text.get(), &s, &d);
+		return SDL_RenderCopy(_get(), t._get(), &s, &d);
 	}
 
 	int Renderer::copyTo(Texture t, Rect dst)
 	{
 		SDL_Rect d = dst.toSDLRect();
-		return SDL_RenderCopy(rnd.lock().get(), t.text.get(), NULL, &d);
+		return SDL_RenderCopy(_get(), t._get(), NULL, &d);
 	}
 
 	int Renderer::copyTo(Texture t, Point lupoint)
@@ -316,12 +612,12 @@ namespace MiniEngine
 	int Renderer::copyFill(Texture t, Rect src)
 	{
 		SDL_Rect s = src.toSDLRect();
-		return SDL_RenderCopy(rnd.lock().get(), t.text.get(), &s, NULL);
+		return SDL_RenderCopy(_get(), t._get(), &s, NULL);
 	}
 
 	int Renderer::copyFullFill(Texture t)
 	{
-		return SDL_RenderCopy(rnd.lock().get(), t.text.get(), NULL, NULL);
+		return SDL_RenderCopy(_get(), t._get(), NULL, NULL);
 	}
 
 	int Renderer::supercopy(Texture t,bool srcfull,Rect src,bool dstfull,Rect dst,double angle,bool haspoint,Point center,FlipMode mode)
@@ -359,9 +655,11 @@ namespace MiniEngine
         case FlipMode::Vertical:
             flip=SDL_FLIP_VERTICAL;
             break;
+        default:
+            flip=SDL_FLIP_NONE;
         }
 
-        return SDL_RenderCopyEx(rnd.lock().get(),t.text.get(),pR1,pR2,angle,pPoint,flip);
+        return SDL_RenderCopyEx(_get(),t._get(),pR1,pR2,angle,pPoint,flip);
 	}
 
 	Surface Renderer::loadSurface(std::string FileName) throw(ErrorViewer)
@@ -374,43 +672,69 @@ namespace MiniEngine
 			e.fetch();
 			throw e;
 		}
-		surf.surf.reset(temp, SDL_FreeSurface);
+		surf._set(temp);
 		return surf;
+	}
+
+	Surface Renderer::loadSurfaceRW(RWOP rwop) throw (ErrorViewer)
+	{
+        Surface surf;
+        SDL_Surface* temp=IMG_Load_RW(rwop._get(),0);
+        if(temp==nullptr)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+        surf._set(temp);
+        return surf;
 	}
 
 	Texture Renderer::render(Surface surf) throw(ErrorViewer)
 	{
 		Texture t;
-		SDL_Texture* temp = SDL_CreateTextureFromSurface(rnd.lock().get(), surf.surf.get());
+		SDL_Texture* temp = SDL_CreateTextureFromSurface(_get(), surf._get());
 		if (temp == nullptr)
 		{
 			ErrorViewer e;
 			e.fetch();
 			throw e;
 		}
-		t.text.reset(temp, SDL_DestroyTexture);
-		t.updateInfo();
+		t._set(temp);
 		return t;
 	}
 
 	Texture Renderer::loadTexture(std::string FileName) throw(ErrorViewer)
 	{
 		Texture t;
-		SDL_Texture* temp = IMG_LoadTexture(rnd.lock().get(), FileName.c_str());
+		SDL_Texture* temp = IMG_LoadTexture(_get(), FileName.c_str());
 		if (temp == nullptr)
 		{
 			ErrorViewer e;
 			e.fetch();
 			throw e;
 		}
-		t.text.reset(temp, SDL_DestroyTexture);
-		t.updateInfo();
+		t._set(temp);
+		return t;
+	}
+
+	Texture Renderer::loadTextureRW(RWOP rwop) throw (ErrorViewer)
+	{
+        Texture t;
+        SDL_Texture* temp=IMG_LoadTexture_RW(_get(),rwop._get(),0);
+        if (temp == nullptr)
+		{
+			ErrorViewer e;
+			e.fetch();
+			throw e;
+		}
+		t._set(temp);
 		return t;
 	}
 
 	Texture Renderer::createTexture(int Width, int Height) throw(ErrorViewer)
 	{
-		SDL_Texture* temp = SDL_CreateTexture(rnd.lock().get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, Width, Height);
+		SDL_Texture* temp = SDL_CreateTexture(_get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, Width, Height);
 		if (temp == NULL)
 		{
 			ErrorViewer e;
@@ -418,8 +742,7 @@ namespace MiniEngine
 			throw e;
 		}
 		Texture t;
-		t.text.reset(temp, SDL_DestroyTexture);
-		t.updateInfo();
+		t._set(temp);
 		return t;
 	}
 
@@ -468,7 +791,22 @@ namespace MiniEngine
 
 	bool Renderer::isReady()
 	{
-		return !rnd.expired();
+		return (_get() != nullptr);
+	}
+
+	void Window::_set(SDL_Window* p)
+	{
+        _wnd.reset(p,SDL_DestroyWindow);
+	}
+
+	void Window::_clear()
+	{
+        _wnd.reset();
+	}
+
+	SDL_Window* Window::_get()
+	{
+	    return _wnd.get();
 	}
 
 	Window::Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags) throw(ErrorViewer)
@@ -480,7 +818,7 @@ namespace MiniEngine
 			e.fetch();
 			throw e;
 		}
-		wnd.reset(temp, SDL_DestroyWindow);
+		_set(temp);
 		setRenderer(RendererFlags);
 	}
 
@@ -502,7 +840,7 @@ namespace MiniEngine
 	Rect Window::getSize()
 	{
 		int w, h;
-		SDL_GetWindowSize(wnd.get(), &w, &h);
+		SDL_GetWindowSize(_get(), &w, &h);
 		return Rect(0, 0, w, h);
 	}
 
@@ -513,79 +851,79 @@ namespace MiniEngine
 
 	void Window::setSize(int w, int h)
 	{
-		SDL_SetWindowSize(wnd.get(), w, h);
+		SDL_SetWindowSize(_get(), w, h);
 	}
 
 	Rect Window::getPosition()
 	{
 		int x, y;
-		SDL_GetWindowPosition(wnd.get(), &x, &y);
+		SDL_GetWindowPosition(_get(), &x, &y);
 		return Rect(x, y, 0, 0);
 	}
 
 	void Window::setPosition(int x, int y)
 	{
-		SDL_SetWindowPosition(wnd.get(), x, y);
+		SDL_SetWindowPosition(_get(), x, y);
 	}
 
 	/// FIXME: Use class Point or class Rect ?
 
 	void Window::setPosition(Point point)
 	{
-		SDL_SetWindowPosition(wnd.get(), point.x, point.y);
+		SDL_SetWindowPosition(_get(), point.x, point.y);
 	}
 
 	void Window::setTitle(std::string Title)
 	{
-		SDL_SetWindowTitle(wnd.get(), Title.c_str());
+		SDL_SetWindowTitle(_get(), Title.c_str());
 	}
 
 	std::string Window::getTitle()
 	{
-		return std::string(SDL_GetWindowTitle(wnd.get()));
+		return std::string(SDL_GetWindowTitle(_get()));
 	}
 
 	void Window::setResizable(bool resizable)
 	{
-		//SDL_SetWindowResizable(wnd.get(), static_cast<SDL_bool>(resizable));
+		//SDL_SetWindowResizable(_get(), resizable?SDL_TRUE:SDL_FALSE);
 	}
 
 	void Window::show()
 	{
-		SDL_ShowWindow(wnd.get());
+		SDL_ShowWindow(_get());
 	}
 
 	void Window::hide()
 	{
-		SDL_HideWindow(wnd.get());
+		SDL_HideWindow(_get());
 	}
 
 	void Window::raise()
 	{
-		SDL_RaiseWindow(wnd.get());
+		SDL_RaiseWindow(_get());
 	}
 
 	void Window::minimize()
 	{
-		SDL_MinimizeWindow(wnd.get());
+		SDL_MinimizeWindow(_get());
 	}
 
 	void Window::maximize()
 	{
-		SDL_MaximizeWindow(wnd.get());
+		SDL_MaximizeWindow(_get());
 	}
 
 	void Window::restore()
 	{
-		SDL_RestoreWindow(wnd.get());
+		SDL_RestoreWindow(_get());
 	}
 
 	_DECL_DEPRECATED Surface Window::getSurface()
 	{
-		SDL_Surface* temp = SDL_GetWindowSurface(wnd.get());
+		SDL_Surface* temp = SDL_GetWindowSurface(_get());
 		Surface s;
 		/// Don't Free This Surface
-		s.surf.reset(temp, [](SDL_Surface*) {});
+		s._getex().reset(temp, [](SDL_Surface*) {});
 		return s;
 	}
 
@@ -609,9 +947,13 @@ namespace MiniEngine
 
 	void Window::_setRenderer_Real(Uint32 flags)
 	{
+<<<<<<< HEAD
 	    rnd.reset();
 	    rnd.reset(SDL_CreateRenderer(wnd.get(), -1, flags), SDL_DestroyRenderer);
 	    winrnd.rnd=rnd;
+=======
+		winrnd._rnd.reset(SDL_CreateRenderer(_get(), -1, flags), SDL_DestroyRenderer);
+>>>>>>> mingw-dev
 	}
 
 	int Window::showSimpleMessageBox(MessageBoxType type,std::string Title,std::string Message)
@@ -629,7 +971,22 @@ namespace MiniEngine
             flags=SDL_MESSAGEBOX_WARNING;
             break;
 	    }
-        return SDL_ShowSimpleMessageBox(flags,Title.c_str(),Message.c_str(),wnd.get());
+        return SDL_ShowSimpleMessageBox(flags,Title.c_str(),Message.c_str(),_get());
+	}
+
+	void Font::_set(TTF_Font* p)
+	{
+        _font.reset(p,TTF_CloseFont);
+	}
+
+	void Font::_clear()
+	{
+	    _font.reset();
+	}
+
+	TTF_Font* Font::_get()
+	{
+        return _font.get();
 	}
 
 	Font::Font(std::string FontFileName, int size) throw(ErrorViewer)
@@ -646,18 +1003,18 @@ namespace MiniEngine
 	{
 		TTF_Font* temp = TTF_OpenFont(FontFileName.c_str(), size);
 		if (temp == NULL) return -1;
-		font.reset(temp, TTF_CloseFont);
+		_set(temp);
 		return 0;
 	}
 
 	bool Font::isReady()
 	{
-		return (font.get() != nullptr);
+		return (_get() != nullptr);
 	}
 
     void Font::_real_setFontStyle(int Style)
     {
-        TTF_SetFontStyle(font.get(),Style);
+        TTF_SetFontStyle(_get(),Style);
     }
 
     int Font::_style_caster(Style style)
@@ -680,60 +1037,102 @@ namespace MiniEngine
         return 0;
     }
 
+    /// rendering surfaces...
+    Surface Font::renderText(std::string Text,RGBA fg)
+    {
+        Surface surf;
+        surf._set(TTF_RenderText_Blended(_get(), Text.c_str(), fg.toSDLColor()));
+        return surf;
+    }
+
+    Surface Font::renderTextWrapped(std::string Text, RGBA fg, int WrapLength)
+    {
+        Surface surf;
+		surf._set(TTF_RenderText_Blended_Wrapped(_get(), Text.c_str(), fg.toSDLColor(), WrapLength));
+		return surf;
+    }
+
+    Surface Font::renderTextShaded(std::string Text, RGBA fg,RGBA bg)
+    {
+        Surface surf;
+		surf._set(TTF_RenderText_Shaded(_get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()));
+		return surf;
+    }
+
+    Surface Font::renderTextSolid(std::string Text,RGBA fg)
+    {
+        Surface surf;
+		surf._set(TTF_RenderText_Solid(_get(), Text.c_str(), fg.toSDLColor()));
+		return surf;
+    }
+
+    Surface Font::renderUTF8(std::string Text,RGBA fg)
+    {
+        Surface surf;
+        surf._set(TTF_RenderUTF8_Blended(_get(), Text.c_str(), fg.toSDLColor()));
+        return surf;
+    }
+
+    Surface Font::renderUTF8Wrapped(std::string Text, RGBA fg, int WrapLength)
+    {
+        Surface surf;
+		surf._set(TTF_RenderUTF8_Blended_Wrapped(_get(), Text.c_str(), fg.toSDLColor(), WrapLength));
+		return surf;
+    }
+
+    Surface Font::renderUTF8Shaded(std::string Text, RGBA fg,RGBA bg)
+    {
+        Surface surf;
+		surf._set(TTF_RenderUTF8_Shaded(_get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()));
+		return surf;
+    }
+
+    Surface Font::renderUTF8Solid(std::string Text,RGBA fg)
+    {
+        Surface surf;
+		surf._set(TTF_RenderUTF8_Solid(_get(), Text.c_str(), fg.toSDLColor()));
+		return surf;
+    }
+
+    /// rendering textures...
 	Texture Font::renderText(Renderer rnd, std::string Text, RGBA fg)
 	{
-		Surface surf;
-		surf.surf.reset(TTF_RenderText_Blended(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
-		return rnd.render(surf);
+		return rnd.render(renderText(Text,fg));
 	}
 
 	Texture Font::renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength)
 	{
-		Surface surf;
-		surf.surf.reset(TTF_RenderText_Blended_Wrapped(font.get(), Text.c_str(), fg.toSDLColor(), WrapLength), SDL_FreeSurface);
-		return rnd.render(surf);
+		return rnd.render(renderTextWrapped(Text,fg,WrapLength));
 	}
 
 	Texture Font::renderTextShaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg)
 	{
-		Surface surf;
-		surf.surf.reset(TTF_RenderText_Shaded(font.get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()), SDL_FreeSurface);
-		return rnd.render(surf);
+		return rnd.render(renderTextShaded(Text,fg,bg));
 	}
 
 	Texture Font::renderTextSolid(Renderer rnd, std::string Text, RGBA fg)
 	{
-		Surface surf;
-		surf.surf.reset(TTF_RenderText_Solid(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
-		return rnd.render(surf);
+		return rnd.render(renderTextSolid(Text,fg));
 	}
 
 	Texture Font::renderUTF8(Renderer rnd, std::string Text, RGBA fg)
 	{
-		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Blended(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
-		return rnd.render(surf);
+		return rnd.render(renderUTF8(Text,fg));
 	}
 
 	Texture Font::renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength)
 	{
-		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Blended_Wrapped(font.get(), Text.c_str(), fg.toSDLColor(), WrapLength), SDL_FreeSurface);
-		return rnd.render(surf);
+		return rnd.render(renderUTF8Wrapped(Text,fg,WrapLength));
 	}
 
 	Texture Font::renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg)
 	{
-		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Shaded(font.get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()), SDL_FreeSurface);
-		return rnd.render(surf);
+		return rnd.render(renderUTF8Shaded(Text,fg,bg));
 	}
 
 	Texture Font::renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg)
 	{
-		Surface surf;
-		surf.surf.reset(TTF_RenderUTF8_Solid(font.get(), Text.c_str(), fg.toSDLColor()), SDL_FreeSurface);
-		return rnd.render(surf);
+		return rnd.render(renderUTF8Solid(Text,fg));
 	}
 
 	void LogSystem::d(const char* fmt,...)
@@ -865,6 +1264,20 @@ namespace MiniEngine
         }
 	}
 
+	int SDLSystem::GetPowerLifeLeft()
+	{
+        int i;
+        SDL_GetPowerInfo(&i,NULL);
+        return i;
+	}
+
+	int SDLSystem::GetPowerPrecentageLeft()
+	{
+        int i;
+        SDL_GetPowerInfo(NULL,&i);
+        return i;
+	}
+
 	Platform SDLSystem::GetPlatform()
 	{
         std::string s(SDL_GetPlatform());
@@ -904,14 +1317,28 @@ namespace MiniEngine
 		SDL_StopTextInput();
 	}
 
+	/// Global Executor For class Timer
+	Uint32 _global_timer_executor(Uint32 interval,void* param)
+	{
+	    printf("DEBUG: Global Timer Executor.\n");
+        auto p=reinterpret_cast<std::function<Uint32(Uint32 interval)>*>(param);
+        return (*p)(interval);
+	}
+
     Timer::Timer()
     {
         _enabled=false;
         _detached=false;
+        _delete_on_disable=false;
         id=-1;
     }
 
     Timer::Timer(SDL_TimerCallback callback,Uint32 interval,void* param) : Timer()
+    {
+        _real_timer_call(callback,interval,param);
+    }
+
+    void Timer::_real_timer_call(SDL_TimerCallback callback,Uint32 interval,void* param)
     {
         _callback=callback;
         _interval=interval;
@@ -940,6 +1367,15 @@ namespace MiniEngine
             SDL_RemoveTimer(id);
             _enabled=false;
             id=-1;
+            _callback=nullptr;
+
+            if(_delete_on_disable)
+            {
+                _delete_delegator(reinterpret_cast<std::function<Uint32(Uint32 interval)>*>(_param));
+                _delete_on_disable=false;
+            }
+
+            _param=nullptr;
             return 0;
         }
         else
@@ -959,6 +1395,12 @@ namespace MiniEngine
         {
             disable();
         }
+    }
+
+    //static
+    void Timer::_delete_delegator(std::function<Uint32(Uint32)>* param)
+    {
+        delete param;
     }
 
 	AudioPlayer::AudioPlayer()
@@ -989,6 +1431,21 @@ namespace MiniEngine
 		Mix_CloseAudio();
 	}
 
+	void Music::_set(Mix_Music* p)//private
+    {
+        _music.reset(p,Mix_FreeMusic);
+    }
+
+    void Music::_clear()//private
+    {
+        _music.reset();
+    }
+
+    Mix_Music* Music::_get()//private
+    {
+        return _music.get();
+    }
+
 	Music MusicPlayer::loadMusic(std::string Filename) throw(ErrorViewer)
 	{
 		Mix_Music* temp = Mix_LoadMUS(Filename.c_str());
@@ -999,14 +1456,14 @@ namespace MiniEngine
 			throw e;
 		}
 		Music m;
-		m.music.reset(temp, Mix_FreeMusic);
+		m._set(temp);
 		return m;
 	}
 
 	int MusicPlayer::play(Music music, int loops)
 	{
 		m = music;
-		return Mix_PlayMusic(m.music.get(), loops);
+		return Mix_PlayMusic(m._get(), loops);
 	}
 
 	void MusicPlayer::pause()
@@ -1031,7 +1488,7 @@ namespace MiniEngine
 
 	int MusicPlayer::fadeIn(int loops, int ms)
 	{
-		return Mix_FadeInMusic(m.music.get(), loops, ms);
+		return Mix_FadeInMusic(m._get(), loops, ms);
 	}
 
 	int MusicPlayer::fadeOut(int ms)
@@ -1064,6 +1521,21 @@ namespace MiniEngine
 		}
 	}
 
+	void Sound::_set(Mix_Chunk* p)
+	{
+        _sound.reset(p,Mix_FreeChunk);
+	}
+
+	void Sound::_clear()//private
+	{
+        _sound.reset();
+	}
+
+	Mix_Chunk* Sound::_get()
+	{
+        return _sound.get();
+	}
+
 	SoundPlayer::SoundPlayer(int Channels)
 	{
 		Mix_AllocateChannels(Channels);
@@ -1079,14 +1551,14 @@ namespace MiniEngine
 			throw e;
 		}
 		Sound s;
-		s.sound.reset(temp, Mix_FreeChunk);
+		s._set(temp);
 		return s;
 	}
 
 	ChannelID SoundPlayer::playSound(Sound sound, int loops) throw(ErrorViewer)
 	{
 		ChannelID id;
-		if (-1 == (id = Mix_PlayChannel(-1, sound.sound.get(), loops)))
+		if (-1 == (id = Mix_PlayChannel(-1, sound._get(), loops)))
 		{
 			ErrorViewer e;
 			e.fetch();
@@ -1098,7 +1570,7 @@ namespace MiniEngine
 	ChannelID SoundPlayer::fadein(Sound sound, int loops, int ms) throw(ErrorViewer)
 	{
 		ChannelID id;
-		if (-1 == (id = Mix_FadeInChannel(-1, sound.sound.get(), loops, ms)))
+		if (-1 == (id = Mix_FadeInChannel(-1, sound._get(), loops, ms)))
 		{
 			ErrorViewer e;
 			e.fetch();
@@ -1223,4 +1695,14 @@ int main(int argc, char* argv[])
 	int ret = AppMain();
 	MiniEngine::SDLSystem::Quit();
 	return ret;
+}
+
+int GetArgc()
+{
+    return _miniengine_argc;
+}
+
+char** GetArgv()
+{
+    return _miniengine_argv;
 }
