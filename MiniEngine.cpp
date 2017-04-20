@@ -401,9 +401,10 @@ namespace MiniEngine
         return surf;
     }
 
-    void Texture::_set(SDL_Texture* p)//private
+    void Texture::_set_sp(const std::shared_ptr<SDL_Texture>& sp)//private
     {
-        _text.reset(p,SDL_DestroyTexture);
+        /// Link the weak_ptr (in class Texture) with shared_ptr (in class Window)
+        *(_text.get())=sp;
         updateInfo();
     }
 
@@ -415,11 +416,28 @@ namespace MiniEngine
 
     SDL_Texture* Texture::_get()//private
     {
-        return _text.get();
+        if(_text.get()==nullptr)
+        {
+            return nullptr;
+        }
+        else return _text.get()->lock().get();
+    }
+
+    void Texture::_setWindow(Window* pwnd)
+    {
+        _p_wnd=pwnd;
+    }
+
+    Window* Texture::_getWindow()
+    {
+        return _p_wnd;
     }
 
 	Texture::Texture()
 	{
+	    _text.reset(new std::weak_ptr<SDL_Texture>,[this](std::weak_ptr<SDL_Texture>* wp){
+                 _getWindow()->_deleteTexture_SP(wp->lock());
+                 });
         updateInfo();
 	}
 
@@ -522,6 +540,16 @@ namespace MiniEngine
 	SDL_Renderer* Renderer::_get()
 	{
         return _rnd.lock().get();
+	}
+
+	void Renderer::_setWindow(Window* pWnd)
+	{
+        _p_wnd=pWnd;
+	}
+
+	Window* Renderer::_getWindow()
+	{
+        return _p_wnd;
 	}
 
 	int Renderer::setColor(RGBA pack)
@@ -700,7 +728,9 @@ namespace MiniEngine
 			e.fetch();
 			throw e;
 		}
-		t._set(temp);
+
+		t._set_sp(_getWindow()->_newTexture_Raw(temp));
+		t._setWindow(_getWindow());
 		return t;
 	}
 
@@ -714,7 +744,9 @@ namespace MiniEngine
 			e.fetch();
 			throw e;
 		}
-		t._set(temp);
+
+		t._set_sp(_getWindow()->_newTexture_Raw(temp));
+		t._setWindow(_getWindow());
 		return t;
 	}
 
@@ -728,7 +760,9 @@ namespace MiniEngine
 			e.fetch();
 			throw e;
 		}
-		t._set(temp);
+
+		t._set_sp(_getWindow()->_newTexture_Raw(temp));
+		t._setWindow(_getWindow());
 		return t;
 	}
 
@@ -742,7 +776,9 @@ namespace MiniEngine
 			throw e;
 		}
 		Texture t;
-		t._set(temp);
+
+		t._set_sp(_getWindow()->_newTexture_Raw(temp));
+		t._setWindow(_getWindow());
 		return t;
 	}
 
@@ -807,6 +843,27 @@ namespace MiniEngine
 	SDL_Window* Window::_get()
 	{
 	    return _wnd.get();
+	}
+
+	/// Called by class Renderer ONLY.
+	std::shared_ptr<SDL_Texture> Window::_newTexture_Raw(SDL_Texture* p)
+	{
+	    // DEBUG:
+	    //printf("Window::_newTexture_Raw: %p\n",p);
+
+	    /// Create a shared_ptr of SDL_Texture (with special deleter)
+	    std::shared_ptr<SDL_Texture> sp(p,SDL_DestroyTexture);
+        _lst_texture_sp.push_back(sp);
+        return sp;
+	}
+
+	void Window::_deleteTexture_SP(std::shared_ptr<SDL_Texture> p)
+	{
+	    // DEBUG:
+	    //printf("Window::_deleteTexture_SP: %p\n",p.get());
+
+	    /// Remove shared_ptr of SDL_Texture from list (in class Window)
+	    _lst_texture_sp.remove(p);
 	}
 
 	Window::Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags) throw(ErrorViewer)
@@ -947,6 +1004,9 @@ namespace MiniEngine
 
 	void Window::_setRenderer_Real(Uint32 flags)
 	{
+	    /// Release Previous Textures
+	    _lst_texture_sp.clear();
+
 	    /// Release Previous Renderer
 	    _rnd.reset();
 	    /// Set New Renderer
@@ -954,6 +1014,9 @@ namespace MiniEngine
 
 	    /// Set Link of class Renderer with _rnd (in class Window)
 	    winrnd._set_sp(_rnd);
+
+	    /// Associate class Renderer with this (class Window)
+	    winrnd._setWindow(this);
 	}
 
 	int Window::showSimpleMessageBox(MessageBoxType type,std::string Title,std::string Message)

@@ -19,6 +19,7 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include <list>
 
 #define _DECL_DEPRECATED __declspec(deprecated)
 #define _DECL_DEPRECATED_MSG(InfoString) __declspec(deprecated(InfoString))
@@ -177,12 +178,16 @@ namespace MiniEngine
 		/// updateInfo() must be called after Texture is changed.
 		void updateInfo();
 	private:
-		std::shared_ptr<SDL_Texture> _text;
-		void _set(SDL_Texture*);
+		std::shared_ptr<std::weak_ptr<SDL_Texture>> _text;
+		void _set_sp(const std::shared_ptr<SDL_Texture>& sp);
 		void _clear();
 		SDL_Texture* _get();
 		Rect rect;
 		friend class Renderer;
+
+		class Window* _p_wnd;
+		Window* _getWindow();
+		void _setWindow(Window*);
 	};
 
 	enum class RendererType { Software, Accelerated, PresentSync, TargetTexture };
@@ -239,6 +244,11 @@ namespace MiniEngine
 		void _set_sp(std::shared_ptr<SDL_Renderer>& p);
 		void _clear();
 		SDL_Renderer* _get();
+
+		class Window* _getWindow();
+		void _setWindow(Window*);
+		Window* _p_wnd;
+
 		friend class Window;
 	};
 
@@ -290,8 +300,14 @@ namespace MiniEngine
 		void maximize();
 		void restore();
 
-
 		_DECL_DEPRECATED Surface getSurface();
+
+		/// Called by Class Renderer
+        std::shared_ptr<SDL_Texture> _newTexture_Raw(SDL_Texture*);
+
+        /// Called by Class Texture
+        void _deleteTexture_SP(std::shared_ptr<SDL_Texture>);
+
     protected:
         template<typename... Args>
         void _setRenderer(RendererType Type,Args&&... args)
@@ -316,6 +332,8 @@ namespace MiniEngine
 		void _clear();
 		SDL_Window* _get();
 		Renderer winrnd;
+
+		std::list<std::shared_ptr<SDL_Texture>> _lst_texture_sp;
 	};
 
 	class Font
