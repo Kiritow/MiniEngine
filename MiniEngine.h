@@ -211,6 +211,11 @@ namespace MiniEngine
 		int drawPoint(Point p);
 		int drawLine(Point a,Point b);
 
+		int fillRects_Raw(const SDL_Rect* pRects,int n);
+        int drawRects_Raw(const SDL_Rect* pRects,int n);
+        int drawPoints_Raw(const SDL_Point* pPoints,int n);
+		int drawLines_Raw(const SDL_Point* pPoints,int n);
+
 		int clear();
 		void update();
 
@@ -232,6 +237,8 @@ namespace MiniEngine
 		int setViewport(Rect viewport);
 		int setViewport();
 		Rect getViewport();
+
+		Rect getOutputSize();
 
 		int setClipRect(Rect cliprect);
 		Rect getClipRect();

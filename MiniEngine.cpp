@@ -593,10 +593,20 @@ namespace MiniEngine
 		return SDL_RenderFillRect(_get(), &inr);
 	}
 
+	int Renderer::fillRects_Raw(const SDL_Rect* pRects,int n)
+    {
+        return SDL_RenderFillRects(_get(),pRects,n);
+    }
+
 	int Renderer::drawRect(Rect rect)
 	{
 		auto inr = rect.toSDLRect();
 		return SDL_RenderDrawRect(_get(), &inr);
+	}
+
+	int Renderer::drawRects_Raw(const SDL_Rect* pRects,int n)
+	{
+        return SDL_RenderDrawRects(_get(),pRects,n);
 	}
 
 	int Renderer::drawPoint(Point p)
@@ -604,9 +614,19 @@ namespace MiniEngine
         return SDL_RenderDrawPoint(_get(),p.x,p.y);
 	}
 
+	int Renderer::drawPoints_Raw(const SDL_Point* pPoints,int n)
+	{
+        return SDL_RenderDrawPoints(_get(),pPoints,n);
+	}
+
 	int Renderer::drawLine(Point a,Point b)
 	{
         return SDL_RenderDrawLine(_get(),a.x,a.y,b.x,b.y);
+	}
+
+	int Renderer::drawLines_Raw(const SDL_Point* pPoints,int n)
+	{
+        return SDL_RenderDrawLines(_get(),pPoints,n);
 	}
 
 	int Renderer::clear()
@@ -799,6 +819,13 @@ namespace MiniEngine
         SDL_RenderGetViewport(_get(),&rect);
         return Rect(rect);
 	}
+
+    Rect Renderer::getOutputSize()
+    {
+        int w,h;
+        SDL_GetRendererOutputSize(_get(),&w,&h);
+        return Rect(0,0,w,h);
+    }
 
 	int Renderer::setClipRect(Rect cliparea)
 	{
