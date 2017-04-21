@@ -150,6 +150,7 @@ namespace MiniEngine
 		friend class Window;
 		friend class Renderer;
 		friend class Font;
+		friend class Cursor;
 	};
 
 	class Texture
@@ -230,6 +231,33 @@ namespace MiniEngine
 		SDL_Renderer* _get();
 
 		friend class Window;
+	};
+
+	enum class SystemCursorType
+	{
+	    Arrow, Ibeam, CrossHair,
+        Wait, WaitArrow,
+        SizeNWSE, SizeNESW, SizeWE, SizeNS, SizeAll,
+        No, Hand
+    };
+
+	class Cursor
+	{
+    public:
+        static Cursor CreateSystemCursor(SystemCursorType);
+        static Cursor CreateCursor(Surface surf,Point hotspot={0,0});
+
+        static Cursor GetActiveCursor();
+        static Cursor GetDefaultCursor();
+
+        static void show(bool);
+        static bool isShow();
+    private:
+        std::shared_ptr<SDL_Cursor> _cur;
+        void _set(SDL_Cursor*);
+        void _set_no_delete(SDL_Cursor*);
+        SDL_Cursor* _get();
+        void _clear();
 	};
 
 	enum class MessageBoxType { Error, Warning, Information };
