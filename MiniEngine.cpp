@@ -837,6 +837,22 @@ namespace MiniEngine
     }
 
     //static
+    Cursor Cursor::GetActiveCursor()
+    {
+        Cursor ns;
+        ns._set(SDL_GetCursor());
+        return ns;
+    }
+
+    //static
+    Cursor Cursor::GetDefaultCursor()
+    {
+        Cursor ns;
+        ns._set(SDL_GetDefaultCursor());
+        return ns;
+    }
+
+    //static
     bool Cursor::isShow()
     {
         return (SDL_ShowCursor(SDL_QUERY)==SDL_ENABLE);
