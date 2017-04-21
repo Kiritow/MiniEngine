@@ -829,6 +829,16 @@ namespace MiniEngine
 		return std::string(SDL_GetWindowTitle(_get()));
 	}
 
+	void Window::setGrab(bool isGrab)
+	{
+        SDL_SetWindowGrab(_get(),isGrab?SDL_TRUE:SDL_FALSE);
+	}
+
+	bool Window::getGrab()
+	{
+        return (SDL_GetWindowGrab(_get())==SDL_TRUE)?true:false;
+	}
+
 	void Window::setResizable(bool resizable)
 	{
 		//SDL_SetWindowResizable(_get(), resizable?SDL_TRUE:SDL_FALSE);

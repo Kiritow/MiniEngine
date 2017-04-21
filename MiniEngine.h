@@ -268,6 +268,9 @@ namespace MiniEngine
 		void setTitle(std::string Title);
 		std::string getTitle();
 
+		void setGrab(bool);
+		bool getGrab();
+
 		void setResizable(bool resizable);
 
 		/// Use UTF8 in Title and Message please.
