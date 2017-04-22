@@ -252,6 +252,8 @@ namespace MiniEngine
 
         static void show(bool);
         static bool isShow();
+
+        void activate();
     private:
         std::shared_ptr<SDL_Cursor> _cur;
         void _set(SDL_Cursor*);

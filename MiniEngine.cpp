@@ -864,6 +864,11 @@ namespace MiniEngine
         SDL_ShowCursor(Settings?SDL_ENABLE:SDL_DISABLE);
     }
 
+    void Cursor::activate()
+    {
+        SDL_SetCursor(_get());
+    }
+
 	bool Renderer::isReady()
 	{
 		return (_get() != nullptr);
