@@ -81,7 +81,7 @@ int SQLDB::exec(const std::string& SQLCommand)
     return _exec_real(SQLCommand,nullptr,nullptr);
 }
 
-int SQLDB::exec(const std::string& SQLCommand,SQLCallback callback,void* param)
+int SQLDB::exec_raw(const std::string& SQLCommand,SQLCallback callback,void* param)
 {
     return _exec_real(SQLCommand,callback,param);
 }
