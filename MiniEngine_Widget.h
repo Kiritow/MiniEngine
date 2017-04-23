@@ -145,6 +145,14 @@ private:
     int _colorstatus;
 };
 
+class ProcessBarBase : public WidgetBase
+{
+public:
+    int currentVal,maxVal;
+    ProcessBarBase();
+    virtual void draw(const Brush&) override;
+};
+
 }/// End of namespace MiniEngine::Widget
 
 }/// End of namespace MiniEngine
