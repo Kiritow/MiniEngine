@@ -13,6 +13,8 @@ namespace Widget
 class PosInfo
 {
 public:
+    PosInfo() : x(0),y(0),w(1),h(1){}
+    PosInfo(double X,double Y,double W,double H) : x(X),y(Y),w(W),h(H) {}
     double x,y;
     double w,h;
     Rect getRect(Rect Area);
@@ -39,6 +41,7 @@ public:
     int copyFullFill(Texture t);
     Rect getArea();
     void setArea(Rect Area);
+    int fillRect(PosInfo info);
 protected:
     Brush(Renderer Rnd);
 private:
@@ -50,7 +53,8 @@ private:
 class BoardBase : public EventHandlerBase
 {
 public:
-    virtual void draw(const Brush&)=0;
+    virtual void draw(Brush&)=0;
+    PosInfo info;
 };
 
 class Frame
@@ -87,7 +91,7 @@ public:
     void add(WidgetBase*);
     int remove(Board*);
     int remove(WidgetBase*);
-    virtual void draw(const Brush&);
+    virtual void draw(Brush&);
     virtual bool event(const EventBase& ev) override;
     Board* getParent();
     Frame* getFrame();
@@ -95,7 +99,7 @@ public:
 private:
     std::list<Board*> _blst;
     std::list<WidgetBase*> _wlst;
-    PosInfo info;
+
     Board* _parent;
     Frame* _frame;
     friend class Frame;
@@ -125,7 +129,7 @@ class TextButton : public ButtonBase
 public:
     void setText(std::string Text);
     std::string getText();
-    virtual void draw(const Brush&) override;
+    virtual void draw(Brush&) override;
 private:
     std::string _word;
     Texture _text;
@@ -135,7 +139,7 @@ class ColorButton : public ButtonBase
 {
 public:
     RGBA normal,active,clicked;
-    virtual void draw(const Brush&) override;
+    virtual void draw(Brush&) override;
 protected:
     void onPressed();
     void onClick();
@@ -150,7 +154,7 @@ class ProcessBarBase : public WidgetBase
 public:
     int currentVal,maxVal;
     ProcessBarBase();
-    virtual void draw(const Brush&) override;
+    virtual void draw(Brush&) override;
 };
 
 }/// End of namespace MiniEngine::Widget

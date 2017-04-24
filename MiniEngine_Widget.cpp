@@ -124,6 +124,11 @@ Brush::Brush(Renderer Rnd) : Renderer(Rnd)
 
 }
 
+int Brush::fillRect(PosInfo info)
+{
+    return Renderer::fillRect(info.getRect(area));
+}
+
 
 
 
@@ -240,7 +245,7 @@ PosInfo Board::getPosInfo()
     return info;
 }
 
-void Board::draw(const Brush& b)
+void Board::draw(Brush& b)
 {
     /// FIXME: Bug Found while trying to draw a Board in Board.
     for(auto& p:_wlst)
@@ -324,24 +329,32 @@ std::string TextButton::getText()
     return _word;
 }
 
-void TextButton::draw(const Brush&)
+void TextButton::draw(Brush&)
 {
     /// FIXME: Unfinished TextButton::draw() due to Font loading in Frame.
     printf("TextButton::draw()\n");
 }
 
-void ColorButton::draw(const Brush& b)
+void ColorButton::draw(Brush& b)
 {
+    RGBA td=b.getColor();
     switch(_colorstatus)
     {
     case 0:/// Normal
         /// How to fill rect with PosInfo and Brush...
+        b.setColor(normal);
+        b.fillRect(info);
         break;
     case 1:/// Active (MouseOver)
+        b.setColor(active);
+        b.fillRect(info);
         break;
     case 2:/// Pressed Down (MouseUp)
+        b.setColor(active);
+        b.fillRect(info);
         break;
     }
+    b.setColor(td);
 }
 
 
