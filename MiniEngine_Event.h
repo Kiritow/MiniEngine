@@ -35,6 +35,13 @@ public:
     void update(const EventBase&);
 };
 
+class KeyEvent
+{
+public:
+    int key;
+    void update(const EventBase&);
+};
+
 class EventHandlerBase
 {
 public:
@@ -43,6 +50,8 @@ protected:
     virtual bool onMouseDown(const MouseButtonEvent&);
     virtual bool onMouseUp(const MouseButtonEvent&);
     virtual bool onMouseMotion(const MouseMotionEvent&);
+    virtual bool onKeyDown(const KeyEvent&);
+    virtual bool onKeyUp(const KeyEvent&);
 };
 
 }/// End of namespace MiniEngine::EventSystem

@@ -55,6 +55,12 @@ void MouseButtonEvent::update(const EventBase& ev)
     button=_MiniEngine_Internal::_mousebutton_event_enum_caster(e.button.button);
 }
 
+void KeyEvent::update(const EventBase& ev)
+{
+    EventBase::update(ev);
+    key=e.key.keysym.sym;
+}
+
 bool EventHandlerBase::event(const EventBase& ev)
 {
     switch(ev.e.type)
@@ -78,6 +84,20 @@ bool EventHandlerBase::event(const EventBase& ev)
             MouseMotionEvent eb;
             eb.update(ev);
             return onMouseMotion(eb);
+        }
+        break;
+    case SDL_KEYDOWN:
+        {
+            KeyEvent eb;
+            eb.update(ev);
+            return onKeyDown(eb);
+        }
+        break;
+    case SDL_KEYUP:
+        {
+            KeyEvent eb;
+            eb.update(ev);
+            return onKeyUp(eb);
         }
         break;
     }
