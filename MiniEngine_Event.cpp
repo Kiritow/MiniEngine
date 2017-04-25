@@ -1,5 +1,11 @@
 #include "MiniEngine_Event.h"
 
+namespace MiniEngine
+{
+
+namespace EventSystem
+{
+
 namespace _MiniEngine_Internal
 {
     MouseButton _mousebutton_event_enum_caster(int EventInt)
@@ -22,7 +28,7 @@ namespace _MiniEngine_Internal
             return MouseButton::Left;
         }
     }
-}/// End of namespace _MiniEngine_Internal
+}/// End of namespace MiniEngine::EventSystem::_MiniEngine_Internal
 
 EventBase::EventBase(SDL_Event Event)
 {
@@ -93,3 +99,7 @@ bool EventHandlerBase::onMouseMotion(const MouseMotionEvent& ev)
 {
     return false;
 }
+
+}/// End of namespace MiniEngine::EventSystem
+
+}/// End of namespace MiniEngine

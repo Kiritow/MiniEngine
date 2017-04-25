@@ -1,6 +1,12 @@
 #pragma once
 #include "MiniEngine.h"
 
+namespace MiniEngine
+{
+
+namespace EventSystem
+{
+
 class EventBase
 {
 public:
@@ -38,3 +44,7 @@ protected:
     virtual bool onMouseUp(const MouseButtonEvent&);
     virtual bool onMouseMotion(const MouseMotionEvent&);
 };
+
+}/// End of namespace MiniEngine::EventSystem
+
+}/// End of namespace MiniEngine
