@@ -8,11 +8,12 @@ namespace Widget
 
 Rect PosInfo::getRect(Rect Area)
 {
-    Area.x*=x;
-    Area.y*=y;
-    Area.w*=w;
-    Area.h*=h;
-    return Area;
+    Rect NewArea;
+    NewArea.x=Area.x+Area.w*x;
+    NewArea.y=Area.y+Area.h*y;
+    NewArea.w=Area.w*w;
+    NewArea.h=Area.h*h;
+    return NewArea;
 }
 
 
