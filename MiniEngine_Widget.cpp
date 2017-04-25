@@ -1,4 +1,5 @@
 #include "MiniEngine_Widget.h"
+#include <algorithm>
 
 namespace MiniEngine
 {
@@ -131,7 +132,34 @@ int Brush::fillRect(PosInfo info)
 }
 
 
+SDL_Event _WidgetEventBase::getRealEvent()
+{
+    return e;
+}
 
+void _PositionEvent::updatePos(int X,int Y,Rect Area)
+{
+    printf("PositionEvent::updatePos(%d,%d,Rect:%d %d %d %d)\n",X,Y,Area.x,Area.y,Area.w,Area.h);
+    x=(double)(X-Area.x)/Area.w;
+    y=(double)(Y-Area.y)/Area.h;
+    printf("Position: %.2f %.2f\n",x,y);
+}
+
+void MouseButtonEvent::update(const MiniEngine::EventSystem::MouseButtonEvent& ev,Rect Area)
+{
+    updatePos(ev.x,ev.y,Area);
+    button=ev.button;
+}
+
+void MouseMotionEvent::update(const MiniEngine::EventSystem::MouseMotionEvent& ev,Rect Area)
+{
+    updatePos(ev.x,ev.y,Area);
+}
+
+void KeyEvent::update(const MiniEngine::EventSystem::KeyEvent& ev)
+{
+    key=ev.key;
+}
 
 Frame::Frame(Renderer rnd,Rect Area) : brush(rnd)
 {
@@ -142,13 +170,13 @@ Frame::Frame(Renderer rnd,Rect Area) : brush(rnd)
 void Frame::add(Board* p)
 {
     _lst.push_back(p);
-    p->_frame=this;
+    p->setFrame(this);
 }
 
 int Frame::remove(Board* p)
 {
     _lst.remove(p);
-    p->_frame=nullptr;
+    p->setFrame(nullptr);
     return 0;
 }
 
@@ -158,7 +186,7 @@ void Frame::run()
     {
         while(!update&&SDL_WaitEvent(&e))
         {
-            EventBase x(e);
+            MiniEngine::EventSystem::EventBase x(e);
             bool dealed=false;
             if(!_lst.empty())
             {
@@ -187,9 +215,8 @@ void Frame::run()
         {
             for(auto iter=_lst.rbegin();iter!=_lst.rend();++iter)
             {
-                Brush nbrush=brush;
-                nbrush.setArea((*iter)->getPosInfo().getRect(brush.getArea()));
-                (*iter)->draw(nbrush);
+                (*iter)->_realrect=(*iter)->info.getRect(brush.getArea());
+                (*iter)->draw(brush);
             }
         }
 
@@ -211,70 +238,146 @@ void Frame::needUpdate()
     update=true;
 }
 
-
-
-
-
-void Board::add(Board* p)
+//private virtual override
+bool BoardBase::onMouseDown(const MiniEngine::EventSystem::MouseButtonEvent& ev)
 {
-    _blst.push_back(p);
-    p->_parent=this;
+    MouseButtonEvent e;
+    e.update(ev,_realrect);
+    return onMouseDown(e);
+}
+//private virtual override
+bool BoardBase::onMouseUp(const MiniEngine::EventSystem::MouseButtonEvent& ev)
+{
+    MouseButtonEvent e;
+    e.update(ev,_realrect);
+    return onMouseUp(e);
+}
+//private virtual override
+bool BoardBase::onMouseMotion(const MiniEngine::EventSystem::MouseMotionEvent& ev)
+{
+    MouseMotionEvent e;
+    e.update(ev,_realrect);
+    return onMouseMotion(e);
+}
+//private virtual override
+bool BoardBase::onKeyDown(const MiniEngine::EventSystem::KeyEvent& ev)
+{
+    KeyEvent e;
+    e.update(ev);
+    return onKeyDown(e);
+}
+//private virtual override
+bool BoardBase::onKeyUp(const MiniEngine::EventSystem::KeyEvent& ev)
+{
+    KeyEvent e;
+    e.update(ev);
+    return onKeyUp(e);
+}
+//protected virtual
+bool BoardBase::onMouseDown(const MouseButtonEvent& ev)
+{
+    return false;
+}
+//protected virtual
+bool BoardBase::onMouseUp(const MouseButtonEvent& ev)
+{
+    return false;
+}
+//protected virtual
+bool BoardBase::onMouseMotion(const MouseMotionEvent& ev)
+{
+    return false;
+}
+//protected virtual
+bool BoardBase::onKeyDown(const KeyEvent& ev)
+{
+    return false;
+}
+//protected virtual
+bool BoardBase::onKeyUp(const KeyEvent& ev)
+{
+    return false;
+}
+Frame* BoardBase::getFrame()
+{
+    return _frame;
+}
+BoardBase* BoardBase::getParent()
+{
+    return _parent;
+}
+//virtual
+void BoardBase::setFrame(Frame* pFrame)
+{
+    _frame=pFrame;
+}
+//virtual
+void BoardBase::setParent(BoardBase* pBoardBase)
+{
+    _parent=pBoardBase;
 }
 
-int Board::remove(Board* p)
+Board::Board()
 {
-    _blst.remove(p);
-    p->_parent=nullptr;
-    return 0;
+    setParent(nullptr);
+    setFrame(nullptr);
 }
 
-void Board::add(WidgetBase* p)
+void Board::add(BoardBase* p)
 {
-    _wlst.push_back(p);
-    p->_parent=this;
+    _lst.push_back(p);
+    p->setParent(this);
+    p->setFrame(getFrame());
 }
 
-int Board::remove(WidgetBase* p)
+bool Board::remove(BoardBase* p)
 {
-    _wlst.remove(p);
-    p->_parent=nullptr;
-    return 0;
-}
-
-PosInfo Board::getPosInfo()
-{
-    return info;
+    if(std::find(_lst.begin(),_lst.end(),p)!=_lst.end())
+    {
+        _lst.remove(p);
+        p->setParent(nullptr);
+        p->setFrame(nullptr);
+        return true;
+    }
+    return false;
 }
 
 void Board::draw(Brush& b)
 {
-    /// FIXME: Bug Found while trying to draw a Board in Board.
-    for(auto& p:_wlst)
-    {
-        p->draw(b);
-    }
-
     Brush nb=b;
-    nb.setArea(info.getRect(nb.getArea()));
-    for(auto& p:_blst)
+    nb.setArea(_realrect);
+    for(auto& p:_lst)
     {
+        p->_realrect=p->info.getRect(_realrect);
         p->draw(nb);
     }
 }
 
-bool Board::event(const EventBase& ev) /// virtual override
+bool Board::event(const MiniEngine::EventSystem::EventBase& ev) /// virtual override
 {
-    for(auto& p:_wlst)
+    for(auto& p:_lst)
     {
         if(p->event(ev)) return true;
     }
-
-    for(auto& p:_blst)
-    {
-        if(p->event(ev)) return true;
-    }
-
     return false;
+}
+//virtual override
+void Board::setFrame(Frame* pFrame)
+{
+    _frame=pFrame;
+    for(auto& p:_lst)
+    {
+        p->setFrame(pFrame);
+    }
+}
+//virtual override
+void Board::setParent(BoardBase* pBoardBase)
+{
+    _parent=pBoardBase;
+    for(auto& p:_lst)
+    {
+        p->setParent(pBoardBase);
+    }
 }
 
 ButtonBase::ButtonBase()
@@ -282,7 +385,7 @@ ButtonBase::ButtonBase()
     _status=0;
 }
 
-void ButtonBase::onPressed()
+void ButtonBase::onRelease()
 {
 
 }
@@ -301,20 +404,43 @@ void ButtonBase::onMouseOut()
 {
 
 }
-
+//private override
 bool ButtonBase::onMouseDown(const MouseButtonEvent& ev)
 {
-
+    if(_status==1&&ev.x>0&&ev.y>0&&ev.x<1&&ev.y<1)
+    {
+        _status=2;
+        onClick();
+        return true;
+    }
     return false;
 }
-
+//private override
 bool ButtonBase::onMouseUp(const MouseButtonEvent& ev)
 {
+    if(_status==2&&ev.x>0&&ev.y>0&&ev.x<1&&ev.y<1)
+    {
+        _status=1;
+        onRelease();
+        return true;
+    }
     return false;
 }
-
+//private override
 bool ButtonBase::onMouseMotion(const MouseMotionEvent& ev)
 {
+    if(_status==0&&ev.x>0&&ev.y>0&&ev.x<1&&ev.y<1)
+    {
+        _status=1;
+        onMouseOver();
+        return true;
+    }
+    else if(_status==1&&!(ev.x>0&&ev.y>0&&ev.x<1&&ev.y<1))
+    {
+        _status=0;
+        onMouseOut();
+        return true;
+    }
     return false;
 }
 
@@ -336,13 +462,32 @@ void TextButton::draw(Brush&)
     printf("TextButton::draw()\n");
 }
 
+void ColorButton::onRelease()
+{
+    getFrame()->needUpdate();
+    printf("Released\n");
+}
+void ColorButton::onClick()
+{
+    getFrame()->needUpdate();
+    printf("Clicked\n");
+}
+void ColorButton::onMouseOver()
+{
+    getFrame()->needUpdate();
+    printf("MouseOver\n");
+}
+void ColorButton::onMouseOut()
+{
+    getFrame()->needUpdate();
+    printf("MouseOut\n");
+}
 void ColorButton::draw(Brush& b)
 {
     RGBA td=b.getColor();
-    switch(_colorstatus)
+    switch(_status)
     {
     case 0:/// Normal
-        /// How to fill rect with PosInfo and Brush...
         b.setColor(normal);
         b.fillRect(info);
         break;
@@ -351,7 +496,7 @@ void ColorButton::draw(Brush& b)
         b.fillRect(info);
         break;
     case 2:/// Pressed Down (MouseUp)
-        b.setColor(active);
+        b.setColor(clicked);
         b.fillRect(info);
         break;
     }

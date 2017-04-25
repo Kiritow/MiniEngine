@@ -49,12 +49,68 @@ private:
     friend class Frame;
 };
 
+class _WidgetEventBase : public MiniEngine::EventSystem::EventBase
+{
+public:
+    SDL_Event getRealEvent();
+};
 
-class BoardBase : public EventHandlerBase
+class _PositionEvent : public _WidgetEventBase
+{
+public:
+    double x,y;
+    void updatePos(int X,int Y,Rect);
+};
+
+using MouseButton = MiniEngine::EventSystem::MouseButton;
+
+class MouseButtonEvent : public _PositionEvent
+{
+public:
+    MouseButton button;
+    void update(const MiniEngine::EventSystem::MouseButtonEvent&,Rect);
+};
+
+class MouseMotionEvent : public _PositionEvent
+{
+public:
+    void update(const MiniEngine::EventSystem::MouseMotionEvent&,Rect);
+};
+
+class KeyEvent : public _WidgetEventBase
+{
+public:
+    int key;
+    void update(const MiniEngine::EventSystem::KeyEvent&);
+};
+
+
+class BoardBase : public MiniEngine::EventSystem::EventHandlerBase
 {
 public:
     virtual void draw(Brush&)=0;
     PosInfo info;
+    Rect _realrect;
+
+    BoardBase* getParent();
+    virtual void setParent(BoardBase*);
+    Frame* getFrame();
+    virtual void setFrame(Frame*);
+
+protected:
+    virtual bool onMouseDown(const MouseButtonEvent&);
+    virtual bool onMouseUp(const MouseButtonEvent&);
+    virtual bool onMouseMotion(const MouseMotionEvent&);
+    virtual bool onKeyDown(const KeyEvent&);
+    virtual bool onKeyUp(const KeyEvent&);
+    BoardBase* _parent;
+    Frame* _frame;
+private:
+    virtual bool onMouseDown(const MiniEngine::EventSystem::MouseButtonEvent&) override;
+    virtual bool onMouseUp(const MiniEngine::EventSystem::MouseButtonEvent&) override;
+    virtual bool onMouseMotion(const MiniEngine::EventSystem::MouseMotionEvent&) override;
+    virtual bool onKeyDown(const MiniEngine::EventSystem::KeyEvent&) override;
+    virtual bool onKeyUp(const MiniEngine::EventSystem::KeyEvent&) override;
 };
 
 class Frame
@@ -78,50 +134,40 @@ class WidgetBase : public BoardBase
 {
 public:
     Board* getBoard();
-    PosInfo info;
 private:
-    Board* _parent;
     friend class Board;
 };
 
 class Board : public BoardBase
 {
 public:
-    void add(Board*);
-    void add(WidgetBase*);
-    int remove(Board*);
-    int remove(WidgetBase*);
-    virtual void draw(Brush&);
-    virtual bool event(const EventBase& ev) override;
-    Board* getParent();
-    Frame* getFrame();
-    PosInfo getPosInfo();
+    Board();
+    void add(BoardBase*);
+    bool remove(BoardBase*);
+    virtual void draw(Brush&) override;
+    virtual bool event(const MiniEngine::EventSystem::EventBase& ev) override;
+
+    virtual void setParent(BoardBase*) override;
+    virtual void setFrame(Frame*) override;
 private:
-    std::list<Board*> _blst;
-    std::list<WidgetBase*> _wlst;
-
-    Board* _parent;
-    Frame* _frame;
-    friend class Frame;
+    std::list<BoardBase*> _lst;
 };
-
-
 
 class ButtonBase : public WidgetBase
 {
 protected:
     ButtonBase();
-    void onPressed();
-    void onClick();
-    void onMouseOver();
-    void onMouseOut();
+    virtual void onRelease();
+    virtual void onClick();
+    virtual void onMouseOver();
+    virtual void onMouseOut();
+    /// Button Status: 0 Normal 1 MouseOver 2 MouseDown(Clicked)
+    int _status;
 private:
     /// Overrides, called by EventHandler::event()
     virtual bool onMouseDown(const MouseButtonEvent&) override;
     virtual bool onMouseUp(const MouseButtonEvent&) override;
     virtual bool onMouseMotion(const MouseMotionEvent&) override;
-
-    int _status;
 };
 
 class TextButton : public ButtonBase
@@ -141,12 +187,10 @@ public:
     RGBA normal,active,clicked;
     virtual void draw(Brush&) override;
 protected:
-    void onPressed();
-    void onClick();
-    void onMouseOver();
-    void onMouseOut();
-private:
-    int _colorstatus;
+    virtual void onRelease() override;
+    virtual void onClick() override;
+    virtual void onMouseOver() override;
+    virtual void onMouseOut() override;
 };
 
 class ProcessBarBase : public WidgetBase
