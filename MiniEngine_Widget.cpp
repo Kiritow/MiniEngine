@@ -465,22 +465,18 @@ void TextButton::draw(Brush&)
 void ColorButton::onRelease()
 {
     getFrame()->needUpdate();
-    printf("Released\n");
 }
 void ColorButton::onClick()
 {
     getFrame()->needUpdate();
-    printf("Clicked\n");
 }
 void ColorButton::onMouseOver()
 {
     getFrame()->needUpdate();
-    printf("MouseOver\n");
 }
 void ColorButton::onMouseOut()
 {
     getFrame()->needUpdate();
-    printf("MouseOut\n");
 }
 void ColorButton::draw(Brush& b)
 {
