@@ -119,6 +119,14 @@ bool EventHandlerBase::onMouseMotion(const MouseMotionEvent& ev)
 {
     return false;
 }
+bool EventHandlerBase::onKeyDown(const KeyEvent& ev)
+{
+    return false;
+}
+bool EventHandlerBase::onKeyUp(const KeyEvent& ev)
+{
+    return false;
+}
 
 }/// End of namespace MiniEngine::EventSystem
 

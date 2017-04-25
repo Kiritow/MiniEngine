@@ -35,7 +35,7 @@ public:
     void update(const EventBase&);
 };
 
-class KeyEvent
+class KeyEvent : public EventBase
 {
 public:
     int key;
