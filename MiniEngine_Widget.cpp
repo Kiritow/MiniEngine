@@ -131,6 +131,11 @@ int Brush::fillRect(PosInfo info)
     return Renderer::fillRect(info.getRect(area));
 }
 
+int Brush::drawRect(PosInfo info)
+{
+    return Renderer::drawRect(info.getRect(area));
+}
+
 
 SDL_Event _WidgetEventBase::getRealEvent()
 {
@@ -139,10 +144,8 @@ SDL_Event _WidgetEventBase::getRealEvent()
 
 void _PositionEvent::updatePos(int X,int Y,Rect Area)
 {
-    printf("PositionEvent::updatePos(%d,%d,Rect:%d %d %d %d)\n",X,Y,Area.x,Area.y,Area.w,Area.h);
     x=(double)(X-Area.x)/Area.w;
     y=(double)(Y-Area.y)/Area.h;
-    printf("Position: %.2f %.2f\n",x,y);
 }
 
 void MouseButtonEvent::update(const MiniEngine::EventSystem::MouseButtonEvent& ev,Rect Area)
@@ -444,11 +447,79 @@ bool ButtonBase::onMouseMotion(const MouseMotionEvent& ev)
     return false;
 }
 
-void TextButton::setText(std::string Text)
+//private
+FontManager::FontManager()
+{
+    _id=0;
+}
+
+FONTHANDLE FontManager::loadFont(const std::string& FontFilename,int Size)
+{
+    Font t;
+    int ret=t.use(FontFilename,Size);
+    if(ret!=0)
+    {
+        /// Error
+        return nullptr;
+    }
+    else
+    {
+        ++_id;
+        _vec.push_back(std::make_pair(_id,t));
+        return (FONTHANDLE)(_id);
+    }
+}
+
+Font FontManager::getFont(FONTHANDLE ID)
+{
+    Font t;
+    for(auto& x:_vec)
+    {
+        if(x.first==(int)ID)
+        {
+            return x.second;
+        }
+    }
+    return t;
+}
+void FontManager::freeFont(FONTHANDLE ID)
+{
+    for(auto iter=_vec.begin();iter!=_vec.end();iter++)
+    {
+        if(iter->first==(int)ID)
+        {
+            _vec.erase(iter);
+            return;
+        }
+    }
+}
+FontManager* FontManager::getInstance()
+{
+    if(_this==nullptr)
+    {
+        _this=new FontManager();
+        _this->loadFont("msyh.ttf",18);
+        return _this;
+    }
+    else
+    {
+        return _this;
+    }
+}
+
+//static
+FontManager* FontManager::_this=nullptr;
+
+TextButton::TextButton()
+{
+    _changed=false;
+}
+
+void TextButton::setText(std::string Text,FONTHANDLE FontStyle)
 {
     if(Text==_word) return;
     _word=Text;
-    /// TODO: How to Render...
+    _changed=true;
 }
 
 std::string TextButton::getText()
@@ -456,10 +527,16 @@ std::string TextButton::getText()
     return _word;
 }
 
-void TextButton::draw(Brush&)
+void TextButton::draw(Brush& b)
 {
-    /// FIXME: Unfinished TextButton::draw() due to Font loading in Frame.
-    printf("TextButton::draw()\n");
+    if(_changed)
+    {
+        _text=FontManager::getInstance()->getFont(_style).renderUTF8(b,_word,RGBA(255,255,255,0));
+        _changed=false;
+    }
+
+    b.drawRect(info);
+    b.copyTo(_text,info);
 }
 
 void ColorButton::onRelease()
@@ -502,4 +579,4 @@ void ColorButton::draw(Brush& b)
 
 }/// End of namespace MiniEngine::Widget
 
-}/// End of namespace MiniEngine::Widget
+}/// End of namespace MiniEngine

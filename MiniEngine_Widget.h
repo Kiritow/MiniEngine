@@ -3,6 +3,7 @@
 #include "MiniEngine_Event.h"
 #include <string>
 #include <list>
+#include <vector>
 
 namespace MiniEngine
 {
@@ -42,6 +43,7 @@ public:
     Rect getArea();
     void setArea(Rect Area);
     int fillRect(PosInfo info);
+    int drawRect(PosInfo info);
 protected:
     Brush(Renderer Rnd);
 private:
@@ -170,15 +172,34 @@ private:
     virtual bool onMouseMotion(const MouseMotionEvent&) override;
 };
 
+typedef void* FONTHANDLE;
+class FontManager
+{
+public:
+    FONTHANDLE loadFont(const std::string& FontFilename,int Size);
+    Font getFont(FONTHANDLE ID);
+    void freeFont(FONTHANDLE ID);
+
+    static FontManager* getInstance();
+private:
+    FontManager();
+    std::vector<std::pair<int,Font>> _vec;
+    int _id;
+    static FontManager* _this;
+};
+
 class TextButton : public ButtonBase
 {
 public:
-    void setText(std::string Text);
+    TextButton();
+    void setText(std::string Text,FONTHANDLE FontStyle=(FONTHANDLE)1);
     std::string getText();
     virtual void draw(Brush&) override;
 private:
     std::string _word;
     Texture _text;
+    bool _changed;
+    FONTHANDLE _style;
 };
 
 class ColorButton : public ButtonBase
