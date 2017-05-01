@@ -3,7 +3,7 @@
 ## 应用到项目中
 ## MiniEngine核心部分
 ### 类列表
-Rect
+[Rect](rect.md)  
 Point
 ColorMode
 RGBA
