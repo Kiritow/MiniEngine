@@ -1,4 +1,4 @@
-CXXFLAGS = -std=c++14 -Wall -O2 -D__C4DROID__ -Iinclude
+CXXFLAGS = -std=c++14 -Wall -O2 -D__LINUX__ -Iinclude
 LDFLAGS =
 LDLIBS = -lstdc++ -lSDL2_image -lSDL2_net -lSDL2_ttf -lSDL2_mixer -lSDL2_test -lSDL2 -shared
 
