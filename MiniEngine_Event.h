@@ -56,9 +56,22 @@ public:
     void needstop();
     void stop();
     void reset();
-private:
+
+    std::function<void()> updater;
+
+protected:
     Event _e;
     bool _running,_update;
     std::map<_SDLEventType_,std::list<std::pair<int,std::function<int(Looper&,Event&)>>>> _evmap;
     int _loop_cnt;
+};
+
+class Poller : public Looper
+{
+public:
+    Poller();
+    void run();
+    void reset();
+
+    std::function<void()> idler;
 };

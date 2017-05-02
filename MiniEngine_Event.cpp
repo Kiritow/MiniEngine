@@ -29,6 +29,7 @@ Looper::Looper()
 {
     _update=_running=true;
     _loop_cnt=0;
+    updater=[](){};
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<int(Looper&,Event&)>& event_callback)
 {
@@ -149,6 +150,11 @@ bool Looper::remove(const LooperID& looperid)
     return false;
 }
 
+bool Looper::operator -(const LooperID& looperid)
+{
+    return remove(looperid);
+}
+
 void Looper::dispatch()
 {
     for(auto callbackPack:_evmap[_e.type])
@@ -164,6 +170,8 @@ void Looper::run()
         {
             dispatch();
         }
+
+        updater();
 
         _update=false;
     }
@@ -191,4 +199,36 @@ void Looper::reset()
     _update=true;
     _evmap.clear();
     _loop_cnt=0;
+    updater=[](){};
+}
+
+Poller::Poller()
+{
+    idler=[](){};
+}
+
+void Poller::reset()
+{
+    Looper::reset();
+    idler=[](){};
+}
+
+void Poller::run()
+{
+    int pollret=1;
+    while(_running)
+    {
+        while(!_update&&(pollret=PollEvent(_e)))
+        {
+            dispatch();
+        }
+
+        /// If pollret is not 0 (new event requests update), or pollret is 0 (No New Event) but Idle function requests update, then call update.
+        if(!pollret) idler();
+        if(_update)
+        {
+            updater();
+            _update=false;
+        }
+    }
 }
