@@ -10,18 +10,45 @@ int WaitEvent(Event& refEvent);
 int WaitEventTimeout(Event& refEvent,int ms);
 int PushEvent(const Event& refEvent);
 
+typedef struct
+{
+    decltype(Event::type) _type_id;
+    int _looper_cnt;
+}LooperID;
+
+bool operator == (const LooperID&,const LooperID&);
+
 class Looper
 {
 public:
+    typedef decltype(Event::type) _SDLEventType_;
     Looper();
     /// If Callback does not return 0, then stop transferring this event.
-    void add(decltype(Event::type) event_type,const std::function<int(Looper&,Event&)>& event_callback);
-    /// If Callback does not return 0, then stop transferring this event. (Discards Looper)
-    void add(decltype(Event::type) event_type,const std::function<int(Event&)>& event_callback);
-    /// If Callback has no return (void), then we assume it return 0.
-    void add(decltype(Event::type) event_type,const std::function<void(Looper&,Event&)>& event_callback);
-    /// If Callback has no return (void), then we assume it return 0. (Discards Looper)
-    void add(decltype(Event::type) event_type,const std::function<void(Event&)>& event_callback);
+    LooperID add(_SDLEventType_ event_type,const std::function<int(Looper&,Event&)>& event_callback);
+    LooperID add(_SDLEventType_ event_type,const std::function<int(Event&)>& event_callback);
+    LooperID add(_SDLEventType_ event_type,const std::function<int(Looper&)>& event_callback);
+    LooperID add(_SDLEventType_ event_type,const std::function<int()>& event_callback);
+
+    /// If Callback has no return (void), then we assume it returns 0.
+    LooperID add(_SDLEventType_ event_type,const std::function<void(Looper&,Event&)>& event_callback);
+    LooperID add(_SDLEventType_ event_type,const std::function<void(Event&)>& event_callback);
+    LooperID add(_SDLEventType_ event_type,const std::function<void(Looper&)>& event_callback);
+    LooperID add(_SDLEventType_ event_type,const std::function<void()>& event_callback);
+
+    LooperID operator + (const std::pair<_SDLEventType_,std::function<int(Looper&,Event&)>>& event_callback);
+    LooperID operator + (const std::pair<_SDLEventType_,std::function<int(Event&)>>& event_callback);
+    LooperID operator + (const std::pair<_SDLEventType_,std::function<int(Looper&)>>& event_callback);
+    LooperID operator + (const std::pair<_SDLEventType_,std::function<int()>>& event_callback);
+
+    LooperID operator + (const std::pair<_SDLEventType_,std::function<void(Looper&,Event&)>>& event_callback);
+    LooperID operator + (const std::pair<_SDLEventType_,std::function<void(Event&)>>& event_callback);
+    LooperID operator + (const std::pair<_SDLEventType_,std::function<void(Looper&)>>& event_callback);
+    LooperID operator + (const std::pair<_SDLEventType_,std::function<void()>>& event_callback);
+
+    bool remove(const LooperID& looperid);
+
+    bool operator - (const LooperID& looperid);
+
     void dispatch();
     void run();
     Event GetLastEvent();
@@ -32,5 +59,6 @@ public:
 private:
     Event _e;
     bool _running,_update;
-    std::map<decltype(Event::type),std::list<std::function<int(Looper&,Event&)>>> _evmap;
+    std::map<_SDLEventType_,std::list<std::pair<int,std::function<int(Looper&,Event&)>>>> _evmap;
+    int _loop_cnt;
 };
