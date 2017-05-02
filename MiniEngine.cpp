@@ -164,7 +164,7 @@ namespace MiniEngine
 	{
 		auto p = toSDLPoint();
 		auto r = rect.toSDLRect();
-		return SDL_PointInRect(&p, &r);
+		return ( SDL_PointInRect(&p, &r) == SDL_TRUE );
 	}
 
 	ColorMode::ColorMode(int R, int G, int B)
@@ -1582,12 +1582,12 @@ namespace MiniEngine
 
 	bool MusicPlayer::isPlaying()
 	{
-		return Mix_PlayingMusic();
+		return (Mix_PlayingMusic() == 1);
 	}
 
 	bool MusicPlayer::isPaused()
 	{
-		return Mix_PausedMusic();
+		return (Mix_PausedMusic() == 1);
 	}
 
 	int MusicPlayer::isFading()
