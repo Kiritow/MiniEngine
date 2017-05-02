@@ -51,8 +51,7 @@ public:
 
     int exec(const std::string& SQLCommand);
 
-    /// Reserved For Capability
-    int exec(const std::string& SQLCommand,SQLCallback callback,void* param);
+    int exec_raw(const std::string& SQLCommand,SQLCallback callback,void* param);
 
     const char* getErrorMsg();
     void clearError();

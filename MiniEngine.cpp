@@ -50,6 +50,72 @@ namespace MiniEngine
                 return SDL_BLENDMODE_NONE;
             }
         }
+
+        SystemCursorType getCursorTypeFromSDLSystemCursor(SDL_SystemCursor id)
+        {
+            switch(id)
+            {
+            case SDL_SYSTEM_CURSOR_ARROW:
+                return SystemCursorType::Arrow;
+            case SDL_SYSTEM_CURSOR_CROSSHAIR:
+                return SystemCursorType::CrossHair;
+            case SDL_SYSTEM_CURSOR_HAND:
+                return SystemCursorType::Hand;
+            case SDL_SYSTEM_CURSOR_IBEAM:
+                return SystemCursorType::Ibeam;
+            case SDL_SYSTEM_CURSOR_NO:
+                return SystemCursorType::No;
+            case SDL_SYSTEM_CURSOR_SIZEALL:
+                return SystemCursorType::SizeAll;
+            case SDL_SYSTEM_CURSOR_SIZENESW:
+                return SystemCursorType::SizeNESW;
+            case SDL_SYSTEM_CURSOR_SIZENS:
+                return SystemCursorType::SizeNS;
+            case SDL_SYSTEM_CURSOR_SIZENWSE:
+                return SystemCursorType::SizeNWSE;
+            case SDL_SYSTEM_CURSOR_SIZEWE:
+                return SystemCursorType::SizeWE;
+            case SDL_SYSTEM_CURSOR_WAIT:
+                return SystemCursorType::Wait;
+            case SDL_SYSTEM_CURSOR_WAITARROW:
+                return SystemCursorType::WaitArrow;
+            default:/// return SystemCursorType::Arrow on default.
+                return SystemCursorType::Arrow;
+            }
+        }
+
+        SDL_SystemCursor getSDLSystemCursorFromSystemCursorType(SystemCursorType type)
+        {
+            switch(type)
+            {
+            case SystemCursorType::Arrow:
+                return SDL_SYSTEM_CURSOR_ARROW;
+            case SystemCursorType::CrossHair:
+                return SDL_SYSTEM_CURSOR_CROSSHAIR;
+            case SystemCursorType::Hand:
+                return SDL_SYSTEM_CURSOR_HAND;
+            case SystemCursorType::Ibeam:
+                return SDL_SYSTEM_CURSOR_IBEAM;
+            case SystemCursorType::No:
+                return SDL_SYSTEM_CURSOR_NO;
+            case SystemCursorType::SizeAll:
+                return SDL_SYSTEM_CURSOR_SIZEALL;
+            case SystemCursorType::SizeNESW:
+                return SDL_SYSTEM_CURSOR_SIZENESW;
+            case SystemCursorType::SizeNS:
+                return SDL_SYSTEM_CURSOR_SIZENS;
+            case SystemCursorType::SizeNWSE:
+                return SDL_SYSTEM_CURSOR_SIZENWSE;
+            case SystemCursorType::SizeWE:
+                return SDL_SYSTEM_CURSOR_SIZEWE;
+            case SystemCursorType::Wait:
+                return SDL_SYSTEM_CURSOR_WAIT;
+            case SystemCursorType::WaitArrow:
+                return SDL_SYSTEM_CURSOR_WAITARROW;
+            default:/// return SDL_SYSTEM_CURSOR_ARROW on default.
+                return SDL_SYSTEM_CURSOR_ARROW;
+            }
+        }
     }/// End of namespace _internal
 
 	Rect::Rect(int X, int Y, int W, int H)
@@ -98,7 +164,7 @@ namespace MiniEngine
 	{
 		auto p = toSDLPoint();
 		auto r = rect.toSDLRect();
-		return SDL_PointInRect(&p, &r);
+		return ( SDL_PointInRect(&p, &r) == SDL_TRUE );
 	}
 
 	ColorMode::ColorMode(int R, int G, int B)
@@ -735,6 +801,74 @@ namespace MiniEngine
 		return t;
 	}
 
+	//private
+	void Cursor::_set(SDL_Cursor* p)
+	{
+        _cur.reset(p,SDL_FreeCursor);
+	}
+
+	//private
+	void Cursor::_set_no_delete(SDL_Cursor* p)
+	{
+        _cur.reset(p,[](SDL_Cursor* p){});
+	}
+
+	//private
+	SDL_Cursor* Cursor::_get()
+	{
+        return _cur.get();
+	}
+
+	//static
+    Cursor Cursor::CreateCursor(Surface surf,Point hotspot)
+    {
+        Cursor ns;
+        SDL_Cursor* cursor=SDL_CreateColorCursor(surf._get(),hotspot.x,hotspot.y);
+        ns._set(cursor);
+        return ns;
+    }
+
+    //static
+    Cursor Cursor::CreateSystemCursor(SystemCursorType type)
+    {
+        Cursor ns;
+        ns._set(SDL_CreateSystemCursor(_internal::getSDLSystemCursorFromSystemCursorType(type)));
+        return ns;
+    }
+
+    //static
+    Cursor Cursor::GetActiveCursor()
+    {
+        Cursor ns;
+        ns._set(SDL_GetCursor());
+        return ns;
+    }
+
+    //static
+    Cursor Cursor::GetDefaultCursor()
+    {
+        Cursor ns;
+        ns._set(SDL_GetDefaultCursor());
+        return ns;
+    }
+
+    //static
+    bool Cursor::isShow()
+    {
+        return (SDL_ShowCursor(SDL_QUERY)==SDL_ENABLE);
+    }
+
+    //static
+    void Cursor::show(bool Settings)
+    {
+        SDL_ShowCursor(Settings?SDL_ENABLE:SDL_DISABLE);
+    }
+
+    void Cursor::activate()
+    {
+        SDL_SetCursor(_get());
+    }
+
 	bool Renderer::isReady()
 	{
 		return (_get() != nullptr);
@@ -827,6 +961,16 @@ namespace MiniEngine
 	std::string Window::getTitle()
 	{
 		return std::string(SDL_GetWindowTitle(_get()));
+	}
+
+	void Window::setGrab(bool isGrab)
+	{
+        SDL_SetWindowGrab(_get(),isGrab?SDL_TRUE:SDL_FALSE);
+	}
+
+	bool Window::getGrab()
+	{
+        return (SDL_GetWindowGrab(_get())==SDL_TRUE)?true:false;
 	}
 
 	void Window::setResizable(bool resizable)
@@ -1438,12 +1582,12 @@ namespace MiniEngine
 
 	bool MusicPlayer::isPlaying()
 	{
-		return Mix_PlayingMusic();
+		return (Mix_PlayingMusic() == 1);
 	}
 
 	bool MusicPlayer::isPaused()
 	{
-		return Mix_PausedMusic();
+		return (Mix_PausedMusic() == 1);
 	}
 
 	int MusicPlayer::isFading()

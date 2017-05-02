@@ -7,6 +7,9 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
+
+/// VC++ does not implied C++ exception. Use this to ignore compile warning on this.
+#pragma warning (disable:4290)
 #else
 /// CodeBlocks (MinGW Compiler)
 #include <SDL2/SDL.h>
@@ -20,8 +23,7 @@
 #include <memory>
 #include <functional>
 
-#define _DECL_DEPRECATED __declspec(deprecated)
-#define _DECL_DEPRECATED_MSG(InfoString) __declspec(deprecated(InfoString))
+#define _DECL_DEPRECATED [[deprecated]]
 
 namespace MiniEngine
 {
@@ -150,6 +152,7 @@ namespace MiniEngine
 		friend class Window;
 		friend class Renderer;
 		friend class Font;
+		friend class Cursor;
 	};
 
 	class Texture
@@ -232,6 +235,35 @@ namespace MiniEngine
 		friend class Window;
 	};
 
+	enum class SystemCursorType
+	{
+	    Arrow, Ibeam, CrossHair,
+        Wait, WaitArrow,
+        SizeNWSE, SizeNESW, SizeWE, SizeNS, SizeAll,
+        No, Hand
+    };
+
+	class Cursor
+	{
+    public:
+        static Cursor CreateSystemCursor(SystemCursorType);
+        static Cursor CreateCursor(Surface surf,Point hotspot={0,0});
+
+        static Cursor GetActiveCursor();
+        static Cursor GetDefaultCursor();
+
+        static void show(bool);
+        static bool isShow();
+
+        void activate();
+    private:
+        std::shared_ptr<SDL_Cursor> _cur;
+        void _set(SDL_Cursor*);
+        void _set_no_delete(SDL_Cursor*);
+        SDL_Cursor* _get();
+        void _clear();
+	};
+
 	enum class MessageBoxType { Error, Warning, Information };
 
 	class Window
@@ -267,6 +299,9 @@ namespace MiniEngine
 
 		void setTitle(std::string Title);
 		std::string getTitle();
+
+		void setGrab(bool);
+		bool getGrab();
 
 		void setResizable(bool resizable);
 
