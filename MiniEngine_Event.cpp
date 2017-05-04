@@ -34,67 +34,39 @@ Looper::Looper()
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<int(Looper&,Event&)>& event_callback)
 {
     _evmap[event_type].push_front(std::make_pair(_loop_cnt,event_callback));
-
-    LooperID id;
-    id._looper_cnt=_loop_cnt;
-    id._type_id=event_type;
-
-    ++_loop_cnt;
-
-    return id;
+	return _getNextID(event_type);
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<int(Event&)>& event_callback)
 {
-    _evmap[event_type].push_front(std::make_pair(_loop_cnt,[&](Looper& lp,Event& ev)->int{return event_callback(ev);}));
-
-    LooperID id;
-    id._looper_cnt=_loop_cnt;
-    id._type_id=event_type;
-
-    ++_loop_cnt;
-
-    return id;
+    _evmap[event_type].push_front(std::make_pair(_loop_cnt,[=](Looper& lp,Event& ev)->int{return event_callback(ev);}));
+	return _getNextID(event_type);
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<int(Looper&)>& event_callback)
 {
-    _evmap[event_type].push_front(std::make_pair(_loop_cnt,[&](Looper& lp,Event& ev)->int{return event_callback(lp);}));
-
-    LooperID id;
-    id._looper_cnt=_loop_cnt;
-    id._type_id=event_type;
-
-    ++_loop_cnt;
-
-    return id;
+    _evmap[event_type].push_front(std::make_pair(_loop_cnt,[=](Looper& lp,Event& ev)->int{return event_callback(lp);}));
+	return _getNextID(event_type);
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<int()>& event_callback)
 {
-    _evmap[event_type].push_front(std::make_pair(_loop_cnt,[&](Looper& lp,Event& ev)->int{return event_callback();}));
-
-    LooperID id;
-    id._looper_cnt=_loop_cnt;
-    id._type_id=event_type;
-
-    ++_loop_cnt;
-
-    return id;
+    _evmap[event_type].push_front(std::make_pair(_loop_cnt,[=](Looper& lp,Event& ev)->int{return event_callback();}));
+	return _getNextID(event_type);
 }
 
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<void(Looper&,Event&)>& event_callback)
 {
-    return add(event_type,std::function<int(Looper&,Event&)>([&](Looper& lp,Event& ev)->int{event_callback(lp,ev); return 0;}));
+    return add(event_type,std::function<int(Looper&,Event&)>([=](Looper& lp,Event& ev)->int{event_callback(lp,ev); return 0;}));
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<void(Event&)>& event_callback)
 {
-    return add(event_type,std::function<int(Looper&,Event&)>([&](Looper& lp,Event& ev)->int{event_callback(ev); return 0;}));
+    return add(event_type,std::function<int(Looper&,Event&)>([=](Looper& lp,Event& ev)->int{event_callback(ev); return 0;}));
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<void(Looper&)>& event_callback)
 {
-    return add(event_type,std::function<int(Looper&,Event&)>([&](Looper& lp,Event& ev)->int{event_callback(lp); return 0;}));
+    return add(event_type,std::function<int(Looper&,Event&)>([=](Looper& lp,Event& ev)->int{event_callback(lp); return 0;}));
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<void()>& event_callback)
 {
-    return add(event_type,std::function<int(Looper&,Event&)>([&](Looper& lp,Event& ev)->int{event_callback();return 0;}));
+    return add(event_type,std::function<int(Looper&,Event&)>([=](Looper& lp,Event& ev)->int{event_callback();return 0;}));
 }
 
 LooperID Looper::operator + (const std::pair<_SDLEventType_,std::function<int(Looper&,Event&)>>& event_callback)
@@ -202,6 +174,16 @@ void Looper::reset()
     updater=[](){};
 }
 
+LooperID Looper::_getNextID(const _SDLEventType_& event_type)
+{
+	LooperID id;
+	id._looper_cnt = _loop_cnt;
+	id._type_id = event_type;
+
+	++_loop_cnt;
+	return id;
+}
+
 Poller::Poller()
 {
     idler=[](){};
@@ -223,7 +205,7 @@ void Poller::run()
             dispatch();
         }
 
-        /// If pollret is not 0 (new event requests update), or pollret is 0 (No New Event) but Idle function requests update, then call update.
+        /// If pollret is not 0 (new event requests update), or pollret is 0 (No New Event) but Idle function requests update, then call updater.
         if(!pollret) idler();
         if(_update)
         {
@@ -231,4 +213,39 @@ void Poller::run()
             _update=false;
         }
     }
+}
+
+LooperWithTime::LooperWithTime(int Timeout_ms)
+{
+	_timeout_ms = Timeout_ms;
+}
+
+void LooperWithTime::setTimeout(int ms)
+{
+	_timeout_ms = ms;
+}
+
+int LooperWithTime::getTimeout() const
+{
+	return _timeout_ms;
+}
+
+void LooperWithTime::run()
+{
+	int timeret = 1;
+	while (_running)
+	{
+		while (!_update&&(timeret=WaitEventTimeout(_e, _timeout_ms)))
+		{
+			dispatch();
+		}
+
+		/// If timeret is not 0 (new event request update), or timeret is 0 (Time out) but Idle function requests update, then call updater.
+		if (!timeret) idler();
+		if (_update)
+		{
+			updater();
+			_update = false;
+		}
+	}
 }

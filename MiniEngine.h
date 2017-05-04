@@ -7,6 +7,9 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
+
+/// VC++ does not implied C++ exception. Use this to ignore compile warning on this.
+#pragma warning (disable:4290)
 #else
 /// CodeBlocks (MinGW Compiler)
 #include <SDL2/SDL.h>

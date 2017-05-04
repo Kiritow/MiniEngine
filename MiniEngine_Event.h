@@ -60,6 +60,7 @@ public:
     std::function<void()> updater;
 
 protected:
+	LooperID _getNextID(const _SDLEventType_ & event_type);
     Event _e;
     bool _running,_update;
     std::map<_SDLEventType_,std::list<std::pair<int,std::function<int(Looper&,Event&)>>>> _evmap;
@@ -74,4 +75,15 @@ public:
     void reset();
 
     std::function<void()> idler;
+};
+
+class LooperWithTime : public Poller
+{
+public:
+	LooperWithTime(int Timeout_ms=10);
+	void setTimeout(int ms);
+	int getTimeout() const;
+	void run();
+protected:
+	int _timeout_ms;
 };
