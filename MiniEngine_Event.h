@@ -9,6 +9,9 @@ int PollEvent(Event& refEvent);
 int WaitEvent(Event& refEvent);
 int WaitEventTimeout(Event& refEvent,int ms);
 int PushEvent(const Event& refEvent);
+void PumpEvents();
+bool HasEvent(decltype(Event::type) EventType);
+bool HasEvent(decltype(Event::type) EventTypeMin,decltype(Event::type) EventTypeMax);
 
 typedef struct
 {

@@ -1404,7 +1404,6 @@ namespace MiniEngine
 	/// Global Executor For class Timer
 	Uint32 _global_timer_executor(Uint32 interval,void* param)
 	{
-	    printf("DEBUG: Global Timer Executor.\n");
         auto p=reinterpret_cast<std::function<Uint32(Uint32 interval)>*>(param);
         return (*p)(interval);
 	}

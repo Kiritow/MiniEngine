@@ -20,6 +20,21 @@ int PushEvent(const Event& refEvent)
     return SDL_PushEvent(const_cast<Event*>(&refEvent));
 }
 
+void PumpEvents()
+{
+    SDL_PumpEvents();
+}
+
+bool HasEvent(decltype(Event::type) EventType)
+{
+    return ( SDL_HasEvent(EventType)==SDL_TRUE );
+}
+
+bool HasEvent(decltype(Event::type) EventTypeMin,decltype(Event::type) EventTypeMax)
+{
+    return ( SDL_HasEvents(EventTypeMin,EventTypeMax)==SDL_TRUE );
+}
+
 bool operator == (const LooperID& a,const LooperID& b)
 {
     return a._type_id==b._type_id && a._looper_cnt==b._looper_cnt ;
