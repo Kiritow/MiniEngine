@@ -12,6 +12,9 @@ int PushEvent(const Event& refEvent);
 void PumpEvents();
 bool HasEvent(decltype(Event::type) EventType);
 bool HasEvent(decltype(Event::type) EventTypeMin,decltype(Event::type) EventTypeMax);
+bool EnableEvent(decltype(Event::type) EventType);
+bool DisableEvent(decltype(Event::type) EventType);
+bool IsEventEnabled(decltype(Event::type) EventType);
 
 typedef struct
 {
@@ -20,6 +23,7 @@ typedef struct
 }LooperID;
 
 bool operator == (const LooperID&,const LooperID&);
+bool operator != (const LooperID&,const LooperID&);
 
 class Looper
 {

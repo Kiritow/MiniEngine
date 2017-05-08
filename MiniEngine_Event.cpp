@@ -40,6 +40,11 @@ bool operator == (const LooperID& a,const LooperID& b)
     return a._type_id==b._type_id && a._looper_cnt==b._looper_cnt ;
 }
 
+bool operator != (const LooperID& a,const LooperID& b)
+{
+    return !(a==b);
+}
+
 Looper::Looper()
 {
     _update=_running=true;
