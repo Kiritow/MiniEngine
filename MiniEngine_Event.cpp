@@ -25,12 +25,12 @@ void PumpEvents()
     SDL_PumpEvents();
 }
 
-bool HasEvent(decltype(Event::type) EventType)
+bool HasEvent(_SDLEventType_ EventType)
 {
     return ( SDL_HasEvent(EventType)==SDL_TRUE );
 }
 
-bool HasEvent(decltype(Event::type) EventTypeMin,decltype(Event::type) EventTypeMax)
+bool HasEvent(_SDLEventType_ EventTypeMin,_SDLEventType_ EventTypeMax)
 {
     return ( SDL_HasEvents(EventTypeMin,EventTypeMax)==SDL_TRUE );
 }
