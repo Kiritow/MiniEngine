@@ -126,12 +126,17 @@ namespace MiniEngine
 		h = H;
 	}
 
+	Rect::Rect(const SDL_Rect& r):Rect(r.x,r.y,r.w,r.h)
+	{
+
+	}
+
 	Rect::Rect()
 	{
 		x = y = w = h = 0;
 	}
 
-	SDL_Rect Rect::toSDLRect()
+	SDL_Rect Rect::toSDLRect() const
 	{
 		SDL_Rect r;
 		r.x = x;
@@ -139,6 +144,44 @@ namespace MiniEngine
 		r.w = w;
 		r.h = h;
 		return r;
+	}
+
+	bool Rect::isEmpty()
+	{
+        SDL_Rect r=toSDLRect();
+        return SDL_RectEmpty(&r)==SDL_TRUE;
+	}
+
+	bool Rect::operator == (const Rect& r) const
+	{
+        SDL_Rect a=toSDLRect(),b=r.toSDLRect();
+        return SDL_RectEquals(&a,&b)==SDL_TRUE;
+	}
+
+	bool Rect::hasIntersection(const Rect& r)
+	{
+        SDL_Rect a=toSDLRect(),b=r.toSDLRect();
+        return SDL_HasIntersection(&a,&b)==SDL_TRUE;
+	}
+
+	Rect Rect::getIntersection(const Rect& r)
+	{
+        SDL_Rect a=toSDLRect(),b=r.toSDLRect(),c;
+        if(SDL_IntersectRect(&a,&b,&c)==SDL_TRUE)
+        {
+            return Rect(c);
+        }
+        else
+        {
+            return Rect();
+        }
+	}
+
+	Rect Rect::getUnion(const Rect& r)
+	{
+        SDL_Rect a=toSDLRect(),b=r.toSDLRect(),c;
+        SDL_UnionRect(&a,&b,&c);//void
+        return Rect(c);
 	}
 
 	Point::Point(int X, int Y)

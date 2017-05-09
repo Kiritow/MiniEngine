@@ -33,8 +33,14 @@ namespace MiniEngine
 	public:
 		int x, y, w, h;
 		Rect(int X, int Y, int W, int H);
+		Rect(const SDL_Rect&);
 		Rect();
-		SDL_Rect toSDLRect();
+		SDL_Rect toSDLRect() const;
+		bool isEmpty();
+		bool operator == (const Rect&) const;
+		bool hasIntersection(const Rect&);
+		Rect getIntersection(const Rect&);
+		Rect getUnion(const Rect&);
 	};
 
 	class Point
