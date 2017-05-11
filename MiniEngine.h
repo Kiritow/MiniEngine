@@ -429,6 +429,19 @@ namespace MiniEngine
 	    static void critical(const char* fmt,...);/// Critical
 	};
 
+	class SharedLibrary
+	{
+    public:
+        SharedLibrary();
+        SharedLibrary(const std::string& Filename);
+        ~SharedLibrary();
+        int load(const std::string& Filename);
+        int unload();
+        void* get(const std::string& FunctionName);
+    private:
+        void* _obj;
+	};
+
 	class SDLSystem
 	{
 	public:

@@ -1310,6 +1310,54 @@ namespace MiniEngine
 	    va_end(ap);
 	}
 
+    SharedLibrary::SharedLibrary()
+    {
+        _obj=nullptr;
+    }
+
+    SharedLibrary::SharedLibrary(const std::string& Filename)
+    {
+        _obj=nullptr;
+        load(Filename);
+    }
+
+    SharedLibrary::~SharedLibrary()
+    {
+        if(_obj)
+        {
+            unload();
+        }
+    }
+
+    int SharedLibrary::load(const std::string& Filename)
+    {
+        if(_obj) return -1;
+        else
+        {
+            _obj=SDL_LoadObject(Filename.c_str());
+            if(_obj) return 0;
+            else return -2;
+        }
+    }
+
+    int SharedLibrary::unload()
+    {
+        if(_obj)
+        {
+            SDL_UnloadObject(_obj);
+            _obj=nullptr;
+            return 0;
+        }
+        else return -1;
+    }
+
+    void* SharedLibrary::get(const std::string& FunctionName)
+    {
+        if(!_obj) return nullptr;
+        else return SDL_LoadFunction(_obj,FunctionName.c_str());
+    }
+
+
 	int SDLSystem::SDLInit()
 	{
 		return SDL_Init(SDL_INIT_EVERYTHING);
