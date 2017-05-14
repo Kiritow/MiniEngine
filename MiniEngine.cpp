@@ -126,12 +126,17 @@ namespace MiniEngine
 		h = H;
 	}
 
+	Rect::Rect(const SDL_Rect& r):Rect(r.x,r.y,r.w,r.h)
+	{
+
+	}
+
 	Rect::Rect()
 	{
 		x = y = w = h = 0;
 	}
 
-	SDL_Rect Rect::toSDLRect()
+	SDL_Rect Rect::toSDLRect() const
 	{
 		SDL_Rect r;
 		r.x = x;
@@ -139,6 +144,44 @@ namespace MiniEngine
 		r.w = w;
 		r.h = h;
 		return r;
+	}
+
+	bool Rect::isEmpty()
+	{
+        SDL_Rect r=toSDLRect();
+        return SDL_RectEmpty(&r)==SDL_TRUE;
+	}
+
+	bool Rect::operator == (const Rect& r) const
+	{
+        SDL_Rect a=toSDLRect(),b=r.toSDLRect();
+        return SDL_RectEquals(&a,&b)==SDL_TRUE;
+	}
+
+	bool Rect::hasIntersection(const Rect& r)
+	{
+        SDL_Rect a=toSDLRect(),b=r.toSDLRect();
+        return SDL_HasIntersection(&a,&b)==SDL_TRUE;
+	}
+
+	Rect Rect::getIntersection(const Rect& r)
+	{
+        SDL_Rect a=toSDLRect(),b=r.toSDLRect(),c;
+        if(SDL_IntersectRect(&a,&b,&c)==SDL_TRUE)
+        {
+            return Rect(c);
+        }
+        else
+        {
+            return Rect();
+        }
+	}
+
+	Rect Rect::getUnion(const Rect& r)
+	{
+        SDL_Rect a=toSDLRect(),b=r.toSDLRect(),c;
+        SDL_UnionRect(&a,&b,&c);//void
+        return Rect(c);
 	}
 
 	Point::Point(int X, int Y)
@@ -1267,6 +1310,54 @@ namespace MiniEngine
 	    va_end(ap);
 	}
 
+    SharedLibrary::SharedLibrary()
+    {
+        _obj=nullptr;
+    }
+
+    SharedLibrary::SharedLibrary(const std::string& Filename)
+    {
+        _obj=nullptr;
+        load(Filename);
+    }
+
+    SharedLibrary::~SharedLibrary()
+    {
+        if(_obj)
+        {
+            unload();
+        }
+    }
+
+    int SharedLibrary::load(const std::string& Filename)
+    {
+        if(_obj) return -1;
+        else
+        {
+            _obj=SDL_LoadObject(Filename.c_str());
+            if(_obj) return 0;
+            else return -2;
+        }
+    }
+
+    int SharedLibrary::unload()
+    {
+        if(_obj)
+        {
+            SDL_UnloadObject(_obj);
+            _obj=nullptr;
+            return 0;
+        }
+        else return -1;
+    }
+
+    void* SharedLibrary::get(const std::string& FunctionName)
+    {
+        if(!_obj) return nullptr;
+        else return SDL_LoadFunction(_obj,FunctionName.c_str());
+    }
+
+
 	int SDLSystem::SDLInit()
 	{
 		return SDL_Init(SDL_INIT_EVERYTHING);
@@ -1404,7 +1495,6 @@ namespace MiniEngine
 	/// Global Executor For class Timer
 	Uint32 _global_timer_executor(Uint32 interval,void* param)
 	{
-	    printf("DEBUG: Global Timer Executor.\n");
         auto p=reinterpret_cast<std::function<Uint32(Uint32 interval)>*>(param);
         return (*p)(interval);
 	}

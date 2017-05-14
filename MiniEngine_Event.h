@@ -4,24 +4,31 @@
 #include <list>
 
 typedef SDL_Event Event;
+typedef decltype(Event::type) _SDLEventType_;
 
 int PollEvent(Event& refEvent);
 int WaitEvent(Event& refEvent);
 int WaitEventTimeout(Event& refEvent,int ms);
 int PushEvent(const Event& refEvent);
+void PumpEvents();
+bool HasEvent(_SDLEventType_ EventType);
+bool HasEvent(_SDLEventType_ EventTypeMin,_SDLEventType_ EventTypeMax);
+bool EnableEvent(_SDLEventType_ EventType);
+bool DisableEvent(_SDLEventType_ EventType);
+bool IsEventEnabled(_SDLEventType_ EventType);
 
 typedef struct
 {
-    decltype(Event::type) _type_id;
+    _SDLEventType_ _type_id;
     int _looper_cnt;
 }LooperID;
 
 bool operator == (const LooperID&,const LooperID&);
+bool operator != (const LooperID&,const LooperID&);
 
 class Looper
 {
 public:
-    typedef decltype(Event::type) _SDLEventType_;
     Looper();
     /// If Callback does not return 0, then stop transferring this event.
     LooperID add(_SDLEventType_ event_type,const std::function<int(Looper&,Event&)>& event_callback);

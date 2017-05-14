@@ -33,8 +33,14 @@ namespace MiniEngine
 	public:
 		int x, y, w, h;
 		Rect(int X, int Y, int W, int H);
+		Rect(const SDL_Rect&);
 		Rect();
-		SDL_Rect toSDLRect();
+		SDL_Rect toSDLRect() const;
+		bool isEmpty();
+		bool operator == (const Rect&) const;
+		bool hasIntersection(const Rect&);
+		Rect getIntersection(const Rect&);
+		Rect getUnion(const Rect&);
 	};
 
 	class Point
@@ -423,6 +429,19 @@ namespace MiniEngine
 	    static void critical(const char* fmt,...);/// Critical
 	};
 
+	class SharedLibrary
+	{
+    public:
+        SharedLibrary();
+        SharedLibrary(const std::string& Filename);
+        ~SharedLibrary();
+        int load(const std::string& Filename);
+        int unload();
+        void* get(const std::string& FunctionName);
+    private:
+        void* _obj;
+	};
+
 	class SDLSystem
 	{
 	public:
@@ -467,11 +486,21 @@ namespace MiniEngine
 	{
     public:
         Timer();
-        /// Uint32 func(Uint32,void*) ...
+
+        /// void func(Uint32,...)
+        template<typename VoidCallable,typename... Args>
+        Timer(Uint32 interval,VoidCallable&& vcallable,Args&&... args) : Timer()
+        {
+            auto realCall=[&](Uint32 ims)->Uint32{vcallable(ims,args...);return interval;};
+            auto pfunc=new std::function<Uint32(Uint32 interval)>(realCall);
+            _real_timer_call(_global_timer_executor,interval,pfunc);
+        }
+
+        /// Uint32 func(Uint32,...)
         template<typename Callable,typename... Args>
         Timer(Callable&& callable,Uint32 interval,Args&&... args) : Timer()
         {
-            auto realCall=[&](Uint32 interval)->Uint32{return callable(interval,args...);};
+            auto realCall=[&](Uint32 ims)->Uint32{return callable(ims,args...);};
             auto pfunc=new std::function<Uint32(Uint32 interval)>(realCall);
             _real_timer_call(_global_timer_executor,interval,pfunc);
         }
