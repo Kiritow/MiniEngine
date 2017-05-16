@@ -373,6 +373,9 @@ namespace MiniEngine
 
 		std::tuple<Style> getFontStyles();
 
+        Rect sizeText(const std::string& Text) throw (ErrorViewer);
+        Rect sizeUTF8(const std::string& Text) throw (ErrorViewer);
+
 		Surface renderText(std::string Text, RGBA fg);
 		Surface renderTextWrapped(std::string Text, RGBA fg, int WrapLength);
 		Surface renderTextShaded(std::string Text, RGBA fg, RGBA bg);

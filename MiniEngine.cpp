@@ -1164,6 +1164,28 @@ namespace MiniEngine
         return 0;
     }
 
+    Rect Font::sizeText(const std::string& Text) throw (ErrorViewer)
+    {
+        int w=0,h=0;
+        if(TTF_SizeText(_get(),Text.c_str(),&w,&h)!=0)
+        {
+            /// Something might be wrong
+            throw ErrorViewer();
+        }
+        return Rect(0,0,w,h);
+    }
+
+    Rect Font::sizeUTF8(const std::string& Text) throw (ErrorViewer)
+    {
+        int w=0,h=0;
+        if(TTF_SizeUTF8(_get(),Text.c_str(),&w,&h)!=0)
+        {
+            /// Something might be wrong
+            throw ErrorViewer();
+        }
+        return Rect(0,0,w,h);
+    }
+
     /// rendering surfaces...
     Surface Font::renderText(std::string Text,RGBA fg)
     {
