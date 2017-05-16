@@ -116,6 +116,52 @@ namespace MiniEngine
                 return SDL_SYSTEM_CURSOR_ARROW;
             }
         }
+
+        int getTTFFontStyleFromFontStyle(Font::Style style)
+        {
+            switch(style)
+            {
+            case Font::Style::Bold:
+                return TTF_STYLE_BOLD;
+            case Font::Style::Italic:
+                return TTF_STYLE_ITALIC;
+            case Font::Style::Normal:
+                return TTF_STYLE_NORMAL;
+            case Font::Style::StrikeThrough:
+                return TTF_STYLE_STRIKETHROUGH;
+            case Font::Style::UnderLine:
+                return TTF_STYLE_UNDERLINE;
+            default:
+                return TTF_STYLE_NORMAL;
+            }
+        }
+
+        std::vector<Font::Style> getFontStyleVecFromMixedTTFFontStyle(int Mixed_TTF_Font_Style)
+        {
+            std::vector<Font::Style> vec;
+            if(Mixed_TTF_Font_Style&TTF_STYLE_BOLD)
+            {
+                vec.push_back(Font::Style::Bold);
+            }
+            if(Mixed_TTF_Font_Style&TTF_STYLE_ITALIC)
+            {
+                vec.push_back(Font::Style::Italic);
+            }
+            if(Mixed_TTF_Font_Style&TTF_STYLE_STRIKETHROUGH)
+            {
+                vec.push_back(Font::Style::StrikeThrough);
+            }
+            if(Mixed_TTF_Font_Style&TTF_STYLE_UNDERLINE)
+            {
+                vec.push_back(Font::Style::UnderLine);
+            }
+            if(vec.empty())
+            {
+                vec.push_back(Font::Style::Normal);
+            }
+
+            return vec;
+        }
     }/// End of namespace _internal
 
 	Rect::Rect(int X, int Y, int W, int H)
@@ -1139,6 +1185,68 @@ namespace MiniEngine
 		return (_get() != nullptr);
 	}
 
+    bool Font::isNormal()
+    {
+        return !(TTF_GetFontStyle(_get()));
+    }
+
+    bool Font::isBold()
+    {
+        return (TTF_GetFontStyle(_get()) & TTF_STYLE_BOLD );
+    }
+
+    bool Font::isItalic()
+    {
+        return (TTF_GetFontStyle(_get()) & TTF_STYLE_ITALIC );
+    }
+
+    bool Font::isUnderLine()
+    {
+        return (TTF_GetFontStyle(_get()) & TTF_STYLE_UNDERLINE );
+    }
+
+    bool Font::isStrikeThrough()
+    {
+        return (TTF_GetFontStyle(_get()) & TTF_STYLE_STRIKETHROUGH );
+    }
+
+    void Font::setNormal()
+    {
+        _real_setFontStyle(TTF_STYLE_NORMAL);
+    }
+
+    void Font::setBold(bool enable)
+    {
+        if( enable!=isBold() )
+        {
+            _real_setFontStyle( TTF_GetFontStyle(_get()) | (enable?TTF_STYLE_BOLD:!TTF_STYLE_BOLD) );
+        }
+    }
+
+    void Font::setItalic(bool enable)
+    {
+        if( enable!=isItalic() )
+        {
+            _real_setFontStyle( TTF_GetFontStyle(_get()) | (enable?TTF_STYLE_ITALIC:!TTF_STYLE_ITALIC) );
+        }
+    }
+
+    void Font::setUnderLine(bool enable)
+    {
+        if( enable!=isUnderLine() )
+        {
+            _real_setFontStyle( TTF_GetFontStyle(_get()) | (enable?TTF_STYLE_UNDERLINE:!TTF_STYLE_UNDERLINE) );
+        }
+    }
+
+    void Font::setStrikeThrough(bool enable)
+    {
+        if( enable!=isStrikeThrough() )
+        {
+            _real_setFontStyle( TTF_GetFontStyle(_get()) | (enable?TTF_STYLE_STRIKETHROUGH:!TTF_STYLE_STRIKETHROUGH) );
+        }
+    }
+
     void Font::_real_setFontStyle(int Style)
     {
         TTF_SetFontStyle(_get(),Style);
@@ -1146,22 +1254,13 @@ namespace MiniEngine
 
     int Font::_style_caster(Style style)
     {
-        switch(style)
-        {
-        case Style::Bold:
-            return TTF_STYLE_BOLD;
-        case Style::Italic:
-            return TTF_STYLE_ITALIC;
-        case Style::Normal:
-            return TTF_STYLE_NORMAL;
-        case Style::StrikeThrough:
-            return TTF_STYLE_STRIKETHROUGH;
-        case Style::UnderLine:
-            return TTF_STYLE_UNDERLINE;
-        }
+        return _internal::getTTFFontStyleFromFontStyle(style);
+    }
 
-        /// If an error occurs, return 0 instead of -1.
-        return 0;
+    std::vector<Font::Style> Font::getFontStyles()
+    {
+        int styles=TTF_GetFontStyle(_get());
+        return _internal::getFontStyleVecFromMixedTTFFontStyle(styles);
     }
 
     Rect Font::sizeText(const std::string& Text) throw (ErrorViewer)

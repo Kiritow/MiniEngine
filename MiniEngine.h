@@ -22,6 +22,7 @@
 #include <string>
 #include <memory>
 #include <functional>
+#include <vector>
 
 #define _DECL_DEPRECATED [[deprecated]]
 
@@ -359,6 +360,18 @@ namespace MiniEngine
 		int use(std::string FontFileName, int size);
 		bool isReady();
 
+		bool isNormal();
+        bool isBold();
+        bool isItalic();
+        bool isUnderLine();
+        bool isStrikeThrough();
+
+        void setNormal();
+        void setBold(bool);
+        void setItalic(bool);
+        void setUnderLine(bool);
+        void setStrikeThrough(bool);
+
 		template<typename... Args>
 		void setFontStyle(Style style,Args&&... args)
 		{
@@ -372,7 +385,7 @@ namespace MiniEngine
             _setFontStyle(fontcalc,style);
 		}
 
-		std::tuple<Style> getFontStyles();
+		std::vector<Style> getFontStyles();
 
         Rect sizeText(const std::string& Text) throw (ErrorViewer);
         Rect sizeUTF8(const std::string& Text) throw (ErrorViewer);
