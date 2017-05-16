@@ -51,6 +51,56 @@ namespace MiniEngine
             }
         }
 
+        /// FIXME: return SDL_WindowFlags or Uint32 ?
+        Uint32 getSDLWindowFlagsFromWindowType(WindowType type)
+        {
+            switch(type)
+            {
+            case WindowType::FullScreen:
+                return SDL_WINDOW_FULLSCREEN;
+            case WindowType::OpenGL:
+                return SDL_WINDOW_OPENGL;
+            case WindowType::Shown:
+                return SDL_WINDOW_SHOWN;
+            case WindowType::Hidden:
+                return SDL_WINDOW_HIDDEN;
+            case WindowType::Borderless:
+                return SDL_WINDOW_BORDERLESS;
+            case WindowType::Resizable:
+                return SDL_WINDOW_RESIZABLE;
+            case WindowType::Minimized:
+                return SDL_WINDOW_MINIMIZED;
+            case WindowType::Maximized:
+                return SDL_WINDOW_MAXIMIZED;
+            case WindowType::InputGrabbed:
+                return SDL_WINDOW_INPUT_GRABBED;
+            case WindowType::InputFocus:
+                return SDL_WINDOW_INPUT_FOCUS;
+            case WindowType::MouseFocus:
+                return SDL_WINDOW_MOUSE_FOCUS;
+            case WindowType::FullScreenDesktop:
+                return SDL_WINDOW_FULLSCREEN_DESKTOP;
+            case WindowType::Foreign:
+                return SDL_WINDOW_FOREIGN;
+            case WindowType::AllowHighDPI:
+                return SDL_WINDOW_ALLOW_HIGHDPI;
+            case WindowType::MouseCapture:
+                return SDL_WINDOW_MOUSE_CAPTURE;
+            case WindowType::AlwaysOnTop:
+                return SDL_WINDOW_ALWAYS_ON_TOP;
+            case WindowType::SkipTaskBar:
+                return SDL_WINDOW_SKIP_TASKBAR;
+            case WindowType::Utility:
+                return SDL_WINDOW_UTILITY;
+            case WindowType::ToolTip:
+                return SDL_WINDOW_TOOLTIP;
+            case WindowType::PopUpMenu:
+                return SDL_WINDOW_POPUP_MENU;
+            default:
+                return 0;/// Return 0 on default.
+            }
+        }
+
         SystemCursorType getCursorTypeFromSDLSystemCursor(SDL_SystemCursor id)
         {
             switch(id)
@@ -978,9 +1028,18 @@ namespace MiniEngine
 	    return _wnd.get();
 	}
 
-	Window::Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags) throw(ErrorViewer)
+	Window::Window(std::string Title, int Width, int Height,
+                std::initializer_list<RendererType> RendererFlags,
+                std::initializer_list<WindowType> WindowFlags , int WindowPositionX, int WindowPositionY) throw(ErrorViewer)
 	{
-		SDL_Window* temp = SDL_CreateWindow(Title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_SHOWN);
+	    /// Calculate Window Flags
+	    Uint32 windowFlag=0;
+	    for(auto v:WindowFlags)
+        {
+            windowFlag|=_internal::getSDLWindowFlagsFromWindowType(v);
+        }
+
+		SDL_Window* temp = SDL_CreateWindow(Title.c_str(), WindowPositionX, WindowPositionY, Width, Height, windowFlag);
 		if (temp == NULL)
 		{
 			ErrorViewer e;

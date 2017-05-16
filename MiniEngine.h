@@ -252,10 +252,23 @@ namespace MiniEngine
 
 	enum class MessageBoxType { Error, Warning, Information };
 
+	enum class WindowType
+	{
+	    FullScreen, OpenGL, Shown, Hidden,
+	    Borderless, Resizable, Minimized, Maximized,
+	    InputGrabbed, InputFocus, MouseFocus,
+	    FullScreenDesktop, Foreign, AllowHighDPI,
+	    MouseCapture, AlwaysOnTop, SkipTaskBar,
+	    Utility, ToolTip, PopUpMenu
+	};
+
 	class Window
 	{
 	public:
-		Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw(ErrorViewer);
+		Window(std::string Title, int Width, int Height,
+         std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture },
+         std::initializer_list<WindowType> WindowFlags = {WindowType::Shown} ,
+         int WindowPositionX=SDL_WINDOWPOS_CENTERED, int WindowPositionY=SDL_WINDOWPOS_CENTERED) throw(ErrorViewer);
 		Renderer getRenderer() const;
 
 		void setRenderer(RendererType Type)
