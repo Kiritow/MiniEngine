@@ -362,13 +362,14 @@ namespace MiniEngine
 		template<typename... Args>
 		void setFontStyle(Style style,Args&&... args)
 		{
-            _internal_fontcalc=0;
-            _setFontStyle(style,std::forward(args...));
+		    int fontcalc=0;
+		    _setFontStyle(fontcalc,style,args...);
 		}
 
 		void setFontStyle(Style style)
 		{
-            _real_setFontStyle(_style_caster(style));
+            int fontcalc=0;
+            _setFontStyle(fontcalc,style);
 		}
 
 		std::tuple<Style> getFontStyles();
@@ -397,21 +398,20 @@ namespace MiniEngine
 		Texture renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg);
     protected:
 		template<typename... Args>
-        void _setFontStyle(Style style,Args&&... args)
+        void _setFontStyle(int& fontcalc,Style style,Args&&... args)
         {
-            _internal_fontcalc|=_style_caster(style);
-            _setFontStyle(args...);
+            fontcalc|=_style_caster(style);
+            _setFontStyle(fontcalc,args...);
         }
 
-        void _setFontStyle(Style style)
+        void _setFontStyle(int& fontcalc,Style style)
         {
-            _internal_fontcalc|=_style_caster(style);
-            _real_setFontStyle(_internal_fontcalc);
+            fontcalc|=_style_caster(style);
+            _real_setFontStyle(fontcalc);
         }
 	private:
 	    void _real_setFontStyle(int);
 	    int _style_caster(Style);
-        int _internal_fontcalc;
 
 		std::shared_ptr<TTF_Font> _font;
 		void _set(TTF_Font*);
