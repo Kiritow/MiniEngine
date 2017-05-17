@@ -9,6 +9,107 @@ namespace MiniEngine
 namespace XML
 {
 
+void Node::push_front(const Node& node)
+{
+    _pnode->prepend_node(node._pnode);
+}
+
+void Node::push_back(const Node& node)
+{
+    _pnode->append_node(node._pnode);
+}
+
+void Node::insert(const Node& where, const Node& val)
+{
+    _pnode->insert_node(where._pnode,val._pnode);
+}
+
+void Node::remove_first_node()
+{
+    _pnode->remove_first_node();
+}
+
+void Node::remove_last_node()
+{
+    _pnode->remove_last_node();
+}
+
+void Node::remove_node(const Node& todelete)
+{
+    _pnode->remove_node(todelete._pnode);
+}
+
+void Node::remove_all_node()
+{
+    _pnode->remove_all_nodes();
+}
+
+void Node::push_front(const Attribute& attr)
+{
+    _pnode->prepend_attribute(attr._get());
+}
+
+void Node::push_back(const Attribute& attr)
+{
+    _pnode->append_attribute(attr._get());
+}
+
+void Node::insert(const Attribute& where, const Attribute& val)
+{
+    _pnode->insert_attribute(where._get(),val._get());
+}
+
+void Node::remove_first_attr()
+{
+    _pnode->remove_first_attribute();
+}
+
+void Node::remove_last_attr()
+{
+    _pnode->remove_last_attribute();
+}
+
+void Node::remove_attr(const Attribute& todelete)
+{
+    _pnode->remove_attribute(todelete._get());
+}
+
+void Node::remove_all_attr()
+{
+    _pnode->remove_all_attributes();
+}
+
+bool Node::hasPrevNode() const
+{
+    return _pnode->previous_sibling()!=nullptr;
+}
+
+bool Node::hasNextNode() const
+{
+    return _pnode->next_sibling()!=nullptr;
+}
+
+bool Node::hasParentNode() const
+{
+    return _pnode->parent()!=nullptr;
+}
+
+Node Node::getPrevNode() const
+{
+    return Node(_pnode->previous_sibling());
+}
+
+Node Node::getNextNode() const
+{
+    return Node(_pnode->next_sibling());
+}
+
+Node Node::getParentNode() const
+{
+    return Node(_pnode->parent());
+}
+
+
 Document::Document()
 {
     _is_ready=false;
@@ -65,17 +166,17 @@ bool Document::ready()
 Node Document::newNode(const std::string& name,const std::string& value)
 {
     Node node;
-    node._pnode=_doc.allocate_node(rapidxml::node_type::node_element,
-                       _allocate_string(name),_allocate_string(value));
-    node._pdoc=this;
+    node._set(_doc.allocate_node(rapidxml::node_type::node_element,
+                       _allocate_string(name),_allocate_string(value)));
+    node._setdoc(this);
     return node;
 }
 
 Attribute Document::newAttr(const std::string& name,const std::string& value)
 {
     Attribute attr;
-    attr._pattr=_doc.allocate_attribute(_allocate_string(name),_allocate_string(value));
-    attr._pdoc=this;
+    attr._set(_doc.allocate_attribute(_allocate_string(name),_allocate_string(value)));
+    attr._setdoc(this);
     return attr;
 }
 

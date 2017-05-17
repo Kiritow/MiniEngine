@@ -17,15 +17,27 @@ class Document;
 
 class Attribute
 {
+public:
+    void _set(XAttr*);
+    XAttr* _get() const;
+    void _clear();
+    void _setdoc(Document*);
 private:
     XAttr* _pattr;
     Document* _pdoc;
-    friend class Document;
 };
 
 class Node
 {
 public:
+    void _set(XNode*);
+    XNode* _get();
+    void _clear();
+    void _setdoc(Document*);
+
+    Node();
+    Node(XNode*);
+
     void push_front(const Node&);
     void push_back(const Node&);
     void insert(const Node& where,const Node& val);
@@ -56,10 +68,11 @@ public:
     Node getNextNode() const;
     Node getParentNode() const;
 
+    Node clone();
+
 private:
     XNode* _pnode;
     Document* _pdoc;
-    friend class Document;
 };
 
 class Document
