@@ -1967,6 +1967,7 @@ namespace MiniEngine
     {
         pimpl=new impl;
         pimpl->status=false;
+
         std::ifstream ifs(StringFile);
         if(!ifs) return;
         rapidxml::file<> strFile(ifs);
@@ -1999,9 +2000,11 @@ namespace MiniEngine
 
     std::string StringEngine::getString(std::string Tag)
     {
-        if(!ready()) return "";
-        char* context=pimpl->root->first_node(Tag.c_str())->value();
-        if(context==nullptr) return "";
+        if(!ready()) return "(StringEngine::STRING_NOT_FOUND)";
+        rapidxml::xml_node<>* pnode=pimpl->root->first_node(Tag.c_str());
+        if(pnode==nullptr) return "(StringEngine::STRING_NOT_FOUND)";
+        char* context=pnode->value();
+        if(context==nullptr) return "";/// Empty String.
         else return std::string(context);
     }
 
