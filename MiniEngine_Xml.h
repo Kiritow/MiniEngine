@@ -22,6 +22,12 @@ public:
     XAttr* _get() const;
     void _clear();
     void _setdoc(Document*);
+
+    std::string getName() const;
+    std::string getValue() const;
+
+    char* getNameRaw() const;
+    char* getValueRaw() const;
 private:
     XAttr* _pattr;
     Document* _pdoc;
@@ -31,12 +37,18 @@ class Node
 {
 public:
     void _set(XNode*);
-    XNode* _get();
+    XNode* _get() const;
     void _clear();
     void _setdoc(Document*);
 
     Node();
     Node(XNode*);
+
+    std::string getName() const;
+    std::string getValue() const;
+
+    char* getNameRaw() const;
+    char* getValueRaw() const;
 
     void push_front(const Node&);
     void push_back(const Node&);
@@ -56,10 +68,7 @@ public:
     void remove_attr(const Attribute& todelete);
     void remove_all_attr();
 
-    bool operator == (const Node& node)
-    {
-        return _pnode==node._pnode && _pdoc==node._pdoc;
-    }
+    bool operator == (const Node& node);
 
     bool hasPrevNode() const;
     bool hasNextNode() const;
@@ -68,7 +77,7 @@ public:
     Node getNextNode() const;
     Node getParentNode() const;
 
-    Node clone();
+    bool valid();
 
 private:
     XNode* _pnode;
@@ -85,6 +94,9 @@ public:
     bool ready();
     Node newNode(const std::string& name,const std::string& value);
     Attribute newAttr(const std::string& name,const std::string& value);
+    Node cloneNode(const Node&);
+    void clear();
+
 protected:
     char* _allocate_string(const std::string& str);
     char* _allocate_string(const char* pstr,int sz);

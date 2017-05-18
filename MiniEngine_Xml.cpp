@@ -9,6 +9,102 @@ namespace MiniEngine
 namespace XML
 {
 
+void Attribute::_set(XAttr* pattr)
+{
+    _pattr=pattr;
+}
+
+XAttr* Attribute::_get() const
+{
+    return _pattr;
+}
+
+void Attribute::_clear()
+{
+    _pattr=nullptr;
+}
+
+void Attribute::_setdoc(Document* pDoc)
+{
+    _pdoc=pDoc;
+}
+
+std::string Attribute::getName() const
+{
+    return std::string(getNameRaw());
+}
+
+std::string Attribute::getValue() const
+{
+    return std::string(getValueRaw());
+}
+
+char* Attribute::getNameRaw() const
+{
+    return _pattr->name();
+}
+
+char* Attribute::getValueRaw() const
+{
+    return _pattr->value();
+}
+
+
+Node::Node()
+{
+    _pnode=nullptr;
+    _pdoc=nullptr;
+}
+
+Node::Node(XNode* expNode)
+{
+    _pnode=expNode;
+    _pdoc=nullptr;
+}
+
+
+
+void Node::_set(XNode* node)
+{
+    _pnode=node;
+}
+
+XNode* Node::_get() const
+{
+    return _pnode;
+}
+
+void Node::_clear()
+{
+    _pnode=nullptr;
+}
+
+void Node::_setdoc(Document* pDoc)
+{
+    _pdoc=pDoc;
+}
+
+std::string Node::getName() const
+{
+    return std::string(getNameRaw());
+}
+
+std::string Node::getValue() const
+{
+    return std::string(getValueRaw());
+}
+
+char* Node::getNameRaw() const
+{
+    return _pnode->name();
+}
+
+char* Node::getValueRaw() const
+{
+    return _pnode->value();
+}
+
+
 void Node::push_front(const Node& node)
 {
     _pnode->prepend_node(node._pnode);
@@ -79,6 +175,11 @@ void Node::remove_all_attr()
     _pnode->remove_all_attributes();
 }
 
+bool Node::operator==(const Node& node)
+{
+    return _pnode==node._pnode && _pdoc==node._pdoc;
+}
+
 bool Node::hasPrevNode() const
 {
     return _pnode->previous_sibling()!=nullptr;
@@ -107,6 +208,11 @@ Node Node::getNextNode() const
 Node Node::getParentNode() const
 {
     return Node(_pnode->parent());
+}
+
+bool Node::valid()
+{
+    return _pnode!=nullptr && _pdoc!=nullptr;
 }
 
 
@@ -178,6 +284,16 @@ Attribute Document::newAttr(const std::string& name,const std::string& value)
     attr._set(_doc.allocate_attribute(_allocate_string(name),_allocate_string(value)));
     attr._setdoc(this);
     return attr;
+}
+
+Node Document::cloneNode(const Node& node)
+{
+    return Node(_doc.clone_node(node._get()));
+}
+
+void Document::clear()
+{
+    return _doc.clear();
 }
 
 //protected
