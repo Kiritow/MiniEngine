@@ -80,6 +80,8 @@ namespace MiniEngine
         RWOP(void* mem,int size);
         RWOP()=default;
         ~RWOP()=default;
+
+        void release();
     private:
         std::shared_ptr<SDL_RWops> _op;
         SDL_RWops* _get();
@@ -459,6 +461,7 @@ namespace MiniEngine
     private:
         void* _get();
         void _set(void*);
+        void _clear();
         std::shared_ptr<void> _obj;
 	};
 

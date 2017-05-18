@@ -407,6 +407,11 @@ namespace MiniEngine
         _set(SDL_RWFromMem(mem,size));
     }
 
+    void RWOP::release()
+    {
+        _clear();
+    }
+
     void Surface::_set(SDL_Surface* p)//private
     {
         _surf.reset(p,SDL_FreeSurface);
@@ -598,6 +603,11 @@ namespace MiniEngine
         return surf;
     }
 
+    void Surface::release()
+    {
+        _clear();
+    }
+
     void Texture::_set(SDL_Texture* p)//private
     {
         _text.reset(p,SDL_DestroyTexture);
@@ -704,6 +714,11 @@ namespace MiniEngine
         }
 		SDL_QueryTexture(_get(), NULL, NULL, &rect.w, &rect.h);
 		rect.x = rect.y = 0;
+	}
+
+	void Texture::release()
+	{
+        _clear();
 	}
 
 	void Renderer::_set(SDL_Renderer* p)
@@ -940,6 +955,16 @@ namespace MiniEngine
 		return t;
 	}
 
+    bool Renderer::isReady()
+	{
+		return (_get() != nullptr);
+	}
+
+	void Renderer::release()
+	{
+        _clear();
+	}
+
 	//private
 	void Cursor::_set(SDL_Cursor* p)
 	{
@@ -956,6 +981,11 @@ namespace MiniEngine
 	SDL_Cursor* Cursor::_get()
 	{
         return _cur.get();
+	}
+
+	void Cursor::_clear()
+	{
+        _cur.reset();
 	}
 
 	//static
@@ -1003,15 +1033,15 @@ namespace MiniEngine
         SDL_ShowCursor(Settings?SDL_ENABLE:SDL_DISABLE);
     }
 
+    void Cursor::release()
+    {
+        _clear();
+    }
+
     void Cursor::activate()
     {
         SDL_SetCursor(_get());
     }
-
-	bool Renderer::isReady()
-	{
-		return (_get() != nullptr);
-	}
 
 	void Window::_set(SDL_Window* p)
 	{
@@ -1165,6 +1195,12 @@ namespace MiniEngine
 		return s;
 	}
 
+	void Window::release()
+	{
+        _clear();
+	}
+
+	// private
 	Uint32 Window::_render_caster(RendererType Type)
 	{
 	    switch(Type)
@@ -1183,6 +1219,7 @@ namespace MiniEngine
 	    return 0;
 	}
 
+	// private
 	void Window::_setRenderer_Real(Uint32 flags)
 	{
 		winrnd._rnd.reset(SDL_CreateRenderer(_get(), -1, flags), SDL_DestroyRenderer);
@@ -1442,6 +1479,11 @@ namespace MiniEngine
 		return rnd.render(renderUTF8Solid(Text,fg));
 	}
 
+	void Font::release()
+	{
+        _clear();
+	}
+
 	void LogSystem::d(const char* fmt,...)
 	{
         va_list ap;
@@ -1490,6 +1532,21 @@ namespace MiniEngine
 	    va_end(ap);
 	}
 
+	void* SharedLibrary::_get()
+	{
+	    return _obj.get();
+	}
+
+	void SharedLibrary::_set(void* ptr)
+	{
+	    _obj.reset(ptr,SDL_UnloadObject);
+	}
+
+	void SharedLibrary::_clear()
+	{
+        _obj.reset();
+	}
+
     SharedLibrary::SharedLibrary()
     {
         _obj=nullptr;
@@ -1503,40 +1560,44 @@ namespace MiniEngine
 
     SharedLibrary::~SharedLibrary()
     {
-        if(_obj)
-        {
-            unload();
-        }
+
     }
 
     int SharedLibrary::load(const std::string& Filename)
     {
-        if(_obj) return -1;
+        if(_get()!=nullptr) return -1; /// Loaded
         else
         {
-            _obj=SDL_LoadObject(Filename.c_str());
-            if(_obj) return 0;
-            else return -2;
+            void* ptr=SDL_LoadObject(Filename.c_str());
+            if(ptr)
+            {
+                _set(ptr);
+                return 0; /// Success
+            }
+            else return -2; /// Failed to load
         }
     }
 
     int SharedLibrary::unload()
     {
-        if(_obj)
+        if(_get()!=nullptr)
         {
-            SDL_UnloadObject(_obj);
-            _obj=nullptr;
-            return 0;
+            _clear();
+            return 0; /// Success to unload
         }
-        else return -1;
+        else return -1; /// Not Loaded.
     }
 
     void* SharedLibrary::get(const std::string& FunctionName)
     {
-        if(!_obj) return nullptr;
-        else return SDL_LoadFunction(_obj,FunctionName.c_str());
+        if(_get()==nullptr) return nullptr;
+        else return SDL_LoadFunction(_get(),FunctionName.c_str());
     }
 
+    void SharedLibrary::release()
+    {
+        _clear();
+    }
 
 	int SDLSystem::SDLInit()
 	{
