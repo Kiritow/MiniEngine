@@ -126,6 +126,7 @@ namespace MiniEngine
 
         static Surface createSurface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer);
 
+        void release();
 	protected:
 		Surface() = default;
 	private:
@@ -161,6 +162,7 @@ namespace MiniEngine
 		RGBA getRGBA();
 		void setRGBA(RGBA pack);
 
+		void release();
 	protected:
 		/// updateInfo() must be called after Texture is changed.
 		void updateInfo();
@@ -212,6 +214,8 @@ namespace MiniEngine
 		Texture createTexture(int Width, int Height) throw(ErrorViewer);
 
 		bool isReady();
+
+		void release();
 	private:
 		std::shared_ptr<SDL_Renderer> _rnd;
 		void _set(SDL_Renderer*);
@@ -242,6 +246,8 @@ namespace MiniEngine
         static bool isShow();
 
         void activate();
+
+        void release();
     private:
         std::shared_ptr<SDL_Cursor> _cur;
         void _set(SDL_Cursor*);
@@ -314,8 +320,9 @@ namespace MiniEngine
 		void maximize();
 		void restore();
 
-
 		_DECL_DEPRECATED Surface getSurface();
+
+		void release();
     protected:
         template<typename... Args>
         void _setRenderer(RendererType Type,Args&&... args)
@@ -401,6 +408,8 @@ namespace MiniEngine
 		Texture renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
 		Texture renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
 		Texture renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg);
+
+		void release();
     protected:
 		template<typename... Args>
         void _setFontStyle(int& fontcalc,Style style,Args&&... args)
@@ -446,8 +455,11 @@ namespace MiniEngine
         int load(const std::string& Filename);
         int unload();
         void* get(const std::string& FunctionName);
+        void release();
     private:
-        void* _obj;
+        void* _get();
+        void _set(void*);
+        std::shared_ptr<void> _obj;
 	};
 
 	class SDLSystem
