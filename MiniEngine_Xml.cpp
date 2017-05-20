@@ -29,6 +29,18 @@ void Attribute::_setdoc(Document* pDoc)
     _pdoc=pDoc;
 }
 
+Attribute::Attribute()
+{
+    _pattr=nullptr;
+    _pdoc=nullptr;
+}
+
+Attribute::Attribute(XAttr* pAttr)
+{
+    _pattr=pAttr;
+    _pdoc=nullptr;
+}
+
 std::string Attribute::getName() const
 {
     return std::string(getNameRaw());
@@ -48,6 +60,27 @@ char* Attribute::getValueRaw() const
 {
     return _pattr->value();
 }
+
+bool Attribute::hasPrevAttr() const
+{
+    return _pattr->previous_attribute()!=nullptr;
+}
+
+bool Attribute::hasNextAttr() const
+{
+    return _pattr->next_attribute()!=nullptr;
+}
+
+Attribute Attribute::getPrevAttr() const
+{
+    return Attribute(_pattr->previous_attribute());
+}
+
+Attribute Attribute::getNextAttr() const
+{
+    return Attribute(_pattr->next_attribute());
+}
+
 
 
 Node::Node()
@@ -105,74 +138,88 @@ char* Node::getValueRaw() const
 }
 
 
-void Node::push_front(const Node& node)
+Node& Node::push_front(const Node& node)
 {
     _pnode->prepend_node(node._pnode);
+    return *this;
 }
 
-void Node::push_back(const Node& node)
+Node& Node::push_back(const Node& node)
 {
     _pnode->append_node(node._pnode);
+    return *this;
 }
 
-void Node::insert(const Node& where, const Node& val)
+Node& Node::insert(const Node& where, const Node& val)
 {
     _pnode->insert_node(where._pnode,val._pnode);
+    return *this;
 }
 
-void Node::remove_first_node()
+Node& Node::remove_first_node()
 {
     _pnode->remove_first_node();
+    return *this;
 }
 
-void Node::remove_last_node()
+Node& Node::remove_last_node()
 {
     _pnode->remove_last_node();
+    return *this;
 }
 
-void Node::remove_node(const Node& todelete)
+Node& Node::remove_node(const Node& todelete)
 {
     _pnode->remove_node(todelete._pnode);
+    return *this;
 }
 
-void Node::remove_all_node()
+Node& Node::remove_all_node()
 {
     _pnode->remove_all_nodes();
+    return *this;
 }
 
-void Node::push_front(const Attribute& attr)
+Node& Node::push_front(const Attribute& attr)
 {
     _pnode->prepend_attribute(attr._get());
+    return *this;
 }
 
-void Node::push_back(const Attribute& attr)
+Node& Node::push_back(const Attribute& attr)
 {
     _pnode->append_attribute(attr._get());
+    return *this;
 }
 
-void Node::insert(const Attribute& where, const Attribute& val)
+Node& Node::insert(const Attribute& where, const Attribute& val)
 {
     _pnode->insert_attribute(where._get(),val._get());
+    return *this;
 }
 
-void Node::remove_first_attr()
+Node& Node::remove_first_attr()
 {
     _pnode->remove_first_attribute();
+    return *this;
 }
 
-void Node::remove_last_attr()
+Node& Node::remove_last_attr()
 {
     _pnode->remove_last_attribute();
+    return *this;
 }
 
-void Node::remove_attr(const Attribute& todelete)
+Node& Node::remove_attr(const Attribute& todelete)
 {
     _pnode->remove_attribute(todelete._get());
+    return *this;
 }
 
-void Node::remove_all_attr()
+Node& Node::remove_all_attr()
 {
     _pnode->remove_all_attributes();
+    return *this;
 }
 
 bool Node::operator==(const Node& node)
@@ -205,6 +252,16 @@ Node Node::getNextNode() const
     return Node(_pnode->next_sibling());
 }
 
+Node Node::getPrevNode(const std::string& name) const
+{
+    return Node(_pnode->previous_sibling(name.c_str()));
+}
+
+Node Node::getNextNode(const std::string& name) const
+{
+    return Node(_pnode->next_sibling(name.c_str()));
+}
+
 Node Node::getParentNode() const
 {
     return Node(_pnode->parent());
@@ -213,6 +270,17 @@ Node Node::getParentNode() const
 bool Node::valid()
 {
     return _pnode!=nullptr && _pdoc!=nullptr;
+}
+
+
+Node Node::getChild() const
+{
+    return _pnode->first_node();
+}
+
+Node Node::getChild(const std::string& nodename) const
+{
+    return _pnode->first_node(nodename.c_str());
 }
 
 

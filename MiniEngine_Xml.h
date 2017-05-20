@@ -23,11 +23,22 @@ public:
     void _clear();
     void _setdoc(Document*);
 
+    Attribute();
+    Attribute(XAttr*);
+
     std::string getName() const;
     std::string getValue() const;
 
     char* getNameRaw() const;
     char* getValueRaw() const;
+
+    bool hasPrevAttr() const;
+    bool hasNextAttr() const;
+    Attribute getPrevAttr() const;
+    Attribute getNextAttr() const;
+    Attribute getPrevAttr(const std::string& name) const;
+    Attribute getNextAttr(const std::string& name) const;
+
 private:
     XAttr* _pattr;
     Document* _pdoc;
@@ -50,23 +61,23 @@ public:
     char* getNameRaw() const;
     char* getValueRaw() const;
 
-    void push_front(const Node&);
-    void push_back(const Node&);
-    void insert(const Node& where,const Node& val);
+    Node& push_front(const Node&);
+    Node& push_back(const Node&);
+    Node& insert(const Node& where,const Node& val);
 
-    void remove_first_node();
-    void remove_last_node();
-    void remove_node(const Node& todelete);
-    void remove_all_node();
+    Node& remove_first_node();
+    Node& remove_last_node();
+    Node& remove_node(const Node& todelete);
+    Node& remove_all_node();
 
-    void push_front(const Attribute&);
-    void push_back(const Attribute&);
-    void insert(const Attribute& where,const Attribute& val);
+    Node& push_front(const Attribute&);
+    Node& push_back(const Attribute&);
+    Node& insert(const Attribute& where,const Attribute& val);
 
-    void remove_first_attr();
-    void remove_last_attr();
-    void remove_attr(const Attribute& todelete);
-    void remove_all_attr();
+    Node& remove_first_attr();
+    Node& remove_last_attr();
+    Node& remove_attr(const Attribute& todelete);
+    Node& remove_all_attr();
 
     bool operator == (const Node& node);
 
@@ -76,6 +87,11 @@ public:
     Node getPrevNode() const;
     Node getNextNode() const;
     Node getParentNode() const;
+    Node getPrevNode(const std::string& name) const;
+    Node getNextNode(const std::string& name) const;
+
+    Node getChild() const;
+    Node getChild(const std::string& nodename) const;
 
     bool valid();
 
