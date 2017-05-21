@@ -514,7 +514,7 @@ namespace MiniEngine
         template<typename VoidCallable,typename... Args>
         Timer(Uint32 interval,VoidCallable&& vcallable,Args&&... args) : Timer()
         {
-            auto realCall=[&](Uint32 ims)->Uint32{vcallable(ims,args...);return interval;};
+            auto realCall=[&](Uint32 ims)->Uint32{vcallable(ims,args...);return ims;};
             auto pfunc=new std::function<Uint32(Uint32 interval)>(realCall);
             _real_timer_call(_global_timer_executor,interval,pfunc);
         }
