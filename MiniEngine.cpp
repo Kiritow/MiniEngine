@@ -51,6 +51,56 @@ namespace MiniEngine
             }
         }
 
+        /// FIXME: return SDL_WindowFlags or Uint32 ?
+        Uint32 getSDLWindowFlagsFromWindowType(WindowType type)
+        {
+            switch(type)
+            {
+            case WindowType::FullScreen:
+                return SDL_WINDOW_FULLSCREEN;
+            case WindowType::OpenGL:
+                return SDL_WINDOW_OPENGL;
+            case WindowType::Shown:
+                return SDL_WINDOW_SHOWN;
+            case WindowType::Hidden:
+                return SDL_WINDOW_HIDDEN;
+            case WindowType::Borderless:
+                return SDL_WINDOW_BORDERLESS;
+            case WindowType::Resizable:
+                return SDL_WINDOW_RESIZABLE;
+            case WindowType::Minimized:
+                return SDL_WINDOW_MINIMIZED;
+            case WindowType::Maximized:
+                return SDL_WINDOW_MAXIMIZED;
+            case WindowType::InputGrabbed:
+                return SDL_WINDOW_INPUT_GRABBED;
+            case WindowType::InputFocus:
+                return SDL_WINDOW_INPUT_FOCUS;
+            case WindowType::MouseFocus:
+                return SDL_WINDOW_MOUSE_FOCUS;
+            case WindowType::FullScreenDesktop:
+                return SDL_WINDOW_FULLSCREEN_DESKTOP;
+            case WindowType::Foreign:
+                return SDL_WINDOW_FOREIGN;
+            case WindowType::AllowHighDPI:
+                return SDL_WINDOW_ALLOW_HIGHDPI;
+            case WindowType::MouseCapture:
+                return SDL_WINDOW_MOUSE_CAPTURE;
+            case WindowType::AlwaysOnTop:
+                return SDL_WINDOW_ALWAYS_ON_TOP;
+            case WindowType::SkipTaskBar:
+                return SDL_WINDOW_SKIP_TASKBAR;
+            case WindowType::Utility:
+                return SDL_WINDOW_UTILITY;
+            case WindowType::ToolTip:
+                return SDL_WINDOW_TOOLTIP;
+            case WindowType::PopUpMenu:
+                return SDL_WINDOW_POPUP_MENU;
+            default:
+                return 0;/// Return 0 on default.
+            }
+        }
+
         SystemCursorType getCursorTypeFromSDLSystemCursor(SDL_SystemCursor id)
         {
             switch(id)
@@ -115,6 +165,52 @@ namespace MiniEngine
             default:/// return SDL_SYSTEM_CURSOR_ARROW on default.
                 return SDL_SYSTEM_CURSOR_ARROW;
             }
+        }
+
+        int getTTFFontStyleFromFontStyle(Font::Style style)
+        {
+            switch(style)
+            {
+            case Font::Style::Bold:
+                return TTF_STYLE_BOLD;
+            case Font::Style::Italic:
+                return TTF_STYLE_ITALIC;
+            case Font::Style::Normal:
+                return TTF_STYLE_NORMAL;
+            case Font::Style::StrikeThrough:
+                return TTF_STYLE_STRIKETHROUGH;
+            case Font::Style::UnderLine:
+                return TTF_STYLE_UNDERLINE;
+            default:
+                return TTF_STYLE_NORMAL;
+            }
+        }
+
+        std::vector<Font::Style> getFontStyleVecFromMixedTTFFontStyle(int Mixed_TTF_Font_Style)
+        {
+            std::vector<Font::Style> vec;
+            if(Mixed_TTF_Font_Style&TTF_STYLE_BOLD)
+            {
+                vec.push_back(Font::Style::Bold);
+            }
+            if(Mixed_TTF_Font_Style&TTF_STYLE_ITALIC)
+            {
+                vec.push_back(Font::Style::Italic);
+            }
+            if(Mixed_TTF_Font_Style&TTF_STYLE_STRIKETHROUGH)
+            {
+                vec.push_back(Font::Style::StrikeThrough);
+            }
+            if(Mixed_TTF_Font_Style&TTF_STYLE_UNDERLINE)
+            {
+                vec.push_back(Font::Style::UnderLine);
+            }
+            if(vec.empty())
+            {
+                vec.push_back(Font::Style::Normal);
+            }
+
+            return vec;
         }
     }/// End of namespace _internal
 
@@ -311,6 +407,11 @@ namespace MiniEngine
         _set(SDL_RWFromMem(mem,size));
     }
 
+    void RWOP::release()
+    {
+        _clear();
+    }
+
     void Surface::_set(SDL_Surface* p)//private
     {
         _surf.reset(p,SDL_FreeSurface);
@@ -502,6 +603,11 @@ namespace MiniEngine
         return surf;
     }
 
+    void Surface::release()
+    {
+        _clear();
+    }
+
     void Texture::_set(SDL_Texture* p)//private
     {
         _text.reset(p,SDL_DestroyTexture);
@@ -608,6 +714,11 @@ namespace MiniEngine
         }
 		SDL_QueryTexture(_get(), NULL, NULL, &rect.w, &rect.h);
 		rect.x = rect.y = 0;
+	}
+
+	void Texture::release()
+	{
+        _clear();
 	}
 
 	void Renderer::_set(SDL_Renderer* p)
@@ -844,6 +955,16 @@ namespace MiniEngine
 		return t;
 	}
 
+    bool Renderer::isReady()
+	{
+		return (_get() != nullptr);
+	}
+
+	void Renderer::release()
+	{
+        _clear();
+	}
+
 	//private
 	void Cursor::_set(SDL_Cursor* p)
 	{
@@ -860,6 +981,11 @@ namespace MiniEngine
 	SDL_Cursor* Cursor::_get()
 	{
         return _cur.get();
+	}
+
+	void Cursor::_clear()
+	{
+        _cur.reset();
 	}
 
 	//static
@@ -907,15 +1033,15 @@ namespace MiniEngine
         SDL_ShowCursor(Settings?SDL_ENABLE:SDL_DISABLE);
     }
 
+    void Cursor::release()
+    {
+        _clear();
+    }
+
     void Cursor::activate()
     {
         SDL_SetCursor(_get());
     }
-
-	bool Renderer::isReady()
-	{
-		return (_get() != nullptr);
-	}
 
 	void Window::_set(SDL_Window* p)
 	{
@@ -932,9 +1058,18 @@ namespace MiniEngine
 	    return _wnd.get();
 	}
 
-	Window::Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags) throw(ErrorViewer)
+	Window::Window(std::string Title, int Width, int Height,
+                std::initializer_list<RendererType> RendererFlags,
+                std::initializer_list<WindowType> WindowFlags , int WindowPositionX, int WindowPositionY) throw(ErrorViewer)
 	{
-		SDL_Window* temp = SDL_CreateWindow(Title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, Width, Height, SDL_WINDOW_SHOWN);
+	    /// Calculate Window Flags
+	    Uint32 windowFlag=0;
+	    for(auto v:WindowFlags)
+        {
+            windowFlag|=_internal::getSDLWindowFlagsFromWindowType(v);
+        }
+
+		SDL_Window* temp = SDL_CreateWindow(Title.c_str(), WindowPositionX, WindowPositionY, Width, Height, windowFlag);
 		if (temp == NULL)
 		{
 			ErrorViewer e;
@@ -1060,6 +1195,12 @@ namespace MiniEngine
 		return s;
 	}
 
+	void Window::release()
+	{
+        _clear();
+	}
+
+	// private
 	Uint32 Window::_render_caster(RendererType Type)
 	{
 	    switch(Type)
@@ -1078,6 +1219,7 @@ namespace MiniEngine
 	    return 0;
 	}
 
+	// private
 	void Window::_setRenderer_Real(Uint32 flags)
 	{
 		winrnd._rnd.reset(SDL_CreateRenderer(_get(), -1, flags), SDL_DestroyRenderer);
@@ -1139,6 +1281,68 @@ namespace MiniEngine
 		return (_get() != nullptr);
 	}
 
+    bool Font::isNormal()
+    {
+        return !(TTF_GetFontStyle(_get()));
+    }
+
+    bool Font::isBold()
+    {
+        return (TTF_GetFontStyle(_get()) & TTF_STYLE_BOLD );
+    }
+
+    bool Font::isItalic()
+    {
+        return (TTF_GetFontStyle(_get()) & TTF_STYLE_ITALIC );
+    }
+
+    bool Font::isUnderLine()
+    {
+        return (TTF_GetFontStyle(_get()) & TTF_STYLE_UNDERLINE );
+    }
+
+    bool Font::isStrikeThrough()
+    {
+        return (TTF_GetFontStyle(_get()) & TTF_STYLE_STRIKETHROUGH );
+    }
+
+    void Font::setNormal()
+    {
+        _real_setFontStyle(TTF_STYLE_NORMAL);
+    }
+
+    void Font::setBold(bool enable)
+    {
+        if( enable!=isBold() )
+        {
+            _real_setFontStyle( TTF_GetFontStyle(_get()) | (enable?TTF_STYLE_BOLD:!TTF_STYLE_BOLD) );
+        }
+    }
+
+    void Font::setItalic(bool enable)
+    {
+        if( enable!=isItalic() )
+        {
+            _real_setFontStyle( TTF_GetFontStyle(_get()) | (enable?TTF_STYLE_ITALIC:!TTF_STYLE_ITALIC) );
+        }
+    }
+
+    void Font::setUnderLine(bool enable)
+    {
+        if( enable!=isUnderLine() )
+        {
+            _real_setFontStyle( TTF_GetFontStyle(_get()) | (enable?TTF_STYLE_UNDERLINE:!TTF_STYLE_UNDERLINE) );
+        }
+    }
+
+    void Font::setStrikeThrough(bool enable)
+    {
+        if( enable!=isStrikeThrough() )
+        {
+            _real_setFontStyle( TTF_GetFontStyle(_get()) | (enable?TTF_STYLE_STRIKETHROUGH:!TTF_STYLE_STRIKETHROUGH) );
+        }
+    }
+
     void Font::_real_setFontStyle(int Style)
     {
         TTF_SetFontStyle(_get(),Style);
@@ -1146,22 +1350,35 @@ namespace MiniEngine
 
     int Font::_style_caster(Style style)
     {
-        switch(style)
-        {
-        case Style::Bold:
-            return TTF_STYLE_BOLD;
-        case Style::Italic:
-            return TTF_STYLE_ITALIC;
-        case Style::Normal:
-            return TTF_STYLE_NORMAL;
-        case Style::StrikeThrough:
-            return TTF_STYLE_STRIKETHROUGH;
-        case Style::UnderLine:
-            return TTF_STYLE_UNDERLINE;
-        }
+        return _internal::getTTFFontStyleFromFontStyle(style);
+    }
 
-        /// If an error occurs, return 0 instead of -1.
-        return 0;
+    std::vector<Font::Style> Font::getFontStyles()
+    {
+        int styles=TTF_GetFontStyle(_get());
+        return _internal::getFontStyleVecFromMixedTTFFontStyle(styles);
+    }
+
+    Rect Font::sizeText(const std::string& Text) throw (ErrorViewer)
+    {
+        int w=0,h=0;
+        if(TTF_SizeText(_get(),Text.c_str(),&w,&h)!=0)
+        {
+            /// Something might be wrong
+            throw ErrorViewer();
+        }
+        return Rect(0,0,w,h);
+    }
+
+    Rect Font::sizeUTF8(const std::string& Text) throw (ErrorViewer)
+    {
+        int w=0,h=0;
+        if(TTF_SizeUTF8(_get(),Text.c_str(),&w,&h)!=0)
+        {
+            /// Something might be wrong
+            throw ErrorViewer();
+        }
+        return Rect(0,0,w,h);
     }
 
     /// rendering surfaces...
@@ -1262,6 +1479,11 @@ namespace MiniEngine
 		return rnd.render(renderUTF8Solid(Text,fg));
 	}
 
+	void Font::release()
+	{
+        _clear();
+	}
+
 	void LogSystem::d(const char* fmt,...)
 	{
         va_list ap;
@@ -1310,6 +1532,21 @@ namespace MiniEngine
 	    va_end(ap);
 	}
 
+	void* SharedLibrary::_get()
+	{
+	    return _obj.get();
+	}
+
+	void SharedLibrary::_set(void* ptr)
+	{
+	    _obj.reset(ptr,SDL_UnloadObject);
+	}
+
+	void SharedLibrary::_clear()
+	{
+        _obj.reset();
+	}
+
     SharedLibrary::SharedLibrary()
     {
         _obj=nullptr;
@@ -1323,40 +1560,44 @@ namespace MiniEngine
 
     SharedLibrary::~SharedLibrary()
     {
-        if(_obj)
-        {
-            unload();
-        }
+
     }
 
     int SharedLibrary::load(const std::string& Filename)
     {
-        if(_obj) return -1;
+        if(_get()!=nullptr) return -1; /// Loaded
         else
         {
-            _obj=SDL_LoadObject(Filename.c_str());
-            if(_obj) return 0;
-            else return -2;
+            void* ptr=SDL_LoadObject(Filename.c_str());
+            if(ptr)
+            {
+                _set(ptr);
+                return 0; /// Success
+            }
+            else return -2; /// Failed to load
         }
     }
 
     int SharedLibrary::unload()
     {
-        if(_obj)
+        if(_get()!=nullptr)
         {
-            SDL_UnloadObject(_obj);
-            _obj=nullptr;
-            return 0;
+            _clear();
+            return 0; /// Success to unload
         }
-        else return -1;
+        else return -1; /// Not Loaded.
     }
 
     void* SharedLibrary::get(const std::string& FunctionName)
     {
-        if(!_obj) return nullptr;
-        else return SDL_LoadFunction(_obj,FunctionName.c_str());
+        if(_get()==nullptr) return nullptr;
+        else return SDL_LoadFunction(_get(),FunctionName.c_str());
     }
 
+    void SharedLibrary::release()
+    {
+        _clear();
+    }
 
 	int SDLSystem::SDLInit()
 	{
@@ -1787,6 +2028,7 @@ namespace MiniEngine
     {
         pimpl=new impl;
         pimpl->status=false;
+
         std::ifstream ifs(StringFile);
         if(!ifs) return;
         rapidxml::file<> strFile(ifs);
@@ -1819,9 +2061,11 @@ namespace MiniEngine
 
     std::string StringEngine::getString(std::string Tag)
     {
-        if(!ready()) return "";
-        char* context=pimpl->root->first_node(Tag.c_str())->value();
-        if(context==nullptr) return "";
+        if(!ready()) return "(StringEngine::STRING_NOT_FOUND)";
+        rapidxml::xml_node<>* pnode=pimpl->root->first_node(Tag.c_str());
+        if(pnode==nullptr) return "(StringEngine::STRING_NOT_FOUND)";
+        char* context=pnode->value();
+        if(context==nullptr) return "";/// Empty String.
         else return std::string(context);
     }
 

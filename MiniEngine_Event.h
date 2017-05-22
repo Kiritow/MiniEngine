@@ -1,7 +1,8 @@
 #pragma once
-#include "MiniEngine.h"
+#include "MiniEngine_Config.h"
 #include <map>
 #include <list>
+#include <functional>
 
 typedef SDL_Event Event;
 typedef decltype(Event::type) _SDLEventType_;

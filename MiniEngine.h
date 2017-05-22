@@ -1,29 +1,9 @@
 #pragma once
-
-#ifdef _MSC_VER
-/// Visual Studio (VC++ Compiler)
-#include <SDL.h>
-#undef main
-#include <SDL_image.h>
-#include <SDL_ttf.h>
-#include <SDL_mixer.h>
-
-/// VC++ does not implied C++ exception. Use this to ignore compile warning on this.
-#pragma warning (disable:4290)
-#else
-/// CodeBlocks (MinGW Compiler)
-#include <SDL2/SDL.h>
-#undef main
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
-#include <SDL2/SDL_mixer.h>
-#endif
-
+#include "MiniEngine_Config.h"
 #include <string>
 #include <memory>
 #include <functional>
-
-#define _DECL_DEPRECATED [[deprecated]]
+#include <vector>
 
 namespace MiniEngine
 {
@@ -100,6 +80,8 @@ namespace MiniEngine
         RWOP(void* mem,int size);
         RWOP()=default;
         ~RWOP()=default;
+
+        void release();
     private:
         std::shared_ptr<SDL_RWops> _op;
         SDL_RWops* _get();
@@ -146,6 +128,7 @@ namespace MiniEngine
 
         static Surface createSurface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer);
 
+        void release();
 	protected:
 		Surface() = default;
 	private:
@@ -181,6 +164,7 @@ namespace MiniEngine
 		RGBA getRGBA();
 		void setRGBA(RGBA pack);
 
+		void release();
 	protected:
 		/// updateInfo() must be called after Texture is changed.
 		void updateInfo();
@@ -232,6 +216,8 @@ namespace MiniEngine
 		Texture createTexture(int Width, int Height) throw(ErrorViewer);
 
 		bool isReady();
+
+		void release();
 	private:
 		std::shared_ptr<SDL_Renderer> _rnd;
 		void _set(SDL_Renderer*);
@@ -262,6 +248,8 @@ namespace MiniEngine
         static bool isShow();
 
         void activate();
+
+        void release();
     private:
         std::shared_ptr<SDL_Cursor> _cur;
         void _set(SDL_Cursor*);
@@ -272,10 +260,23 @@ namespace MiniEngine
 
 	enum class MessageBoxType { Error, Warning, Information };
 
+	enum class WindowType
+	{
+	    FullScreen, OpenGL, Shown, Hidden,
+	    Borderless, Resizable, Minimized, Maximized,
+	    InputGrabbed, InputFocus, MouseFocus,
+	    FullScreenDesktop, Foreign, AllowHighDPI,
+	    MouseCapture, AlwaysOnTop, SkipTaskBar,
+	    Utility, ToolTip, PopUpMenu
+	};
+
 	class Window
 	{
 	public:
-		Window(std::string Title, int Width, int Height, std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw(ErrorViewer);
+		Window(std::string Title, int Width, int Height,
+         std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture },
+         std::initializer_list<WindowType> WindowFlags = {WindowType::Shown} ,
+         int WindowPositionX=SDL_WINDOWPOS_CENTERED, int WindowPositionY=SDL_WINDOWPOS_CENTERED) throw(ErrorViewer);
 		Renderer getRenderer() const;
 
 		void setRenderer(RendererType Type)
@@ -321,8 +322,9 @@ namespace MiniEngine
 		void maximize();
 		void restore();
 
-
 		_DECL_DEPRECATED Surface getSurface();
+
+		void release();
     protected:
         template<typename... Args>
         void _setRenderer(RendererType Type,Args&&... args)
@@ -359,19 +361,35 @@ namespace MiniEngine
 		int use(std::string FontFileName, int size);
 		bool isReady();
 
+		bool isNormal();
+        bool isBold();
+        bool isItalic();
+        bool isUnderLine();
+        bool isStrikeThrough();
+
+        void setNormal();
+        void setBold(bool);
+        void setItalic(bool);
+        void setUnderLine(bool);
+        void setStrikeThrough(bool);
+
 		template<typename... Args>
 		void setFontStyle(Style style,Args&&... args)
 		{
-            _internal_fontcalc=0;
-            _setFontStyle(style,std::forward(args...));
+		    int fontcalc=0;
+		    _setFontStyle(fontcalc,style,args...);
 		}
 
 		void setFontStyle(Style style)
 		{
-            _real_setFontStyle(_style_caster(style));
+            int fontcalc=0;
+            _setFontStyle(fontcalc,style);
 		}
 
-		std::tuple<Style> getFontStyles();
+		std::vector<Style> getFontStyles();
+
+        Rect sizeText(const std::string& Text) throw (ErrorViewer);
+        Rect sizeUTF8(const std::string& Text) throw (ErrorViewer);
 
 		Surface renderText(std::string Text, RGBA fg);
 		Surface renderTextWrapped(std::string Text, RGBA fg, int WrapLength);
@@ -392,23 +410,24 @@ namespace MiniEngine
 		Texture renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
 		Texture renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
 		Texture renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg);
+
+		void release();
     protected:
 		template<typename... Args>
-        void _setFontStyle(Style style,Args&&... args)
+        void _setFontStyle(int& fontcalc,Style style,Args&&... args)
         {
-            _internal_fontcalc|=_style_caster(style);
-            _setFontStyle(args...);
+            fontcalc|=_style_caster(style);
+            _setFontStyle(fontcalc,args...);
         }
 
-        void _setFontStyle(Style style)
+        void _setFontStyle(int& fontcalc,Style style)
         {
-            _internal_fontcalc|=_style_caster(style);
-            _real_setFontStyle(_internal_fontcalc);
+            fontcalc|=_style_caster(style);
+            _real_setFontStyle(fontcalc);
         }
 	private:
 	    void _real_setFontStyle(int);
 	    int _style_caster(Style);
-        int _internal_fontcalc;
 
 		std::shared_ptr<TTF_Font> _font;
 		void _set(TTF_Font*);
@@ -438,8 +457,12 @@ namespace MiniEngine
         int load(const std::string& Filename);
         int unload();
         void* get(const std::string& FunctionName);
+        void release();
     private:
-        void* _obj;
+        void* _get();
+        void _set(void*);
+        void _clear();
+        std::shared_ptr<void> _obj;
 	};
 
 	class SDLSystem
@@ -491,7 +514,7 @@ namespace MiniEngine
         template<typename VoidCallable,typename... Args>
         Timer(Uint32 interval,VoidCallable&& vcallable,Args&&... args) : Timer()
         {
-            auto realCall=[&](Uint32 ims)->Uint32{vcallable(ims,args...);return interval;};
+            auto realCall=[&,vcallable](Uint32 ims)->Uint32{vcallable(ims,args...);return ims;};
             auto pfunc=new std::function<Uint32(Uint32 interval)>(realCall);
             _real_timer_call(_global_timer_executor,interval,pfunc);
         }
@@ -500,7 +523,7 @@ namespace MiniEngine
         template<typename Callable,typename... Args>
         Timer(Callable&& callable,Uint32 interval,Args&&... args) : Timer()
         {
-            auto realCall=[&](Uint32 ims)->Uint32{return callable(ims,args...);};
+            auto realCall=[&,callable](Uint32 ims)->Uint32{return callable(ims,args...);};
             auto pfunc=new std::function<Uint32(Uint32 interval)>(realCall);
             _real_timer_call(_global_timer_executor,interval,pfunc);
         }
