@@ -1243,6 +1243,11 @@ namespace MiniEngine
         return SDL_ShowSimpleMessageBox(flags,Title.c_str(),Message.c_str(),_get());
 	}
 
+    bool Window::isScreenKeyboardShown()
+    {
+        return SDL_IsScreenKeyboardShown(_get())==SDL_TRUE;
+    }
+
 	void Font::_set(TTF_Font* p)
 	{
         _font.reset(p,TTF_CloseFont);
@@ -1728,9 +1733,20 @@ namespace MiniEngine
 		SDL_StartTextInput();
 	}
 
+	bool SDLSystem::IsTextInputActive()
+	{
+        return SDL_IsTextInputActive()==SDL_TRUE;
+	}
+
 	void SDLSystem::StopTextInput()
 	{
 		SDL_StopTextInput();
+	}
+
+	//static
+	bool SDLSystem::HasScreenKeyboardSupport()
+	{
+        return SDL_HasScreenKeyboardSupport()==SDL_TRUE;
 	}
 
 	/// Global Executor For class Timer
@@ -2097,6 +2113,11 @@ namespace MiniEngine
     bool HasClipboardText()
     {
         return SDL_HasClipboardText()==SDL_TRUE;
+    }
+
+    bool GetScanKeyState(SDL_Scancode code)
+    {
+        return SDL_GetKeyboardState(NULL)[code];
     }
 
 }/// End of namespace MiniEngine

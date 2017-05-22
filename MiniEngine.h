@@ -273,6 +273,7 @@ namespace MiniEngine
 	class Window
 	{
 	public:
+	    Window()=default;
 		Window(std::string Title, int Width, int Height,
          std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture },
          std::initializer_list<WindowType> WindowFlags = {WindowType::Shown} ,
@@ -281,15 +282,15 @@ namespace MiniEngine
 
 		void setRenderer(RendererType Type)
 		{
-		    _internal_rndflagcalc=0;
-            _setRenderer(Type);
+		    int flagcalc=0;
+            _setRenderer(flagcalc,Type);
 		}
 
 		template<typename... Args>
 		void setRenderer(RendererType Type,Args&&... args)
 		{
-            _internal_rndflagcalc=0;
-            _setRenderer(Type,std::forward<RendererType>(args...));
+            int flagcalc=0;
+            _setRenderer(flagcalc,Type,std::forward<RendererType>(args...));
 		}
 
 		void setRenderer(std::initializer_list<RendererType>);
@@ -324,23 +325,24 @@ namespace MiniEngine
 
 		_DECL_DEPRECATED Surface getSurface();
 
+		bool isScreenKeyboardShown();
+
 		void release();
     protected:
         template<typename... Args>
-        void _setRenderer(RendererType Type,Args&&... args)
+        void _setRenderer(int& refcalc,RendererType Type,Args&&... args)
         {
-            _internal_rndflagcalc|=_render_caster(Type);
+            refcalc|=_render_caster(Type);
             _setRenderer(args...);
         }
 
-        void _setRenderer(RendererType Type)
+        void _setRenderer(int& refcalc,RendererType Type)
         {
-            _internal_rndflagcalc|=_render_caster(Type);
-            _setRenderer_Real(_internal_rndflagcalc);
+            refcalc|=_render_caster(Type);
+            _setRenderer_Real(refcalc);
         }
 	private:
 		void _setRenderer_Real(Uint32 flags);
-		Uint32 _internal_rndflagcalc;
 		Uint32 _render_caster(RendererType);
 
 		std::shared_ptr<SDL_Window> _wnd;
@@ -489,7 +491,10 @@ namespace MiniEngine
 		static Platform GetPlatform();
 
 		static void StartTextInput();
+		static bool IsTextInputActive();
 		static void StopTextInput();
+
+		bool HasScreenKeyboardSupport();
 
 		class Android
 		{
@@ -653,6 +658,9 @@ namespace MiniEngine
     int SetClipboardText(const std::string& str);
     std::string GetClipboardText();
     bool HasClipboardText();
+
+    /// Experimental - For Experts: Use SDL ScanCode
+    bool GetScanKeyState(SDL_Scancode);
 
 }/// End of namespace MiniEngine
 
