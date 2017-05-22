@@ -35,6 +35,16 @@ bool HasEvent(_SDLEventType_ EventTypeMin,_SDLEventType_ EventTypeMax)
     return ( SDL_HasEvents(EventTypeMin,EventTypeMax)==SDL_TRUE );
 }
 
+_SDLEventType_ RegisterEvent(int howMuch)
+{
+    return SDL_RegisterEvents(howMuch);
+}
+
+bool IsValidEventType(_SDLEventType_ EventType)
+{
+    return (EventType > SDL_FIRSTEVENT) && (EventType < SDL_LASTEVENT);
+}
+
 bool operator == (const LooperID& a,const LooperID& b)
 {
     return a._type_id==b._type_id && a._looper_cnt==b._looper_cnt ;

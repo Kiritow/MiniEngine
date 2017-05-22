@@ -17,6 +17,8 @@ bool HasEvent(_SDLEventType_ EventTypeMin,_SDLEventType_ EventTypeMax);
 bool EnableEvent(_SDLEventType_ EventType);
 bool DisableEvent(_SDLEventType_ EventType);
 bool IsEventEnabled(_SDLEventType_ EventType);
+_SDLEventType_ RegisterEvent(int howMuch);
+bool IsValidEventType(_SDLEventType_ EventType);
 
 typedef struct
 {
