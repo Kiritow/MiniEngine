@@ -650,6 +650,10 @@ namespace MiniEngine
         impl* pimpl;
 	};
 
+    int SetClipboardText(const std::string& str);
+    std::string GetClipboardText();
+    bool HasClipboardText();
+
 }/// End of namespace MiniEngine
 
 std::string UTF8ToGBK(std::string UTF8String);

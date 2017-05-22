@@ -2074,6 +2074,31 @@ namespace MiniEngine
         delete pimpl;
     }
 
+    int SetClipboardText(const std::string& str)
+    {
+        return SDL_SetClipboardText(str.c_str());
+    }
+
+    std::string GetClipboardText()
+    {
+        char* pstr=SDL_GetClipboardText();
+        if(pstr==nullptr)
+        {
+            return std::string();
+        }
+        else
+        {
+            std::string s(pstr);
+            SDL_free(pstr);
+            return s;
+        }
+    }
+
+    bool HasClipboardText()
+    {
+        return SDL_HasClipboardText()==SDL_TRUE;
+    }
+
 }/// End of namespace MiniEngine
 
 /// The Following Functions are not avaliable in Visual Studio
