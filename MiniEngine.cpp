@@ -983,33 +983,30 @@ namespace MiniEngine
         return _cur.get();
 	}
 
+	//private
 	void Cursor::_clear()
 	{
         _cur.reset();
 	}
 
-	//static
-    Cursor Cursor::CreateCursor(Surface surf,Point hotspot)
+    Cursor::Cursor(Surface surf,Point hotspot)
     {
         Cursor ns;
         SDL_Cursor* cursor=SDL_CreateColorCursor(surf._get(),hotspot.x,hotspot.y);
         ns._set(cursor);
-        return ns;
     }
 
-    //static
-    Cursor Cursor::CreateSystemCursor(SystemCursorType type)
+    Cursor::Cursor(SystemCursorType type)
     {
         Cursor ns;
         ns._set(SDL_CreateSystemCursor(_internal::getSDLSystemCursorFromSystemCursorType(type)));
-        return ns;
     }
 
     //static
     Cursor Cursor::GetActiveCursor()
     {
         Cursor ns;
-        ns._set(SDL_GetCursor());
+        ns._set_no_delete(SDL_GetCursor());
         return ns;
     }
 
@@ -1017,7 +1014,7 @@ namespace MiniEngine
     Cursor Cursor::GetDefaultCursor()
     {
         Cursor ns;
-        ns._set(SDL_GetDefaultCursor());
+        ns._set_no_delete(SDL_GetDefaultCursor());
         return ns;
     }
 
@@ -1028,7 +1025,7 @@ namespace MiniEngine
     }
 
     //static
-    void Cursor::show(bool Settings)
+    void Cursor::setShow(bool Settings)
     {
         SDL_ShowCursor(Settings?SDL_ENABLE:SDL_DISABLE);
     }
@@ -1040,7 +1037,10 @@ namespace MiniEngine
 
     void Cursor::activate()
     {
-        SDL_SetCursor(_get());
+        if(_get()!=nullptr)
+        {
+            SDL_SetCursor(_get());
+        }
     }
 
 	void Window::_set(SDL_Window* p)

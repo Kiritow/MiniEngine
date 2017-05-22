@@ -238,13 +238,14 @@ namespace MiniEngine
 	class Cursor
 	{
     public:
-        static Cursor CreateSystemCursor(SystemCursorType);
-        static Cursor CreateCursor(Surface surf,Point hotspot={0,0});
+        Cursor()=default;
+        Cursor(SystemCursorType);
+        Cursor(Surface surf,Point hotspot={0,0});
 
         static Cursor GetActiveCursor();
         static Cursor GetDefaultCursor();
 
-        static void show(bool);
+        static void setShow(bool);
         static bool isShow();
 
         void activate();
@@ -333,7 +334,7 @@ namespace MiniEngine
         void _setRenderer(int& refcalc,RendererType Type,Args&&... args)
         {
             refcalc|=_render_caster(Type);
-            _setRenderer(args...);
+            _setRenderer(refcalc,args...);
         }
 
         void _setRenderer(int& refcalc,RendererType Type)
