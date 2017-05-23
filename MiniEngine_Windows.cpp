@@ -3,14 +3,13 @@ using namespace std;
 
 #include <windows.h>
 
-void _utf8_to_gb(const char* src, char* dst, int len)
+int _utf8_to_gb(const char* src, char* dst, int len)
 {
     int ret = 0;
     WCHAR* strA;
     int i= MultiByteToWideChar(CP_UTF8, 0, src, -1, NULL, 0);
     if (i <= 0) {
-        printf("ERROR.");
-        return;
+        return -1;
     }
     strA = (WCHAR*)malloc(i * 2);
     MultiByteToWideChar(CP_UTF8, 0, src, -1, strA, i);
@@ -21,20 +20,19 @@ void _utf8_to_gb(const char* src, char* dst, int len)
     }
     if (ret <= 0) {
         free(strA);
-        return;
+        return -2;
     }
-
     free( strA );
+    return 0;
 }
 
-void _gb_to_utf8(const char* src, char* dst, int len)
+int _gb_to_utf8(const char* src, char* dst, int len)
 {
     int ret = 0;
     WCHAR* strA;
     int i= MultiByteToWideChar(CP_ACP, 0, src, -1, NULL, 0);
     if (i <= 0) {
-        printf("ERROR.");
-        return;
+        return -1;
     }
     strA = (WCHAR*)malloc(i * 2);
     MultiByteToWideChar(CP_ACP, 0, src, -1, strA, i);
@@ -46,17 +44,22 @@ void _gb_to_utf8(const char* src, char* dst, int len)
 
     if (ret <= 0) {
         free(strA);
-        return;
+        return -2;
     }
     free(strA);
+    return 0;
 }
+
 string UTF8ToGBK(string UTF8String)
 {
     int sz=UTF8String.size()*2/3+256;
     auto gbkstr=new char[sz];
     memset(gbkstr,0,sz);
 
-    _utf8_to_gb(UTF8String.c_str(),gbkstr,sz);
+    if(_utf8_to_gb(UTF8String.c_str(),gbkstr,sz)!=0)
+    {
+        return "[MiniEngine] UT8ToGBK Convert Failed";
+    }
 
     string s((char*)gbkstr);
 
@@ -70,7 +73,10 @@ string GBKToUTF8(string GBKString)
     auto utf8str=new char[sz];
     memset(utf8str,0,sz);
 
-    _gb_to_utf8(GBKString.c_str(),utf8str,sz);
+    if(_gb_to_utf8(GBKString.c_str(),utf8str,sz)!=0)
+    {
+        return "[MiniEngine] GBKToUTF8 Convert Failed";
+    }
 
     string s(utf8str);
 
