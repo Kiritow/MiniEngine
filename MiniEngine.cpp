@@ -376,7 +376,7 @@ namespace MiniEngine
     }
 
     // private
-    SDL_RWops* RWOP::_get()
+    SDL_RWops* RWOP::_get() const
     {
         return _op.get();
     }
@@ -412,17 +412,20 @@ namespace MiniEngine
         _clear();
     }
 
-    void Surface::_set(SDL_Surface* p)//private
+    //private
+    void Surface::_set(SDL_Surface* p)
     {
         _surf.reset(p,SDL_FreeSurface);
     }
 
-    void Surface::_clear()//private
+    //private
+    void Surface::_clear()
     {
         _surf.reset();
     }
 
-    SDL_Surface* Surface::_get()//private
+    //private
+    SDL_Surface* Surface::_get() const
     {
         return _surf.get();
     }
@@ -430,6 +433,115 @@ namespace MiniEngine
     std::shared_ptr<SDL_Surface>& Surface::_getex()
     {
         return _surf;
+    }
+
+    Surface::Surface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer)
+    {
+        if(create(width,height,depth,Rmask,Gmask,Bmask,Amask)!=0)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+    }
+
+    Surface::Surface(int width,int height,int depth,RGBA maskPack) throw (ErrorViewer)
+    : Surface(width,height,depth,maskPack.r,maskPack.g,maskPack.b,maskPack.a)
+    {
+
+    }
+
+    Surface::Surface(int width,int height,int depth,Uint32 surfaceFormat) throw(ErrorViewer)
+    {
+        if(create(width,height,depth,surfaceFormat)!=0)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+    }
+
+    Surface::Surface(const std::string& filename) throw(ErrorViewer)
+    {
+        if(load(filename)!=0)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+    }
+
+    Surface::Surface(const RWOP& rwop) throw (ErrorViewer)
+    {
+        if(load(rwop)!=0)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+    }
+
+    int Surface::load(const std::string& filename)
+    {
+        SDL_Surface* temp=IMG_Load(filename.c_str());
+        if(temp==nullptr)
+        {
+            return -1;
+        }
+        else
+        {
+            _set(temp);
+            return 0;
+        }
+    }
+
+    int Surface::load(const RWOP& rwop)
+    {
+        SDL_Surface* temp=IMG_Load_RW(rwop._get(),0);
+        if(temp==nullptr)
+        {
+            return -1;
+        }
+        else
+        {
+            _set(temp);
+            return 0;
+        }
+    }
+
+    int Surface::create(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask)
+    {
+        SDL_Surface* temp=SDL_CreateRGBSurface(0,width,height,depth,Rmask,Gmask,Bmask,Amask);
+        if(temp==nullptr)
+        {
+            return -1;
+        }
+        else
+        {
+            _set(temp);
+            return 0;
+        }
+    }
+
+    int Surface::create(int width,int height,int depth,Uint32 surfaceFormat)
+    {
+        /// FIXME: This Function is available from SDL2.0.5. But the linker report a undefined reference.
+
+        /*
+        SDL_Surface* temp=SDL_CreateRGBSurfaceWithFormat(0,width,height,depth,surfaceFormat);
+        if(temp==nullptr)
+        {
+            return -1;
+        }
+        else
+        {
+            _set(temp);
+            return 0;
+        }
+        */
+
+        SDL_SetError("[MiniEngine] SDL_CreateRGBSurfaceWithFormat Not Linked.");
+        return -1;
     }
 
     int Surface::getw()
@@ -588,24 +700,20 @@ namespace MiniEngine
         SDL_UnlockSurface(_get());
     }
 
-    //static
-    Surface Surface::createSurface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer)
+    bool Surface::isReady() const
     {
-        SDL_Surface* temp=SDL_CreateRGBSurface(0,width,height,depth,Rmask,Gmask,Bmask,Amask);
-        if(temp==nullptr)
-        {
-            ErrorViewer e;
-            e.fetch();
-            throw e;
-        }
-        Surface surf;
-        surf._set(temp);
-        return surf;
+        return _get()!=nullptr;
     }
 
     void Surface::release()
     {
         _clear();
+    }
+
+    /// Experimental
+    SDL_Surface* Surface::getRawPointer()
+    {
+        return _get();
     }
 
     void Texture::_set(SDL_Texture* p)//private
@@ -869,34 +977,6 @@ namespace MiniEngine
         }
 
         return SDL_RenderCopyEx(_get(),t._get(),pR1,pR2,angle,pPoint,flip);
-	}
-
-	Surface Renderer::loadSurface(std::string FileName) throw(ErrorViewer)
-	{
-		Surface surf;
-		SDL_Surface* temp = IMG_Load(FileName.c_str());
-		if (temp == nullptr)
-		{
-			ErrorViewer e;
-			e.fetch();
-			throw e;
-		}
-		surf._set(temp);
-		return surf;
-	}
-
-	Surface Renderer::loadSurfaceRW(RWOP rwop) throw (ErrorViewer)
-	{
-        Surface surf;
-        SDL_Surface* temp=IMG_Load_RW(rwop._get(),0);
-        if(temp==nullptr)
-        {
-            ErrorViewer e;
-            e.fetch();
-            throw e;
-        }
-        surf._set(temp);
-        return surf;
 	}
 
 	Texture Renderer::render(Surface surf) throw(ErrorViewer)

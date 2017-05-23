@@ -84,9 +84,10 @@ namespace MiniEngine
         void release();
     private:
         std::shared_ptr<SDL_RWops> _op;
-        SDL_RWops* _get();
+        SDL_RWops* _get() const;
         void _clear();
         void _set(SDL_RWops*);
+        friend class Surface;
         friend class Renderer;
 	};
 
@@ -95,7 +96,20 @@ namespace MiniEngine
 	class Surface
 	{
 	public:
+	    Surface()=default;
+	    Surface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer);
+	    Surface(int width,int height,int depth,RGBA colorPack) throw(ErrorViewer);
+	    Surface(int width,int height,int depth,Uint32 surfaceFormat) throw(ErrorViewer);
+        Surface(const std::string& filename) throw(ErrorViewer);
+        Surface(const RWOP& rwop) throw(ErrorViewer);
 		~Surface() = default;
+
+		int load(const std::string& filename);
+		int load(const RWOP& rwop);
+
+		int create(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask);
+		int create(int width,int height,int depth,Uint32 surfaceFormat);
+
         int savePNG(const std::string& filename);
         int getw();
         int geth();
@@ -126,16 +140,16 @@ namespace MiniEngine
         int lock();
         void unlock();
 
-        static Surface createSurface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer);
-
+        bool isReady() const;
         void release();
-	protected:
-		Surface() = default;
+
+        /// Experimental : Get SDL_Surface Pointer and then do anything you want!
+        SDL_Surface* getRawPointer();
 	private:
 	    std::shared_ptr<SDL_Surface> _surf;
         void _set(SDL_Surface*);
         void _clear();
-        SDL_Surface* _get();
+        SDL_Surface* _get() const;
         std::shared_ptr<SDL_Surface>& _getex();
 
 		friend class Window;
@@ -208,8 +222,6 @@ namespace MiniEngine
 
 		int supercopy(Texture t,bool srcfull,Rect src,bool dstfull,Rect dst,double angle,bool haspoint,Point center,FlipMode mode);
 
-		Surface loadSurface(std::string FileName) throw(ErrorViewer);
-		Surface loadSurfaceRW(RWOP rwop) throw(ErrorViewer);
 		Texture render(Surface surf) throw (ErrorViewer);
 		Texture loadTexture(std::string FileName) throw(ErrorViewer);
 		Texture loadTextureRW(RWOP rwop) throw(ErrorViewer);
