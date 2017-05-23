@@ -86,6 +86,9 @@ namespace MiniEngine
                 return SDL_WINDOW_ALLOW_HIGHDPI;
             case WindowType::MouseCapture:
                 return SDL_WINDOW_MOUSE_CAPTURE;
+
+            /// The following value are not defined on C4.
+            #ifndef __C4DROID__
             case WindowType::AlwaysOnTop:
                 return SDL_WINDOW_ALWAYS_ON_TOP;
             case WindowType::SkipTaskBar:
@@ -96,6 +99,8 @@ namespace MiniEngine
                 return SDL_WINDOW_TOOLTIP;
             case WindowType::PopUpMenu:
                 return SDL_WINDOW_POPUP_MENU;
+            #endif // __C4DROID__
+
             default:
                 return 0;/// Return 0 on default.
             }
