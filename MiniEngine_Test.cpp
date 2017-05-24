@@ -31,6 +31,10 @@ std::string GetMD5(unsigned char* buffer,unsigned int bufferLen)
     return str;
 }
 
+int CompareSurface(const Surface& surface1, const Surface& surface2, int allowableError)
+{
+    return SDLTest_CompareSurfaces(surface1.getRawPointer(),surface2.getRawPointer(),allowableError);
+}
 
 }/// End of namespace MiniEngine::Test
 
