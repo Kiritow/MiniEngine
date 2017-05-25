@@ -651,6 +651,24 @@ namespace MiniEngine
         return SDL_BlitScaled(s._get(),NULL,_get(),NULL);
     }
 
+    int Surface::setClipRect(const Rect& clipRect)
+    {
+        auto m=clipRect.toSDLRect();
+        return (SDL_SetClipRect(_get(),&m) == SDL_TRUE) ? 0 : -1;
+    }
+
+    Rect Surface::getClipRect() const
+    {
+        SDL_Rect rect;
+        SDL_GetClipRect(_get(),&rect);
+        return Rect(rect);
+    }
+
+    void Surface::disableClipping()
+    {
+        SDL_SetClipRect(_get(),NULL);
+    }
+
     int Surface::setAlphaMode(int alpha)
     {
         return SDL_SetSurfaceAlphaMod(_get(),alpha);
@@ -716,7 +734,7 @@ namespace MiniEngine
     }
 
     /// Experimental
-    SDL_Surface* Surface::getRawPointer()
+    SDL_Surface* Surface::getRawPointer() const
     {
         return _get();
     }

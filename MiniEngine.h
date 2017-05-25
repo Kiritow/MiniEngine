@@ -128,6 +128,10 @@ namespace MiniEngine
 		int blitScaledFill(Surface t, Rect src);
 		int blitScaledFullFill(Surface t);
 
+		int setClipRect(const Rect& clipRect);
+		Rect getClipRect() const;
+		void disableClipping();
+
         int setAlphaMode(int alpha);
 		int getAlphaMode();
 
@@ -144,7 +148,7 @@ namespace MiniEngine
         void release();
 
         /// Experimental : Get SDL_Surface Pointer and then do anything you want!
-        SDL_Surface* getRawPointer();
+        SDL_Surface* getRawPointer() const;
 	private:
 	    std::shared_ptr<SDL_Surface> _surf;
         void _set(SDL_Surface*);
