@@ -478,6 +478,13 @@ namespace MiniEngine
         ~SharedLibrary();
         int load(const std::string& Filename);
         int unload();
+
+        template<typename ReturnType,typename... Arguments>
+        std::function<ReturnType(Arguments...)> get(const std::string& FunctionName)
+        {
+            return std::function<ReturnType(Arguments...)>(reinterpret_cast<ReturnType(*)(Arguments...)>(get(FunctionName)));
+        }
+
         void* get(const std::string& FunctionName);
         void release();
     private:
