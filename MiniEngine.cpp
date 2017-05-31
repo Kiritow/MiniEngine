@@ -1156,7 +1156,7 @@ namespace MiniEngine
         _wnd.reset();
 	}
 
-	SDL_Window* Window::_get()
+	SDL_Window* Window::_get() const
 	{
 	    return _wnd.get();
 	}
@@ -1253,6 +1253,18 @@ namespace MiniEngine
 	{
         return (SDL_GetWindowGrab(_get())==SDL_TRUE)?true:false;
 	}
+
+	int Window::setOpacity(float opacity)
+	{
+        return SDL_SetWindowOpacity(_get(),opacity);
+	}
+
+    float Window::getOpacity() const
+    {
+        float op=-1;
+        SDL_GetWindowOpacity(_get(),&op);
+        return op;
+    }
 
 	void Window::setResizable(bool resizable)
 	{

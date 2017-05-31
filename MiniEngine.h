@@ -328,6 +328,9 @@ namespace MiniEngine
 		void setGrab(bool);
 		bool getGrab();
 
+		int setOpacity(float opacity);
+		float getOpacity() const;
+
 		void setResizable(bool resizable);
 
 		/// Use UTF8 in Title and Message please.
@@ -365,7 +368,7 @@ namespace MiniEngine
 		std::shared_ptr<SDL_Window> _wnd;
 		void _set(SDL_Window*);
 		void _clear();
-		SDL_Window* _get();
+		SDL_Window* _get() const;
 
 		Renderer winrnd;
 	};
