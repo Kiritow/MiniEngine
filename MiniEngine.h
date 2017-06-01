@@ -5,6 +5,8 @@
 #include <functional>
 #include <vector>
 
+#define _MINIENGINE_SDL_VERSION_ATLEAST(X,Y,Z) SDL_VERSION_ATLEAST(X,Y,Z)
+
 namespace MiniEngine
 {
 
@@ -328,6 +330,9 @@ namespace MiniEngine
 		void setGrab(bool);
 		bool getGrab();
 
+		/// SDL2.0.5 Required.
+		/// If MiniEngine Runs on a lower version of SDL,
+		/// setOpacity() and getOpacity() always returns -1
 		int setOpacity(float opacity);
 		float getOpacity() const;
 
@@ -521,7 +526,10 @@ namespace MiniEngine
 		static bool IsTextInputActive();
 		static void StopTextInput();
 
-		bool HasScreenKeyboardSupport();
+		static bool HasScreenKeyboardSupport();
+
+        static std::tuple<int,int,int> getCompileVersion();
+        static std::tuple<int,int,int> getLinkedVersion();
 
 		class Android
 		{

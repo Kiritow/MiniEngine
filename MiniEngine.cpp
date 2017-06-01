@@ -87,8 +87,7 @@ namespace MiniEngine
             case WindowType::MouseCapture:
                 return SDL_WINDOW_MOUSE_CAPTURE;
 
-            /// The following value are not defined on C4.
-            #ifndef __C4DROID__
+            #if _MINIENGINE_SDL_VERSION_ATLEAST(2,0,5) /// SDL 2.0.5 Required
             case WindowType::AlwaysOnTop:
                 return SDL_WINDOW_ALWAYS_ON_TOP;
             case WindowType::SkipTaskBar:
@@ -99,7 +98,7 @@ namespace MiniEngine
                 return SDL_WINDOW_TOOLTIP;
             case WindowType::PopUpMenu:
                 return SDL_WINDOW_POPUP_MENU;
-            #endif // __C4DROID__
+            #endif // End of SDL2.0.5 Require
 
             default:
                 return 0;/// Return 0 on default.
@@ -1256,14 +1255,22 @@ namespace MiniEngine
 
 	int Window::setOpacity(float opacity)
 	{
+	    #if _MINIENGINE_SDL_VERSION_ATLEAST(2,0,5)
         return SDL_SetWindowOpacity(_get(),opacity);
+        #else
+        return -1;
+        #endif
 	}
 
     float Window::getOpacity() const
     {
+        #if _MINIENGINE_SDL_VERSION_ATLEAST(2,0,5)
         float op=-1;
         SDL_GetWindowOpacity(_get(),&op);
         return op;
+        #else
+        return -1;
+        #endif
     }
 
 	void Window::setResizable(bool resizable)
@@ -1719,46 +1726,55 @@ namespace MiniEngine
         _clear();
     }
 
+    //static
 	int SDLSystem::SDLInit()
 	{
 		return SDL_Init(SDL_INIT_EVERYTHING);
 	}
 
+	//static
 	void SDLSystem::SDLQuit()
 	{
 		SDL_Quit();
 	}
 
+	//static
 	int SDLSystem::IMGInit()
 	{
 		return IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
 	}
 
+	//static
 	void SDLSystem::IMGQuit()
 	{
 		IMG_Quit();
 	}
 
+	//static
 	int SDLSystem::TTFInit()
 	{
 		return TTF_Init();
 	}
 
+	//static
 	void SDLSystem::TTFQuit()
 	{
 		TTF_Quit();
 	}
 
+	//static
 	int SDLSystem::MixInit()
 	{
 		return Mix_Init(MIX_INIT_MP3);
 	}
 
+	//static
 	void SDLSystem::MixQuit()
 	{
 		Mix_Quit();
 	}
 
+	//static
 	void SDLSystem::Init()
 	{
 		SDLInit();
@@ -1767,6 +1783,7 @@ namespace MiniEngine
 		MixInit();
 	}
 
+	//static
 	void SDLSystem::Quit()
 	{
 		MixQuit();
@@ -1775,11 +1792,13 @@ namespace MiniEngine
 		SDLQuit();
 	}
 
+	//static
 	void SDLSystem::Delay(int ms)
 	{
 		SDL_Delay(ms);
 	}
 
+	//static
 	PowerState SDLSystem::GetPowerState()
 	{
         SDL_PowerState ret=SDL_GetPowerInfo(NULL,NULL);
@@ -1800,6 +1819,7 @@ namespace MiniEngine
         }
 	}
 
+	//static
 	int SDLSystem::GetPowerLifeLeft()
 	{
         int i;
@@ -1807,6 +1827,7 @@ namespace MiniEngine
         return i;
 	}
 
+	//static
 	int SDLSystem::GetPowerPrecentageLeft()
 	{
         int i;
@@ -1814,6 +1835,7 @@ namespace MiniEngine
         return i;
 	}
 
+	//static
 	Platform SDLSystem::GetPlatform()
 	{
         std::string s(SDL_GetPlatform());
@@ -1843,16 +1865,19 @@ namespace MiniEngine
         }
 	}
 
+	//static
 	void SDLSystem::StartTextInput()
 	{
 		SDL_StartTextInput();
 	}
 
+	//static
 	bool SDLSystem::IsTextInputActive()
 	{
         return SDL_IsTextInputActive()==SDL_TRUE;
 	}
 
+	//static
 	void SDLSystem::StopTextInput()
 	{
 		SDL_StopTextInput();
@@ -1863,6 +1888,22 @@ namespace MiniEngine
 	{
         return SDL_HasScreenKeyboardSupport()==SDL_TRUE;
 	}
+
+	//static
+    std::tuple<int,int,int> SDLSystem::getCompileVersion()
+    {
+        SDL_version ver;
+        SDL_VERSION(&ver);
+        return std::make_tuple(ver.major,ver.minor,ver.patch);
+    }
+
+    //static
+    std::tuple<int,int,int> SDLSystem::getLinkedVersion()
+    {
+        SDL_version ver;
+        SDL_GetVersion(&ver);
+        return std::make_tuple(ver.major,ver.minor,ver.patch);
+    }
 
 	/// Global Executor For class Timer
 	Uint32 _global_timer_executor(Uint32 interval,void* param)
