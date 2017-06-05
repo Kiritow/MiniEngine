@@ -106,43 +106,50 @@ namespace MiniEngine
         Surface(const RWOP& rwop) throw(ErrorViewer);
 		~Surface() = default;
 
-		int load(const std::string& filename);
-		int load(const RWOP& rwop);
+		/// static functions
+		static Surface load(const std::string& filename);
+		static Surface load(const RWOP& rwop);
+		static Surface create(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask);
+		static Surface create(int width,int height,int depth,Uint32 surfaceFormat);
 
-		int create(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask);
-		int create(int width,int height,int depth,Uint32 surfaceFormat);
+		/// xxxAs will clear the current surface if loaded or created successfully.
+		int loadAs(const std::string& filename);
+		int loadAs(const RWOP& rwop);
+		int createAs(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask);
+		int createAs(int width,int height,int depth,Uint32 surfaceFormat);
 
-        int savePNG(const std::string& filename);
-        int getw();
-        int geth();
-        BlendMode getBlendMode();
+        int savePNG(const std::string& filename) const;
+        int getw() const;
+        int geth() const;
+        BlendMode getBlendMode() const;
         int setBlendMode(BlendMode mode);
 
-        int blit(Surface s,Rect src,Rect dst);
-        int blitTo(Surface t, Rect dst);
-		int blitTo(Surface t, Point lupoint);
-		int blitFill(Surface t, Rect src);
-		int blitFullFill(Surface t);
+        /// Rendering functions. Copy an external surface to this surface. So it has no constant attribute.
+        int blit(const Surface& s,Rect src,Rect dst);
+        int blitTo(const Surface& t, Rect dst);
+		int blitTo(const Surface& t, Point lupoint);
+		int blitFill(const Surface& t, Rect src);
+		int blitFullFill(const Surface& t);
 
-		int blitScaled(Surface s,Rect src,Rect dst);
-		int blitScaledTo(Surface t, Rect dst);
-		int blitScaledTo(Surface t, Point lupoint);
-		int blitScaledFill(Surface t, Rect src);
-		int blitScaledFullFill(Surface t);
+		int blitScaled(const Surface& s,Rect src,Rect dst);
+		int blitScaledTo(const Surface& t, Rect dst);
+		int blitScaledTo(const Surface& t, Point lupoint);
+		int blitScaledFill(const Surface& t, Rect src);
+		int blitScaledFullFill(const Surface& t);
 
 		int setClipRect(const Rect& clipRect);
 		Rect getClipRect() const;
 		void disableClipping();
 
         int setAlphaMode(int alpha);
-		int getAlphaMode();
+		int getAlphaMode() const;
 
-		ColorMode getColorMode();
+		ColorMode getColorMode() const;
 		int setColorMode(ColorMode mode);
-		RGBA getRGBA();
+		RGBA getRGBA() const;
 		void setRGBA(RGBA pack);
 
-		bool mustlock();
+		bool mustlock() const;
         int lock();
         void unlock();
 
@@ -150,7 +157,8 @@ namespace MiniEngine
         void release();
 
         /// Experimental : Get SDL_Surface Pointer and then do anything you want!
-        SDL_Surface* getRawPointer() const;
+        /// In case you can do anything with this pointer, this function should not has constant attribute.
+        SDL_Surface* getRawPointer();
 	private:
 	    std::shared_ptr<SDL_Surface> _surf;
         void _set(SDL_Surface*);

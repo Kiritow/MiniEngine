@@ -441,7 +441,7 @@ namespace MiniEngine
 
     Surface::Surface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer)
     {
-        if(create(width,height,depth,Rmask,Gmask,Bmask,Amask)!=0)
+        if(createAs(width,height,depth,Rmask,Gmask,Bmask,Amask)!=0)
         {
             ErrorViewer e;
             e.fetch();
@@ -457,7 +457,7 @@ namespace MiniEngine
 
     Surface::Surface(int width,int height,int depth,Uint32 surfaceFormat) throw(ErrorViewer)
     {
-        if(create(width,height,depth,surfaceFormat)!=0)
+        if(createAs(width,height,depth,surfaceFormat)!=0)
         {
             ErrorViewer e;
             e.fetch();
@@ -467,7 +467,7 @@ namespace MiniEngine
 
     Surface::Surface(const std::string& filename) throw(ErrorViewer)
     {
-        if(load(filename)!=0)
+        if(loadAs(filename)!=0)
         {
             ErrorViewer e;
             e.fetch();
@@ -477,7 +477,7 @@ namespace MiniEngine
 
     Surface::Surface(const RWOP& rwop) throw (ErrorViewer)
     {
-        if(load(rwop)!=0)
+        if(loadAs(rwop)!=0)
         {
             ErrorViewer e;
             e.fetch();
@@ -485,7 +485,7 @@ namespace MiniEngine
         }
     }
 
-    int Surface::load(const std::string& filename)
+    int Surface::loadAs(const std::string& filename)
     {
         SDL_Surface* temp=IMG_Load(filename.c_str());
         if(temp==nullptr)
@@ -499,7 +499,7 @@ namespace MiniEngine
         }
     }
 
-    int Surface::load(const RWOP& rwop)
+    int Surface::loadAs(const RWOP& rwop)
     {
         SDL_Surface* temp=IMG_Load_RW(rwop._get(),0);
         if(temp==nullptr)
@@ -513,7 +513,7 @@ namespace MiniEngine
         }
     }
 
-    int Surface::create(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask)
+    int Surface::createAs(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask)
     {
         SDL_Surface* temp=SDL_CreateRGBSurface(0,width,height,depth,Rmask,Gmask,Bmask,Amask);
         if(temp==nullptr)
@@ -527,7 +527,7 @@ namespace MiniEngine
         }
     }
 
-    int Surface::create(int width,int height,int depth,Uint32 surfaceFormat)
+    int Surface::createAs(int width,int height,int depth,Uint32 surfaceFormat)
     {
         /// FIXME: This Function is available from SDL2.0.5. But the linker report a undefined reference.
 
@@ -548,7 +548,7 @@ namespace MiniEngine
         return -1;
     }
 
-    int Surface::getw()
+    int Surface::getw() const
     {
         if(_get()!=nullptr)
         {
@@ -561,7 +561,7 @@ namespace MiniEngine
         }
     }
 
-    int Surface::geth()
+    int Surface::geth() const
     {
         if(_get()!=nullptr)
         {
@@ -574,7 +574,7 @@ namespace MiniEngine
         }
     }
 
-    BlendMode Surface::getBlendMode()
+    BlendMode Surface::getBlendMode() const
     {
         SDL_BlendMode temp;
         /// FIXME: return value are ignored.
@@ -587,65 +587,65 @@ namespace MiniEngine
         return SDL_SetSurfaceBlendMode(_get(),_internal::getSDLBlendModeFromBlendMode(mode));
     }
 
-    int Surface::savePNG(const std::string& filename)
+    int Surface::savePNG(const std::string& filename) const
     {
         return IMG_SavePNG(_get(),filename.c_str());
     }
 
-    int Surface::blit(Surface s,Rect src,Rect dst)
+    int Surface::blit(const Surface& s,Rect src,Rect dst)
     {
         SDL_Rect rsrc=src.toSDLRect();
         SDL_Rect rdst=dst.toSDLRect();
         return SDL_BlitSurface(s._get(),&rsrc,_get(),&rdst);
     }
 
-    int Surface::blitTo(Surface s,Rect dst)
+    int Surface::blitTo(const Surface& s,Rect dst)
     {
         SDL_Rect rdst=dst.toSDLRect();
         return SDL_BlitSurface(s._get(),NULL,_get(),&rdst);
     }
 
-    int Surface::blitTo(Surface s,Point lupoint)
+    int Surface::blitTo(const Surface& s,Point lupoint)
     {
         return blitTo(s,Rect(lupoint.x,lupoint.y,s.getw(),s.geth()));
     }
 
-    int Surface::blitFill(Surface s,Rect src)
+    int Surface::blitFill(const Surface& s,Rect src)
     {
         SDL_Rect rsrc=src.toSDLRect();
         return SDL_BlitSurface(s._get(),&rsrc,_get(),NULL);
     }
 
-    int Surface::blitFullFill(Surface s)
+    int Surface::blitFullFill(const Surface& s)
     {
         return SDL_BlitSurface(s._get(),NULL,_get(),NULL);
     }
 
-    int Surface::blitScaled(Surface s,Rect src,Rect dst)
+    int Surface::blitScaled(const Surface& s,Rect src,Rect dst)
     {
         SDL_Rect rsrc=src.toSDLRect();
         SDL_Rect rdst=dst.toSDLRect();
         return SDL_BlitScaled(s._get(),&rsrc,_get(),&rdst);
     }
 
-    int Surface::blitScaledTo(Surface s,Rect dst)
+    int Surface::blitScaledTo(const Surface& s,Rect dst)
     {
         SDL_Rect rdst=dst.toSDLRect();
         return SDL_BlitScaled(s._get(),NULL,_get(),&rdst);
     }
 
-    int Surface::blitScaledTo(Surface s,Point lupoint)
+    int Surface::blitScaledTo(const Surface& s,Point lupoint)
     {
         return blitScaledTo(s,Rect(lupoint.x,lupoint.y,s.getw(),s.geth()));
     }
 
-    int Surface::blitScaledFill(Surface s,Rect src)
+    int Surface::blitScaledFill(const Surface& s,Rect src)
     {
         SDL_Rect rsrc=src.toSDLRect();
         return SDL_BlitScaled(s._get(),&rsrc,_get(),NULL);
     }
 
-    int Surface::blitScaledFullFill(Surface s)
+    int Surface::blitScaledFullFill(const Surface& s)
     {
         return SDL_BlitScaled(s._get(),NULL,_get(),NULL);
     }
@@ -673,7 +673,7 @@ namespace MiniEngine
         return SDL_SetSurfaceAlphaMod(_get(),alpha);
     }
 
-    int Surface::getAlphaMode()
+    int Surface::getAlphaMode() const
     {
         Uint8 al;
         SDL_GetSurfaceAlphaMod(_get(),&al);
@@ -685,7 +685,7 @@ namespace MiniEngine
         return SDL_SetSurfaceColorMod(_get(),mode.r,mode.g,mode.b);
     }
 
-    ColorMode Surface::getColorMode()
+    ColorMode Surface::getColorMode() const
     {
         Uint8 r,g,b;
         SDL_GetSurfaceColorMod(_get(),&r,&g,&b);
@@ -702,12 +702,12 @@ namespace MiniEngine
         setAlphaMode(pack.a);
     }
 
-    RGBA Surface::getRGBA()
+    RGBA Surface::getRGBA() const
     {
         return RGBA(getColorMode(),getAlphaMode());
     }
 
-    bool Surface::mustlock()
+    bool Surface::mustlock() const
     {
         return SDL_MUSTLOCK(_get());
     }
@@ -732,8 +732,8 @@ namespace MiniEngine
         _clear();
     }
 
-    /// Experimental
-    SDL_Surface* Surface::getRawPointer() const
+    /// Experimental (Not constant)
+    SDL_Surface* Surface::getRawPointer()
     {
         return _get();
     }
