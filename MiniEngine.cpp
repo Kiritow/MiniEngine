@@ -434,9 +434,10 @@ namespace MiniEngine
         return _surf.get();
     }
 
-    std::shared_ptr<SDL_Surface>& Surface::_getex()
+    //private
+    void Surface::_set_no_delete(SDL_Surface* p)
     {
-        return _surf;
+        _surf.reset(p,[](SDL_Surface*){});
     }
 
     Surface::Surface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer)
@@ -484,6 +485,39 @@ namespace MiniEngine
             throw e;
         }
     }
+
+    //static
+    Surface Surface::load(const std::string& filename)
+    {
+        Surface s;
+        s.loadAs(filename);
+        return s;
+    }
+
+    //static
+    Surface Surface::load(const RWOP& rwop)
+    {
+        Surface s;
+        s.loadAs(rwop);
+        return s;
+    }
+
+    //static
+    Surface Surface::create(int width, int height, int depth, int Rmask, int Gmask, int Bmask, int Amask)
+    {
+        Surface s;
+        s.create(width,height,depth,Rmask,Gmask,Bmask,Amask);
+        return s;
+    }
+
+    //static
+    Surface Surface::create(int width, int height, int depth, Uint32 surfaceFormat)
+    {
+        Surface s;
+        s.create(width,height,depth,surfaceFormat);
+        return s;
+    }
+
 
     int Surface::loadAs(const std::string& filename)
     {
@@ -592,25 +626,25 @@ namespace MiniEngine
         return IMG_SavePNG(_get(),filename.c_str());
     }
 
-    int Surface::blit(const Surface& s,Rect src,Rect dst)
+    int Surface::blit(const Surface& s,const Rect& src,const Rect& dst)
     {
         SDL_Rect rsrc=src.toSDLRect();
         SDL_Rect rdst=dst.toSDLRect();
         return SDL_BlitSurface(s._get(),&rsrc,_get(),&rdst);
     }
 
-    int Surface::blitTo(const Surface& s,Rect dst)
+    int Surface::blitTo(const Surface& s,const Rect& dst)
     {
         SDL_Rect rdst=dst.toSDLRect();
         return SDL_BlitSurface(s._get(),NULL,_get(),&rdst);
     }
 
-    int Surface::blitTo(const Surface& s,Point lupoint)
+    int Surface::blitTo(const Surface& s,const Point& lupoint)
     {
         return blitTo(s,Rect(lupoint.x,lupoint.y,s.getw(),s.geth()));
     }
 
-    int Surface::blitFill(const Surface& s,Rect src)
+    int Surface::blitFill(const Surface& s,const Rect& src)
     {
         SDL_Rect rsrc=src.toSDLRect();
         return SDL_BlitSurface(s._get(),&rsrc,_get(),NULL);
@@ -621,25 +655,25 @@ namespace MiniEngine
         return SDL_BlitSurface(s._get(),NULL,_get(),NULL);
     }
 
-    int Surface::blitScaled(const Surface& s,Rect src,Rect dst)
+    int Surface::blitScaled(const Surface& s,const Rect& src,const Rect& dst)
     {
         SDL_Rect rsrc=src.toSDLRect();
         SDL_Rect rdst=dst.toSDLRect();
         return SDL_BlitScaled(s._get(),&rsrc,_get(),&rdst);
     }
 
-    int Surface::blitScaledTo(const Surface& s,Rect dst)
+    int Surface::blitScaledTo(const Surface& s,const Rect& dst)
     {
         SDL_Rect rdst=dst.toSDLRect();
         return SDL_BlitScaled(s._get(),NULL,_get(),&rdst);
     }
 
-    int Surface::blitScaledTo(const Surface& s,Point lupoint)
+    int Surface::blitScaledTo(const Surface& s,const Point& lupoint)
     {
         return blitScaledTo(s,Rect(lupoint.x,lupoint.y,s.getw(),s.geth()));
     }
 
-    int Surface::blitScaledFill(const Surface& s,Rect src)
+    int Surface::blitScaledFill(const Surface& s,const Rect& src)
     {
         SDL_Rect rsrc=src.toSDLRect();
         return SDL_BlitScaled(s._get(),&rsrc,_get(),NULL);
@@ -696,7 +730,7 @@ namespace MiniEngine
         return mode;
     }
 
-    void Surface::setRGBA(RGBA pack)
+    void Surface::setRGBA(const RGBA& pack)
     {
         setColorMode(pack.toColorMode());
         setAlphaMode(pack.a);
@@ -831,7 +865,7 @@ namespace MiniEngine
 		return RGBA(getColorMode(), getAlphaMode());
 	}
 
-	void Texture::setRGBA(RGBA pack)
+	void Texture::setRGBA(const RGBA& pack)
 	{
 		setColorMode(pack.toColorMode());
 		setAlphaMode(pack.a);
@@ -869,17 +903,16 @@ namespace MiniEngine
         return _rnd.get();
 	}
 
-	int Renderer::setColor(RGBA pack)
+	int Renderer::setColor(const RGBA& pack)
 	{
 		return SDL_SetRenderDrawColor(_get(), pack.r, pack.g, pack.b, pack.a);
 	}
 
-	RGBA Renderer::getColor()
+	RGBA Renderer::getColor() const
 	{
 		Uint8 r, g, b, a;
 		SDL_GetRenderDrawColor(_get(), &r, &g, &b, &a);
-		RGBA pack(r, g, b, a);
-		return pack;
+		return RGBA(r, g, b, a);
 	}
 
 	int Renderer::setBlendMode(BlendMode mode)
@@ -887,7 +920,7 @@ namespace MiniEngine
 		return SDL_SetRenderDrawBlendMode(_get(), _internal::getSDLBlendModeFromBlendMode(mode));
 	}
 
-	BlendMode Renderer::getBlendMode()
+	BlendMode Renderer::getBlendMode() const
 	{
 		SDL_BlendMode temp;
 		SDL_GetRenderDrawBlendMode(_get(), &temp);
@@ -906,19 +939,19 @@ namespace MiniEngine
 		return SDL_SetRenderTarget(_get(), nullptr);
 	}
 
-	int Renderer::fillRect(Rect rect)
+	int Renderer::fillRect(const Rect& rect)
 	{
 		auto inr = rect.toSDLRect();
 		return SDL_RenderFillRect(_get(), &inr);
 	}
 
-	int Renderer::drawRect(Rect rect)
+	int Renderer::drawRect(const Rect& rect)
 	{
 		auto inr = rect.toSDLRect();
 		return SDL_RenderDrawRect(_get(), &inr);
 	}
 
-	int Renderer::drawPoint(Point p)
+	int Renderer::drawPoint(const Point& p)
 	{
         return SDL_RenderDrawPoint(_get(),p.x,p.y);
 	}
@@ -933,36 +966,39 @@ namespace MiniEngine
 		SDL_RenderPresent(_get());
 	}
 
-	int Renderer::copy(Texture t, Rect src, Rect dst)
+	int Renderer::copy(const Texture& t, const Rect& src, const Rect& dst)
 	{
 		SDL_Rect s = src.toSDLRect();
 		SDL_Rect d = dst.toSDLRect();
 		return SDL_RenderCopy(_get(), t._get(), &s, &d);
 	}
 
-	int Renderer::copyTo(Texture t, Rect dst)
+	int Renderer::copyTo(const Texture& t, const Rect& dst)
 	{
 		SDL_Rect d = dst.toSDLRect();
 		return SDL_RenderCopy(_get(), t._get(), NULL, &d);
 	}
 
-	int Renderer::copyTo(Texture t, Point lupoint)
+	int Renderer::copyTo(const Texture& t, const Point& lupoint)
 	{
 		return copyTo(t, Rect(lupoint.x, lupoint.y, t.getw(), t.geth()));
 	}
 
-	int Renderer::copyFill(Texture t, Rect src)
+	int Renderer::copyFill(const Texture& t, const Rect& src)
 	{
 		SDL_Rect s = src.toSDLRect();
 		return SDL_RenderCopy(_get(), t._get(), &s, NULL);
 	}
 
-	int Renderer::copyFullFill(Texture t)
+	int Renderer::copyFullFill(const Texture& t)
 	{
 		return SDL_RenderCopy(_get(), t._get(), NULL, NULL);
 	}
 
-	int Renderer::supercopy(Texture t,bool srcfull,Rect src,bool dstfull,Rect dst,double angle,bool haspoint,Point center,FlipMode mode)
+	int Renderer::supercopy(const Texture& t,
+                         bool srcfull,const Rect& src,bool dstfull,const Rect& dst,
+                         double angle,
+                         bool haspoint,const Point& center,FlipMode mode)
 	{
 	    SDL_Rect R1,R2;
 	    SDL_Point P;
@@ -1060,7 +1096,7 @@ namespace MiniEngine
 		return t;
 	}
 
-    bool Renderer::isReady()
+    bool Renderer::isReady() const
 	{
 		return (_get() != nullptr);
 	}
@@ -1187,7 +1223,7 @@ namespace MiniEngine
 
 	Renderer Window::getRenderer() const
 	{
-		return winrnd;
+		return _winrnd;
 	}
 
 	void Window::setRenderer(std::initializer_list<RendererType> RendererFlags)
@@ -1200,14 +1236,14 @@ namespace MiniEngine
 		_setRenderer_Real(flag);
 	}
 
-	Rect Window::getSize()
+	Rect Window::getSize() const
 	{
 		int w, h;
 		SDL_GetWindowSize(_get(), &w, &h);
 		return Rect(0, 0, w, h);
 	}
 
-	void Window::setSize(Rect sizeRect)
+	void Window::setSize(const Rect& sizeRect)
 	{
 		setSize(sizeRect.w, sizeRect.h);
 	}
@@ -1217,11 +1253,11 @@ namespace MiniEngine
 		SDL_SetWindowSize(_get(), w, h);
 	}
 
-	Rect Window::getPosition()
+	Point Window::getPosition() const
 	{
 		int x, y;
 		SDL_GetWindowPosition(_get(), &x, &y);
-		return Rect(x, y, 0, 0);
+		return Point(x, y);
 	}
 
 	void Window::setPosition(int x, int y)
@@ -1229,19 +1265,17 @@ namespace MiniEngine
 		SDL_SetWindowPosition(_get(), x, y);
 	}
 
-	/// FIXME: Use class Point or class Rect ?
-
-	void Window::setPosition(Point point)
+	void Window::setPosition(const Point& point)
 	{
 		SDL_SetWindowPosition(_get(), point.x, point.y);
 	}
 
-	void Window::setTitle(std::string Title)
+	void Window::setTitle(const std::string& Title)
 	{
 		SDL_SetWindowTitle(_get(), Title.c_str());
 	}
 
-	std::string Window::getTitle()
+	std::string Window::getTitle() const
 	{
 		return std::string(SDL_GetWindowTitle(_get()));
 	}
@@ -1251,31 +1285,25 @@ namespace MiniEngine
         SDL_SetWindowGrab(_get(),isGrab?SDL_TRUE:SDL_FALSE);
 	}
 
-	bool Window::getGrab()
+	bool Window::getGrab() const
 	{
         return (SDL_GetWindowGrab(_get())==SDL_TRUE)?true:false;
 	}
 
+	#if _MINIENGINE_SDL_VERSION_ATLEAST(2,0,5)
 	int Window::setOpacity(float opacity)
 	{
-	    #if _MINIENGINE_SDL_VERSION_ATLEAST(2,0,5)
         return SDL_SetWindowOpacity(_get(),opacity);
-        #else
-        return -1;
-        #endif
 	}
-
     float Window::getOpacity() const
     {
-        #if _MINIENGINE_SDL_VERSION_ATLEAST(2,0,5)
         float op=-1;
         SDL_GetWindowOpacity(_get(),&op);
         return op;
-        #else
-        return -1;
-        #endif
     }
+    #endif /// End of SDL2 2.0.5 Require.
 
+    /// FIXME: Not Implemented.
 	void Window::setResizable(bool resizable)
 	{
 		//SDL_SetWindowResizable(_get(), resizable?SDL_TRUE:SDL_FALSE);
@@ -1316,7 +1344,7 @@ namespace MiniEngine
 		SDL_Surface* temp = SDL_GetWindowSurface(_get());
 		Surface s;
 		/// Don't Free This Surface
-		s._getex().reset(temp, [](SDL_Surface*) {});
+		s._set_no_delete(temp);
 		return s;
 	}
 
@@ -1347,10 +1375,10 @@ namespace MiniEngine
 	// private
 	void Window::_setRenderer_Real(Uint32 flags)
 	{
-		winrnd._rnd.reset(SDL_CreateRenderer(_get(), -1, flags), SDL_DestroyRenderer);
+		_winrnd._rnd.reset(SDL_CreateRenderer(_get(), -1, flags), SDL_DestroyRenderer);
 	}
 
-	int Window::showSimpleMessageBox(MessageBoxType type,std::string Title,std::string Message)
+	int Window::showSimpleMessageBox(MessageBoxType type,const std::string& Title,const std::string& Message) const
 	{
 	    Uint32 flags=0;
 	    switch(type)
@@ -1371,6 +1399,24 @@ namespace MiniEngine
     bool Window::isScreenKeyboardShown()
     {
         return SDL_IsScreenKeyboardShown(_get())==SDL_TRUE;
+    }
+
+    /// Experimental
+    void Window::resetRenderer()
+    {
+        /// Check if there is a renderer exists.
+        if(SDL_GetRenderer(_get())!=nullptr)
+        {
+            /// Clear internal Renderer class.
+            _winrnd._clear();
+            /// Check again.
+            if(SDL_GetRenderer(_get())!=nullptr)
+            {
+                /// If it still exists, (May be some other Renderer is holding)
+                /// then destroy it.
+                SDL_DestroyRenderer(SDL_GetRenderer(_get()));
+            }
+        }
     }
 
 	void Font::_set(TTF_Font* p)
@@ -1722,16 +1768,19 @@ namespace MiniEngine
 	    va_end(ap);
 	}
 
-	void* SharedLibrary::_get()
+	//private
+	void* SharedLibrary::_get() const
 	{
 	    return _obj.get();
 	}
 
+	//private
 	void SharedLibrary::_set(void* ptr)
 	{
 	    _obj.reset(ptr,SDL_UnloadObject);
 	}
 
+	//private
 	void SharedLibrary::_clear()
 	{
         _obj.reset();
@@ -1746,11 +1795,6 @@ namespace MiniEngine
     {
         _obj=nullptr;
         load(Filename);
-    }
-
-    SharedLibrary::~SharedLibrary()
-    {
-
     }
 
     int SharedLibrary::load(const std::string& Filename)
@@ -1778,7 +1822,7 @@ namespace MiniEngine
         else return -1; /// Not Loaded.
     }
 
-    void* SharedLibrary::get(const std::string& FunctionName)
+    void* SharedLibrary::get(const std::string& FunctionName) const
     {
         if(_get()==nullptr) return nullptr;
         else return SDL_LoadFunction(_get(),FunctionName.c_str());

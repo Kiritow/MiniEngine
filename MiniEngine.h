@@ -125,16 +125,16 @@ namespace MiniEngine
         int setBlendMode(BlendMode mode);
 
         /// Rendering functions. Copy an external surface to this surface. So it has no constant attribute.
-        int blit(const Surface& s,Rect src,Rect dst);
-        int blitTo(const Surface& t, Rect dst);
-		int blitTo(const Surface& t, Point lupoint);
-		int blitFill(const Surface& t, Rect src);
+        int blit(const Surface& s,const Rect& src,const Rect& dst);
+        int blitTo(const Surface& t, const Rect& dst);
+		int blitTo(const Surface& t, const Point& lupoint);
+		int blitFill(const Surface& t, const Rect& src);
 		int blitFullFill(const Surface& t);
 
-		int blitScaled(const Surface& s,Rect src,Rect dst);
-		int blitScaledTo(const Surface& t, Rect dst);
-		int blitScaledTo(const Surface& t, Point lupoint);
-		int blitScaledFill(const Surface& t, Rect src);
+		int blitScaled(const Surface& s,const Rect& src,const Rect& dst);
+		int blitScaledTo(const Surface& t, const Rect& dst);
+		int blitScaledTo(const Surface& t, const Point& lupoint);
+		int blitScaledFill(const Surface& t, const Rect& src);
 		int blitScaledFullFill(const Surface& t);
 
 		int setClipRect(const Rect& clipRect);
@@ -147,7 +147,7 @@ namespace MiniEngine
 		ColorMode getColorMode() const;
 		int setColorMode(ColorMode mode);
 		RGBA getRGBA() const;
-		void setRGBA(RGBA pack);
+		void setRGBA(const RGBA& pack);
 
 		bool mustlock() const;
         int lock();
@@ -162,9 +162,9 @@ namespace MiniEngine
 	private:
 	    std::shared_ptr<SDL_Surface> _surf;
         void _set(SDL_Surface*);
+        void _set_no_delete(SDL_Surface*);
         void _clear();
         SDL_Surface* _get() const;
-        std::shared_ptr<SDL_Surface>& _getex();
 
 		friend class Window;
 		friend class Renderer;
@@ -190,7 +190,7 @@ namespace MiniEngine
 		ColorMode getColorMode() const;
 		int setColorMode(ColorMode mode);
 		RGBA getRGBA() const;
-		void setRGBA(RGBA pack);
+		void setRGBA(const RGBA& pack);
 
 		void release();
 	protected:
@@ -213,35 +213,38 @@ namespace MiniEngine
 	{
 	public:
 	    Renderer() = default;
-		int setColor(RGBA pack);
-		RGBA getColor();
+		int setColor(const RGBA& pack);
+		RGBA getColor() const;
 		int setBlendMode(BlendMode mode);
-		BlendMode getBlendMode();
+		BlendMode getBlendMode() const;
 
 		int setTarget(Texture& t);
 		int setTarget();
 
-		int fillRect(Rect rect);
-		int drawRect(Rect rect);
-		int drawPoint(Point p);
+		int fillRect(const Rect& rect);
+		int drawRect(const Rect& rect);
+		int drawPoint(const Point& p);
 
 		int clear();
 		void update();
 
-		int copy(Texture t, Rect src, Rect dst);
-		int copyTo(Texture t, Rect dst);
-		int copyTo(Texture t, Point lupoint);
-		int copyFill(Texture t, Rect src);
-		int copyFullFill(Texture t);
+		int copy(const Texture& t, const Rect& src, const Rect& dst);
+		int copyTo(const Texture& t, const Rect& dst);
+		int copyTo(const Texture& t, const Point& lupoint);
+		int copyFill(const Texture& t, const Rect& src);
+		int copyFullFill(const Texture& t);
 
-		int supercopy(Texture t,bool srcfull,Rect src,bool dstfull,Rect dst,double angle,bool haspoint,Point center,FlipMode mode);
+		int supercopy(const Texture& t,
+                bool srcfull,const Rect& src,bool dstfull,const Rect& dst,
+                double angle,
+                bool haspoint,const Point& center,FlipMode mode);
 
 		Texture render(const Surface& surf) const throw (ErrorViewer);
 		Texture loadTexture(const std::string& FileName) const throw(ErrorViewer);
 		Texture loadTextureRW(const RWOP& rwop) const throw(ErrorViewer);
 		Texture createTexture(int Width, int Height) const throw(ErrorViewer);
 
-		bool isReady();
+		bool isReady() const;
 
 		void release();
 	private:
@@ -322,32 +325,31 @@ namespace MiniEngine
 
 		void setRenderer(std::initializer_list<RendererType>);
 
-		Rect getSize();
-		void setSize(Rect sizeRect);
+		Rect getSize() const;
+		void setSize(const Rect& sizeRect);
 		void setSize(int w, int h);
 
-		Rect getPosition();
+		Point getPosition() const;
 		void setPosition(int x, int y);
-		/// FIXME: Use class Point or class Rect ?
-		void setPosition(Point point);
+		void setPosition(const Point& point);
 
+		void setTitle(const std::string& Title);
+		std::string getTitle() const;
 
-		void setTitle(std::string Title);
-		std::string getTitle();
+		void setGrab(bool isGrab);
+		bool getGrab() const;
 
-		void setGrab(bool);
-		bool getGrab();
-
+		#if _MINIENGINE_SDL_VERSION_ATLEAST(2,0,5)
 		/// SDL2.0.5 Required.
-		/// If MiniEngine Runs on a lower version of SDL,
-		/// setOpacity() and getOpacity() always returns -1
 		int setOpacity(float opacity);
 		float getOpacity() const;
+		#endif
 
+		/// FIXME: Not Implemented.
 		void setResizable(bool resizable);
 
 		/// Use UTF8 in Title and Message please.
-		int showSimpleMessageBox(MessageBoxType type,std::string Title,std::string Message);
+		int showSimpleMessageBox(MessageBoxType type,const std::string& Title,const std::string& Message) const;
 
 		void show();
 		void hide();
@@ -361,6 +363,11 @@ namespace MiniEngine
 		bool isScreenKeyboardShown();
 
 		void release();
+
+        /// Experimental : Free current renderer.
+        /// This will cause all existing Renderer class throw an error on delete.
+        /// This function destroy current renderer (if exist) and all Renderer class will not be notified.
+        void resetRenderer();
     protected:
         template<typename... Args>
         void _setRenderer(int& refcalc,RendererType Type,Args&&... args)
@@ -383,7 +390,7 @@ namespace MiniEngine
 		void _clear();
 		SDL_Window* _get() const;
 
-		Renderer winrnd;
+		Renderer _winrnd;
 	};
 
 	enum class FontStyle { Normal, Bold, Italic, UnderLine, StrikeThrough };
@@ -501,7 +508,7 @@ namespace MiniEngine
     public:
         SharedLibrary();
         SharedLibrary(const std::string& Filename);
-        ~SharedLibrary();
+        ~SharedLibrary()=default;
         int load(const std::string& Filename);
         int unload();
 
@@ -511,10 +518,10 @@ namespace MiniEngine
             return std::function<ReturnType(Arguments...)>(reinterpret_cast<ReturnType(*)(Arguments...)>(get(FunctionName)));
         }
 
-        void* get(const std::string& FunctionName);
+        void* get(const std::string& FunctionName) const;
         void release();
     private:
-        void* _get();
+        void* _get() const;
         void _set(void*);
         void _clear();
         std::shared_ptr<void> _obj;
@@ -594,7 +601,7 @@ namespace MiniEngine
 
         int enable();
         int disable();
-        bool isenable();
+        bool isenable() const;
         void detach();
         ~Timer();
 
