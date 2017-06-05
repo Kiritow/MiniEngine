@@ -378,21 +378,21 @@ namespace MiniEngine
 		Renderer winrnd;
 	};
 
+	enum class FontStyle { Normal, Bold, Italic, UnderLine, StrikeThrough };
+
 	class Font
 	{
 	public:
-	    enum class Style { Normal, Bold, Italic, UnderLine, StrikeThrough };
-
 		Font() = default;
 		Font(std::string FontFileName, int size) throw(ErrorViewer);
 		int use(std::string FontFileName, int size);
-		bool isReady();
+		bool isReady() const;
 
-		bool isNormal();
-        bool isBold();
-        bool isItalic();
-        bool isUnderLine();
-        bool isStrikeThrough();
+		bool isNormal() const;
+        bool isBold() const;
+        bool isItalic() const;
+        bool isUnderLine() const;
+        bool isStrikeThrough() const;
 
         void setNormal();
         void setBold(bool);
@@ -401,65 +401,78 @@ namespace MiniEngine
         void setStrikeThrough(bool);
 
 		template<typename... Args>
-		void setFontStyle(Style style,Args&&... args)
+		void setFontStyle(FontStyle style,Args&&... args)
 		{
 		    int fontcalc=0;
 		    _setFontStyle(fontcalc,style,args...);
 		}
 
-		void setFontStyle(Style style)
+		void setFontStyle(FontStyle style)
 		{
             int fontcalc=0;
             _setFontStyle(fontcalc,style);
 		}
 
-		std::vector<Style> getFontStyles();
+		std::vector<FontStyle> getFontStyles() const;
 
-        Rect sizeText(const std::string& Text) throw (ErrorViewer);
-        Rect sizeUTF8(const std::string& Text) throw (ErrorViewer);
+        Rect sizeText(const std::string& Text) const throw (ErrorViewer);
+        Rect sizeUTF8(const std::string& Text) const throw (ErrorViewer);
+        Rect sizeUnicode(const uint16_t* Text) const throw (ErrorViewer);
 
-		Surface renderText(std::string Text, RGBA fg);
-		Surface renderTextWrapped(std::string Text, RGBA fg, int WrapLength);
-		Surface renderTextShaded(std::string Text, RGBA fg, RGBA bg);
-		Surface renderTextSolid(std::string Text, RGBA fg);
+        /// Surface Rendering Functions.
+		Surface renderText(std::string Text, RGBA fg) const;
+		Surface renderTextWrapped(std::string Text, RGBA fg, size_t WrapLength) const;
+		Surface renderTextShaded(std::string Text, RGBA fg, RGBA bg) const;
+		Surface renderTextSolid(std::string Text, RGBA fg) const;
 
-		Surface renderUTF8(std::string Text, RGBA fg);
-		Surface renderUTF8Wrapped(std::string Text, RGBA fg, int WrapLength);
-		Surface renderUTF8Shaded(std::string Text, RGBA fg, RGBA bg);
-		Surface renderUTF8Solid(std::string Text, RGBA fg);
+		Surface renderUTF8(std::string Text, RGBA fg) const;
+		Surface renderUTF8Wrapped(std::string Text, RGBA fg, size_t WrapLength) const;
+		Surface renderUTF8Shaded(std::string Text, RGBA fg, RGBA bg) const;
+		Surface renderUTF8Solid(std::string Text, RGBA fg) const;
 
+		Surface renderUnicode(const uint16_t* Text,RGBA fg) const;
+		Surface renderUnicodeWrapped(const uint16_t* Text,RGBA fg,size_t WrapLength) const;
+		Surface renderUnicodeShaded(const uint16_t* Text,RGBA fg,RGBA bg) const;
+		Surface renderUnicodeSolid(const uint16_t* Text,RGBA fg) const;
+
+		/// Texture Rendering Functions.
 		Texture renderText(Renderer rnd, std::string Text, RGBA fg);
-		Texture renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
+		Texture renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, size_t WrapLength);
 		Texture renderTextShaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
 		Texture renderTextSolid(Renderer rnd, std::string Text, RGBA fg);
 
 		Texture renderUTF8(Renderer rnd, std::string Text, RGBA fg);
-		Texture renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
+		Texture renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, size_t WrapLength);
 		Texture renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
 		Texture renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg);
+
+		Texture renderUnicode(Renderer rnd,const uint16_t* Text,RGBA fg) const;
+		Texture renderUnicodeWrapped(Renderer rnd,const uint16_t* Text,RGBA fg,size_t WrapLength) const;
+		Texture renderUnicodeShaded(Renderer rnd,const uint16_t* Text,RGBA fg,RGBA bg) const;
+		Texture renderUnicodeSolid(Renderer rnd,const uint16_t* Text,RGBA fg) const;
 
 		void release();
     protected:
 		template<typename... Args>
-        void _setFontStyle(int& fontcalc,Style style,Args&&... args)
+        void _setFontStyle(int& fontcalc,FontStyle style,Args&&... args)
         {
             fontcalc|=_style_caster(style);
             _setFontStyle(fontcalc,args...);
         }
 
-        void _setFontStyle(int& fontcalc,Style style)
+        void _setFontStyle(int& fontcalc,FontStyle style)
         {
             fontcalc|=_style_caster(style);
             _real_setFontStyle(fontcalc);
         }
 	private:
 	    void _real_setFontStyle(int);
-	    int _style_caster(Style);
+	    int _style_caster(FontStyle);
 
 		std::shared_ptr<TTF_Font> _font;
 		void _set(TTF_Font*);
 		void _clear();
-		TTF_Font* _get();
+		TTF_Font* _get() const;
 	};
 
 	enum class Platform { Unknown,Windows,MacOS,Linux,iOS,Android };

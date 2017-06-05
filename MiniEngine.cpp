@@ -171,47 +171,47 @@ namespace MiniEngine
             }
         }
 
-        int getTTFFontStyleFromFontStyle(Font::Style style)
+        int getTTFFontStyleFromFontStyle(FontStyle style)
         {
             switch(style)
             {
-            case Font::Style::Bold:
+            case FontStyle::Bold:
                 return TTF_STYLE_BOLD;
-            case Font::Style::Italic:
+            case FontStyle::Italic:
                 return TTF_STYLE_ITALIC;
-            case Font::Style::Normal:
+            case FontStyle::Normal:
                 return TTF_STYLE_NORMAL;
-            case Font::Style::StrikeThrough:
+            case FontStyle::StrikeThrough:
                 return TTF_STYLE_STRIKETHROUGH;
-            case Font::Style::UnderLine:
+            case FontStyle::UnderLine:
                 return TTF_STYLE_UNDERLINE;
             default:
                 return TTF_STYLE_NORMAL;
             }
         }
 
-        std::vector<Font::Style> getFontStyleVecFromMixedTTFFontStyle(int Mixed_TTF_Font_Style)
+        std::vector<FontStyle> getFontStyleVecFromMixedTTFFontStyle(int Mixed_TTF_Font_Style)
         {
-            std::vector<Font::Style> vec;
+            std::vector<FontStyle> vec;
             if(Mixed_TTF_Font_Style&TTF_STYLE_BOLD)
             {
-                vec.push_back(Font::Style::Bold);
+                vec.push_back(FontStyle::Bold);
             }
             if(Mixed_TTF_Font_Style&TTF_STYLE_ITALIC)
             {
-                vec.push_back(Font::Style::Italic);
+                vec.push_back(FontStyle::Italic);
             }
             if(Mixed_TTF_Font_Style&TTF_STYLE_STRIKETHROUGH)
             {
-                vec.push_back(Font::Style::StrikeThrough);
+                vec.push_back(FontStyle::StrikeThrough);
             }
             if(Mixed_TTF_Font_Style&TTF_STYLE_UNDERLINE)
             {
-                vec.push_back(Font::Style::UnderLine);
+                vec.push_back(FontStyle::UnderLine);
             }
             if(vec.empty())
             {
-                vec.push_back(Font::Style::Normal);
+                vec.push_back(FontStyle::Normal);
             }
 
             return vec;
@@ -1380,7 +1380,7 @@ namespace MiniEngine
 	    _font.reset();
 	}
 
-	TTF_Font* Font::_get()
+	TTF_Font* Font::_get() const
 	{
         return _font.get();
 	}
@@ -1403,32 +1403,32 @@ namespace MiniEngine
 		return 0;
 	}
 
-	bool Font::isReady()
+	bool Font::isReady() const
 	{
 		return (_get() != nullptr);
 	}
 
-    bool Font::isNormal()
+    bool Font::isNormal() const
     {
         return !(TTF_GetFontStyle(_get()));
     }
 
-    bool Font::isBold()
+    bool Font::isBold() const
     {
         return (TTF_GetFontStyle(_get()) & TTF_STYLE_BOLD );
     }
 
-    bool Font::isItalic()
+    bool Font::isItalic() const
     {
         return (TTF_GetFontStyle(_get()) & TTF_STYLE_ITALIC );
     }
 
-    bool Font::isUnderLine()
+    bool Font::isUnderLine() const
     {
         return (TTF_GetFontStyle(_get()) & TTF_STYLE_UNDERLINE );
     }
 
-    bool Font::isStrikeThrough()
+    bool Font::isStrikeThrough() const
     {
         return (TTF_GetFontStyle(_get()) & TTF_STYLE_STRIKETHROUGH );
     }
@@ -1475,18 +1475,18 @@ namespace MiniEngine
         TTF_SetFontStyle(_get(),Style);
     }
 
-    int Font::_style_caster(Style style)
+    int Font::_style_caster(FontStyle style)
     {
         return _internal::getTTFFontStyleFromFontStyle(style);
     }
 
-    std::vector<Font::Style> Font::getFontStyles()
+    std::vector<FontStyle> Font::getFontStyles() const
     {
         int styles=TTF_GetFontStyle(_get());
         return _internal::getFontStyleVecFromMixedTTFFontStyle(styles);
     }
 
-    Rect Font::sizeText(const std::string& Text) throw (ErrorViewer)
+    Rect Font::sizeText(const std::string& Text) const throw (ErrorViewer)
     {
         int w=0,h=0;
         if(TTF_SizeText(_get(),Text.c_str(),&w,&h)!=0)
@@ -1497,7 +1497,7 @@ namespace MiniEngine
         return Rect(0,0,w,h);
     }
 
-    Rect Font::sizeUTF8(const std::string& Text) throw (ErrorViewer)
+    Rect Font::sizeUTF8(const std::string& Text) const throw (ErrorViewer)
     {
         int w=0,h=0;
         if(TTF_SizeUTF8(_get(),Text.c_str(),&w,&h)!=0)
@@ -1508,61 +1508,100 @@ namespace MiniEngine
         return Rect(0,0,w,h);
     }
 
+    Rect Font::sizeUnicode(const uint16_t* Text) const throw (ErrorViewer)
+    {
+        int w=0,h=0;
+        if(TTF_SizeUNICODE(_get(),Text,&w,&h)!=0)
+        {
+            /// Something might be wrong
+            throw ErrorViewer();
+        }
+        return Rect(0,0,w,h);
+    }
+
     /// rendering surfaces...
-    Surface Font::renderText(std::string Text,RGBA fg)
+    Surface Font::renderText(std::string Text,RGBA fg) const
     {
         Surface surf;
         surf._set(TTF_RenderText_Blended(_get(), Text.c_str(), fg.toSDLColor()));
         return surf;
     }
 
-    Surface Font::renderTextWrapped(std::string Text, RGBA fg, int WrapLength)
+    Surface Font::renderTextWrapped(std::string Text, RGBA fg, size_t WrapLength) const
     {
         Surface surf;
 		surf._set(TTF_RenderText_Blended_Wrapped(_get(), Text.c_str(), fg.toSDLColor(), WrapLength));
 		return surf;
     }
 
-    Surface Font::renderTextShaded(std::string Text, RGBA fg,RGBA bg)
+    Surface Font::renderTextShaded(std::string Text, RGBA fg,RGBA bg) const
     {
         Surface surf;
 		surf._set(TTF_RenderText_Shaded(_get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()));
 		return surf;
     }
 
-    Surface Font::renderTextSolid(std::string Text,RGBA fg)
+    Surface Font::renderTextSolid(std::string Text,RGBA fg) const
     {
         Surface surf;
 		surf._set(TTF_RenderText_Solid(_get(), Text.c_str(), fg.toSDLColor()));
 		return surf;
     }
 
-    Surface Font::renderUTF8(std::string Text,RGBA fg)
+    Surface Font::renderUTF8(std::string Text,RGBA fg) const
     {
         Surface surf;
         surf._set(TTF_RenderUTF8_Blended(_get(), Text.c_str(), fg.toSDLColor()));
         return surf;
     }
 
-    Surface Font::renderUTF8Wrapped(std::string Text, RGBA fg, int WrapLength)
+    Surface Font::renderUTF8Wrapped(std::string Text, RGBA fg, size_t WrapLength) const
     {
         Surface surf;
 		surf._set(TTF_RenderUTF8_Blended_Wrapped(_get(), Text.c_str(), fg.toSDLColor(), WrapLength));
 		return surf;
     }
 
-    Surface Font::renderUTF8Shaded(std::string Text, RGBA fg,RGBA bg)
+    Surface Font::renderUTF8Shaded(std::string Text, RGBA fg,RGBA bg) const
     {
         Surface surf;
 		surf._set(TTF_RenderUTF8_Shaded(_get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()));
 		return surf;
     }
 
-    Surface Font::renderUTF8Solid(std::string Text,RGBA fg)
+    Surface Font::renderUTF8Solid(std::string Text,RGBA fg) const
     {
         Surface surf;
 		surf._set(TTF_RenderUTF8_Solid(_get(), Text.c_str(), fg.toSDLColor()));
 		return surf;
+    }
+
+    Surface Font::renderUnicode(const uint16_t* Text, RGBA fg) const
+    {
+        Surface surf;
+        surf._set(TTF_RenderUNICODE_Blended(_get(),Text,fg.toSDLColor()));
+        return surf;
+    }
+
+    Surface Font::renderUnicodeWrapped(const uint16_t* Text, RGBA fg, size_t WrapLength) const
+    {
+        Surface surf;
+        surf._set(TTF_RenderUNICODE_Blended_Wrapped(_get(),Text,fg.toSDLColor(),WrapLength));
+        return surf;
+    }
+
+    Surface Font::renderUnicodeShaded(const uint16_t* Text, RGBA fg, RGBA bg) const
+    {
+        Surface surf;
+        surf._set(TTF_RenderUNICODE_Shaded(_get(),Text,fg.toSDLColor(),bg.toSDLColor()));
+        return surf;
+    }
+
+    Surface Font::renderUnicodeSolid(const uint16_t* Text, RGBA fg) const
+    {
+        Surface surf;
+        surf._set(TTF_RenderUNICODE_Solid(_get(),Text,fg.toSDLColor()));
+        return surf;
     }
 
     /// rendering textures...
@@ -1571,7 +1610,7 @@ namespace MiniEngine
 		return rnd.render(renderText(Text,fg));
 	}
 
-	Texture Font::renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength)
+	Texture Font::renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, size_t WrapLength)
 	{
 		return rnd.render(renderTextWrapped(Text,fg,WrapLength));
 	}
@@ -1591,7 +1630,7 @@ namespace MiniEngine
 		return rnd.render(renderUTF8(Text,fg));
 	}
 
-	Texture Font::renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength)
+	Texture Font::renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, size_t WrapLength)
 	{
 		return rnd.render(renderUTF8Wrapped(Text,fg,WrapLength));
 	}
@@ -1605,6 +1644,27 @@ namespace MiniEngine
 	{
 		return rnd.render(renderUTF8Solid(Text,fg));
 	}
+
+
+    Texture Font::renderUnicode(Renderer rnd, const uint16_t* Text, RGBA fg) const
+    {
+        return rnd.render(renderUnicode(Text,fg));
+    }
+
+    Texture Font::renderUnicodeWrapped(Renderer rnd, const uint16_t* Text, RGBA fg, size_t WrapLength) const
+    {
+        return rnd.render(renderUnicodeWrapped(Text,fg,WrapLength));
+    }
+
+    Texture Font::renderUnicodeShaded(Renderer rnd, const uint16_t* Text, RGBA fg, RGBA bg) const
+    {
+        return rnd.render(renderUnicodeShaded(Text,fg,bg));
+    }
+
+    Texture Font::renderUnicodeSolid(Renderer rnd, const uint16_t* Text, RGBA fg) const
+    {
+        return rnd.render(renderUnicodeSolid(Text,fg));
+    }
 
 	void Font::release()
 	{
