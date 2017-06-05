@@ -343,7 +343,7 @@ namespace MiniEngine
 		r = g = b = a = 0;
 	}
 
-	SDL_Color RGBA::toSDLColor()
+	SDL_Color RGBA::toSDLColor() const
 	{
 		SDL_Color c;
 		c.r = r;
@@ -353,7 +353,7 @@ namespace MiniEngine
 		return c;
 	}
 
-	ColorMode RGBA::toColorMode()
+	ColorMode RGBA::toColorMode() const
 	{
 		return ColorMode(r, g, b);
 	}
@@ -861,7 +861,7 @@ namespace MiniEngine
         _rnd.reset();
 	}
 
-	SDL_Renderer* Renderer::_get()
+	SDL_Renderer* Renderer::_get() const
 	{
         return _rnd.get();
 	}
@@ -1001,7 +1001,7 @@ namespace MiniEngine
         return SDL_RenderCopyEx(_get(),t._get(),pR1,pR2,angle,pPoint,flip);
 	}
 
-	Texture Renderer::render(Surface surf) throw(ErrorViewer)
+	Texture Renderer::render(const Surface& surf) const throw(ErrorViewer)
 	{
 		Texture t;
 		SDL_Texture* temp = SDL_CreateTextureFromSurface(_get(), surf._get());
@@ -1015,7 +1015,7 @@ namespace MiniEngine
 		return t;
 	}
 
-	Texture Renderer::loadTexture(std::string FileName) throw(ErrorViewer)
+	Texture Renderer::loadTexture(const std::string& FileName) const throw(ErrorViewer)
 	{
 		Texture t;
 		SDL_Texture* temp = IMG_LoadTexture(_get(), FileName.c_str());
@@ -1029,7 +1029,7 @@ namespace MiniEngine
 		return t;
 	}
 
-	Texture Renderer::loadTextureRW(RWOP rwop) throw (ErrorViewer)
+	Texture Renderer::loadTextureRW(const RWOP& rwop) const throw (ErrorViewer)
 	{
         Texture t;
         SDL_Texture* temp=IMG_LoadTexture_RW(_get(),rwop._get(),0);
@@ -1043,7 +1043,7 @@ namespace MiniEngine
 		return t;
 	}
 
-	Texture Renderer::createTexture(int Width, int Height) throw(ErrorViewer)
+	Texture Renderer::createTexture(int Width, int Height) const throw(ErrorViewer)
 	{
 		SDL_Texture* temp = SDL_CreateTexture(_get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, Width, Height);
 		if (temp == NULL)
@@ -1385,7 +1385,7 @@ namespace MiniEngine
         return _font.get();
 	}
 
-	Font::Font(std::string FontFileName, int size) throw(ErrorViewer)
+	Font::Font(std::string FontFileName, size_t size) throw(ErrorViewer)
 	{
 		if (use(FontFileName, size) != 0)
 		{
@@ -1395,7 +1395,7 @@ namespace MiniEngine
 		}
 	}
 
-	int Font::use(std::string FontFileName, int size)
+	int Font::use(std::string FontFileName, size_t size)
 	{
 		TTF_Font* temp = TTF_OpenFont(FontFileName.c_str(), size);
 		if (temp == NULL) return -1;
@@ -1520,84 +1520,84 @@ namespace MiniEngine
     }
 
     /// rendering surfaces...
-    Surface Font::renderText(std::string Text,RGBA fg) const
+    Surface Font::renderText(const std::string& Text,const RGBA& fg) const
     {
         Surface surf;
         surf._set(TTF_RenderText_Blended(_get(), Text.c_str(), fg.toSDLColor()));
         return surf;
     }
 
-    Surface Font::renderTextWrapped(std::string Text, RGBA fg, size_t WrapLength) const
+    Surface Font::renderTextWrapped(const std::string& Text, const RGBA& fg, size_t WrapLength) const
     {
         Surface surf;
 		surf._set(TTF_RenderText_Blended_Wrapped(_get(), Text.c_str(), fg.toSDLColor(), WrapLength));
 		return surf;
     }
 
-    Surface Font::renderTextShaded(std::string Text, RGBA fg,RGBA bg) const
+    Surface Font::renderTextShaded(const std::string& Text, const RGBA& fg,const RGBA& bg) const
     {
         Surface surf;
 		surf._set(TTF_RenderText_Shaded(_get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()));
 		return surf;
     }
 
-    Surface Font::renderTextSolid(std::string Text,RGBA fg) const
+    Surface Font::renderTextSolid(const std::string& Text,const RGBA& fg) const
     {
         Surface surf;
 		surf._set(TTF_RenderText_Solid(_get(), Text.c_str(), fg.toSDLColor()));
 		return surf;
     }
 
-    Surface Font::renderUTF8(std::string Text,RGBA fg) const
+    Surface Font::renderUTF8(const std::string& Text,const RGBA& fg) const
     {
         Surface surf;
         surf._set(TTF_RenderUTF8_Blended(_get(), Text.c_str(), fg.toSDLColor()));
         return surf;
     }
 
-    Surface Font::renderUTF8Wrapped(std::string Text, RGBA fg, size_t WrapLength) const
+    Surface Font::renderUTF8Wrapped(const std::string& Text, const RGBA& fg, size_t WrapLength) const
     {
         Surface surf;
 		surf._set(TTF_RenderUTF8_Blended_Wrapped(_get(), Text.c_str(), fg.toSDLColor(), WrapLength));
 		return surf;
     }
 
-    Surface Font::renderUTF8Shaded(std::string Text, RGBA fg,RGBA bg) const
+    Surface Font::renderUTF8Shaded(const std::string& Text, const RGBA& fg,const RGBA& bg) const
     {
         Surface surf;
 		surf._set(TTF_RenderUTF8_Shaded(_get(), Text.c_str(), fg.toSDLColor(), bg.toSDLColor()));
 		return surf;
     }
 
-    Surface Font::renderUTF8Solid(std::string Text,RGBA fg) const
+    Surface Font::renderUTF8Solid(const std::string& Text,const RGBA& fg) const
     {
         Surface surf;
 		surf._set(TTF_RenderUTF8_Solid(_get(), Text.c_str(), fg.toSDLColor()));
 		return surf;
     }
 
-    Surface Font::renderUnicode(const uint16_t* Text, RGBA fg) const
+    Surface Font::renderUnicode(const uint16_t* Text, const RGBA& fg) const
     {
         Surface surf;
         surf._set(TTF_RenderUNICODE_Blended(_get(),Text,fg.toSDLColor()));
         return surf;
     }
 
-    Surface Font::renderUnicodeWrapped(const uint16_t* Text, RGBA fg, size_t WrapLength) const
+    Surface Font::renderUnicodeWrapped(const uint16_t* Text, const RGBA& fg, size_t WrapLength) const
     {
         Surface surf;
         surf._set(TTF_RenderUNICODE_Blended_Wrapped(_get(),Text,fg.toSDLColor(),WrapLength));
         return surf;
     }
 
-    Surface Font::renderUnicodeShaded(const uint16_t* Text, RGBA fg, RGBA bg) const
+    Surface Font::renderUnicodeShaded(const uint16_t* Text, const RGBA& fg, const RGBA& bg) const
     {
         Surface surf;
         surf._set(TTF_RenderUNICODE_Shaded(_get(),Text,fg.toSDLColor(),bg.toSDLColor()));
         return surf;
     }
 
-    Surface Font::renderUnicodeSolid(const uint16_t* Text, RGBA fg) const
+    Surface Font::renderUnicodeSolid(const uint16_t* Text, const RGBA& fg) const
     {
         Surface surf;
         surf._set(TTF_RenderUNICODE_Solid(_get(),Text,fg.toSDLColor()));
@@ -1605,63 +1605,63 @@ namespace MiniEngine
     }
 
     /// rendering textures...
-	Texture Font::renderText(Renderer rnd, std::string Text, RGBA fg)
+	Texture Font::renderText(const Renderer& rnd, const std::string& Text, const RGBA& fg) const
 	{
 		return rnd.render(renderText(Text,fg));
 	}
 
-	Texture Font::renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, size_t WrapLength)
+	Texture Font::renderTextWrapped(const Renderer& rnd, const std::string& Text, const RGBA& fg, size_t WrapLength) const
 	{
 		return rnd.render(renderTextWrapped(Text,fg,WrapLength));
 	}
 
-	Texture Font::renderTextShaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg)
+	Texture Font::renderTextShaded(const Renderer& rnd, const std::string& Text, const RGBA& fg, const RGBA& bg) const
 	{
 		return rnd.render(renderTextShaded(Text,fg,bg));
 	}
 
-	Texture Font::renderTextSolid(Renderer rnd, std::string Text, RGBA fg)
+	Texture Font::renderTextSolid(const Renderer& rnd, const std::string& Text, const RGBA& fg) const
 	{
 		return rnd.render(renderTextSolid(Text,fg));
 	}
 
-	Texture Font::renderUTF8(Renderer rnd, std::string Text, RGBA fg)
+	Texture Font::renderUTF8(const Renderer& rnd, const std::string& Text, const RGBA& fg) const
 	{
 		return rnd.render(renderUTF8(Text,fg));
 	}
 
-	Texture Font::renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, size_t WrapLength)
+	Texture Font::renderUTF8Wrapped(const Renderer& rnd, const std::string& Text, const RGBA& fg, size_t WrapLength) const
 	{
 		return rnd.render(renderUTF8Wrapped(Text,fg,WrapLength));
 	}
 
-	Texture Font::renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg)
+	Texture Font::renderUTF8Shaded(const Renderer& rnd, const std::string& Text, const RGBA& fg, const RGBA& bg) const
 	{
 		return rnd.render(renderUTF8Shaded(Text,fg,bg));
 	}
 
-	Texture Font::renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg)
+	Texture Font::renderUTF8Solid(const Renderer& rnd, const std::string& Text, const RGBA& fg) const
 	{
 		return rnd.render(renderUTF8Solid(Text,fg));
 	}
 
 
-    Texture Font::renderUnicode(Renderer rnd, const uint16_t* Text, RGBA fg) const
+    Texture Font::renderUnicode(const Renderer& rnd, const uint16_t* Text, const RGBA& fg) const
     {
         return rnd.render(renderUnicode(Text,fg));
     }
 
-    Texture Font::renderUnicodeWrapped(Renderer rnd, const uint16_t* Text, RGBA fg, size_t WrapLength) const
+    Texture Font::renderUnicodeWrapped(const Renderer& rnd, const uint16_t* Text, const RGBA& fg, size_t WrapLength) const
     {
         return rnd.render(renderUnicodeWrapped(Text,fg,WrapLength));
     }
 
-    Texture Font::renderUnicodeShaded(Renderer rnd, const uint16_t* Text, RGBA fg, RGBA bg) const
+    Texture Font::renderUnicodeShaded(const Renderer& rnd, const uint16_t* Text, const RGBA& fg, const RGBA& bg) const
     {
         return rnd.render(renderUnicodeShaded(Text,fg,bg));
     }
 
-    Texture Font::renderUnicodeSolid(Renderer rnd, const uint16_t* Text, RGBA fg) const
+    Texture Font::renderUnicodeSolid(const Renderer& rnd, const uint16_t* Text, const RGBA& fg) const
     {
         return rnd.render(renderUnicodeSolid(Text,fg));
     }

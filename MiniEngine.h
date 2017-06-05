@@ -50,8 +50,8 @@ namespace MiniEngine
 		RGBA(int R, int G, int B, int A);
 		RGBA(ColorMode mode, int A);
 		RGBA();
-		SDL_Color toSDLColor();
-		ColorMode toColorMode();
+		SDL_Color toSDLColor() const;
+		ColorMode toColorMode() const;
 	};
 
 	class NonCopyable
@@ -228,10 +228,10 @@ namespace MiniEngine
 
 		int supercopy(Texture t,bool srcfull,Rect src,bool dstfull,Rect dst,double angle,bool haspoint,Point center,FlipMode mode);
 
-		Texture render(Surface surf) throw (ErrorViewer);
-		Texture loadTexture(std::string FileName) throw(ErrorViewer);
-		Texture loadTextureRW(RWOP rwop) throw(ErrorViewer);
-		Texture createTexture(int Width, int Height) throw(ErrorViewer);
+		Texture render(const Surface& surf) const throw (ErrorViewer);
+		Texture loadTexture(const std::string& FileName) const throw(ErrorViewer);
+		Texture loadTextureRW(const RWOP& rwop) const throw(ErrorViewer);
+		Texture createTexture(int Width, int Height) const throw(ErrorViewer);
 
 		bool isReady();
 
@@ -240,7 +240,7 @@ namespace MiniEngine
 		std::shared_ptr<SDL_Renderer> _rnd;
 		void _set(SDL_Renderer*);
 		void _clear();
-		SDL_Renderer* _get();
+		SDL_Renderer* _get() const;
 
 		friend class Window;
 	};
@@ -384,8 +384,8 @@ namespace MiniEngine
 	{
 	public:
 		Font() = default;
-		Font(std::string FontFileName, int size) throw(ErrorViewer);
-		int use(std::string FontFileName, int size);
+		Font(std::string FontFileName, size_t size) throw(ErrorViewer);
+		int use(std::string FontFileName, size_t size);
 		bool isReady() const;
 
 		bool isNormal() const;
@@ -420,36 +420,36 @@ namespace MiniEngine
         Rect sizeUnicode(const uint16_t* Text) const throw (ErrorViewer);
 
         /// Surface Rendering Functions.
-		Surface renderText(std::string Text, RGBA fg) const;
-		Surface renderTextWrapped(std::string Text, RGBA fg, size_t WrapLength) const;
-		Surface renderTextShaded(std::string Text, RGBA fg, RGBA bg) const;
-		Surface renderTextSolid(std::string Text, RGBA fg) const;
+		Surface renderText(const std::string& Text, const RGBA& fg) const;
+		Surface renderTextWrapped(const std::string& Text, const RGBA& fg, size_t WrapLength) const;
+		Surface renderTextShaded(const std::string& Text, const RGBA& fg, const RGBA& bg) const;
+		Surface renderTextSolid(const std::string& Text, const RGBA& fg) const;
 
-		Surface renderUTF8(std::string Text, RGBA fg) const;
-		Surface renderUTF8Wrapped(std::string Text, RGBA fg, size_t WrapLength) const;
-		Surface renderUTF8Shaded(std::string Text, RGBA fg, RGBA bg) const;
-		Surface renderUTF8Solid(std::string Text, RGBA fg) const;
+		Surface renderUTF8(const std::string& Text, const RGBA& fg) const;
+		Surface renderUTF8Wrapped(const std::string& Text, const RGBA& fg, size_t WrapLength) const;
+		Surface renderUTF8Shaded(const std::string& Text, const RGBA& fg, const RGBA& bg) const;
+		Surface renderUTF8Solid(const std::string& Text, const RGBA& fg) const;
 
-		Surface renderUnicode(const uint16_t* Text,RGBA fg) const;
-		Surface renderUnicodeWrapped(const uint16_t* Text,RGBA fg,size_t WrapLength) const;
-		Surface renderUnicodeShaded(const uint16_t* Text,RGBA fg,RGBA bg) const;
-		Surface renderUnicodeSolid(const uint16_t* Text,RGBA fg) const;
+		Surface renderUnicode(const uint16_t* Text,const RGBA& fg) const;
+		Surface renderUnicodeWrapped(const uint16_t* Text,const RGBA& fg,size_t WrapLength) const;
+		Surface renderUnicodeShaded(const uint16_t* Text,const RGBA& fg,const RGBA& bg) const;
+		Surface renderUnicodeSolid(const uint16_t* Text,const RGBA& fg) const;
 
 		/// Texture Rendering Functions.
-		Texture renderText(Renderer rnd, std::string Text, RGBA fg);
-		Texture renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, size_t WrapLength);
-		Texture renderTextShaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
-		Texture renderTextSolid(Renderer rnd, std::string Text, RGBA fg);
+		Texture renderText(const Renderer& rnd, const std::string& Text, const RGBA& fg) const;
+		Texture renderTextWrapped(const Renderer& rnd, const std::string& Text, const RGBA& fg, size_t WrapLength) const;
+		Texture renderTextShaded(const Renderer& rnd, const std::string& Text, const RGBA& fg, const RGBA& bg) const;
+		Texture renderTextSolid(const Renderer& rnd, const std::string& Text, const RGBA& fg) const;
 
-		Texture renderUTF8(Renderer rnd, std::string Text, RGBA fg);
-		Texture renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, size_t WrapLength);
-		Texture renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
-		Texture renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg);
+		Texture renderUTF8(const Renderer& rnd, const std::string& Text, const RGBA& fg) const;
+		Texture renderUTF8Wrapped(const Renderer& rnd, const std::string& Text, const RGBA& fg, size_t WrapLength) const;
+		Texture renderUTF8Shaded(const Renderer& rnd, const std::string& Text, const RGBA& fg, const RGBA& bg) const;
+		Texture renderUTF8Solid(const Renderer& rnd, const std::string& Text, const RGBA& fg) const;
 
-		Texture renderUnicode(Renderer rnd,const uint16_t* Text,RGBA fg) const;
-		Texture renderUnicodeWrapped(Renderer rnd,const uint16_t* Text,RGBA fg,size_t WrapLength) const;
-		Texture renderUnicodeShaded(Renderer rnd,const uint16_t* Text,RGBA fg,RGBA bg) const;
-		Texture renderUnicodeSolid(Renderer rnd,const uint16_t* Text,RGBA fg) const;
+		Texture renderUnicode(const Renderer& rnd,const uint16_t* Text,const RGBA& fg) const;
+		Texture renderUnicodeWrapped(const Renderer& rnd,const uint16_t* Text,const RGBA& fg,size_t WrapLength) const;
+		Texture renderUnicodeShaded(const Renderer& rnd,const uint16_t* Text,const RGBA& fg,const RGBA& bg) const;
+		Texture renderUnicodeSolid(const Renderer& rnd,const uint16_t* Text,const RGBA& fg) const;
 
 		void release();
     protected:
