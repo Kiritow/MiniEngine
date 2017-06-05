@@ -258,13 +258,13 @@ namespace MiniEngine
         return SDL_RectEquals(&a,&b)==SDL_TRUE;
 	}
 
-	bool Rect::hasIntersection(const Rect& r)
+	bool Rect::hasIntersection(const Rect& r) const
 	{
         SDL_Rect a=toSDLRect(),b=r.toSDLRect();
         return SDL_HasIntersection(&a,&b)==SDL_TRUE;
 	}
 
-	Rect Rect::getIntersection(const Rect& r)
+	Rect Rect::getIntersection(const Rect& r) const
 	{
         SDL_Rect a=toSDLRect(),b=r.toSDLRect(),c;
         if(SDL_IntersectRect(&a,&b,&c)==SDL_TRUE)
@@ -277,7 +277,7 @@ namespace MiniEngine
         }
 	}
 
-	Rect Rect::getUnion(const Rect& r)
+	Rect Rect::getUnion(const Rect& r) const
 	{
         SDL_Rect a=toSDLRect(),b=r.toSDLRect(),c;
         SDL_UnionRect(&a,&b,&c);//void
@@ -295,7 +295,7 @@ namespace MiniEngine
 		x = y = 0;
 	}
 
-	SDL_Point Point::toSDLPoint()
+	SDL_Point Point::toSDLPoint() const
 	{
 		SDL_Point p;
 		p.x = x;
@@ -303,7 +303,7 @@ namespace MiniEngine
 		return p;
 	}
 
-	bool Point::inRect(Rect rect)
+	bool Point::inRect(const Rect& rect) const
 	{
 		auto p = toSDLPoint();
 		auto r = rect.toSDLRect();
@@ -363,7 +363,7 @@ namespace MiniEngine
 		str = SDL_GetError();
 	}
 
-	std::string ErrorViewer::getError()
+	std::string ErrorViewer::getError() const
 	{
 		return str;
 	}
@@ -738,19 +738,22 @@ namespace MiniEngine
         return _get();
     }
 
-    void Texture::_set(SDL_Texture* p)//private
+    //private
+    void Texture::_set(SDL_Texture* p)
     {
         _text.reset(p,SDL_DestroyTexture);
         updateInfo();
     }
 
-    void Texture::_clear()//private
+    //private
+    void Texture::_clear()
     {
         _text.reset();
         updateInfo();
     }
 
-    SDL_Texture* Texture::_get()//private
+    //private
+    SDL_Texture* Texture::_get() const
     {
         return _text.get();
     }
@@ -765,17 +768,17 @@ namespace MiniEngine
 		return rect;
 	}
 
-	int Texture::getw()
+	int Texture::getw() const
 	{
 		return rect.w;
 	}
 
-	int Texture::geth()
+	int Texture::geth() const
 	{
 		return rect.h;
 	}
 
-	bool Texture::isReady()
+	bool Texture::isReady() const
 	{
 		return (_get() != nullptr);
 	}
@@ -785,7 +788,7 @@ namespace MiniEngine
 		return SDL_SetTextureBlendMode(_get(), _internal::getSDLBlendModeFromBlendMode(mode));
 	}
 
-	BlendMode Texture::getBlendMode()
+	BlendMode Texture::getBlendMode() const
 	{
 		SDL_BlendMode temp;
 		SDL_GetTextureBlendMode(_get(), &temp);
@@ -800,14 +803,14 @@ namespace MiniEngine
 		return SDL_SetTextureAlphaMod(_get(), temp);
 	}
 
-	int Texture::getAlphaMode()
+	int Texture::getAlphaMode() const
 	{
 		Uint8 temp;
 		SDL_GetTextureAlphaMod(_get(), &temp);
 		return temp;
 	}
 
-	ColorMode Texture::getColorMode()
+	ColorMode Texture::getColorMode() const
 	{
 		ColorMode pack;
 		Uint8 r, g, b;
@@ -823,7 +826,7 @@ namespace MiniEngine
 		return SDL_SetTextureColorMod(_get(), mode.r, mode.g, mode.b);
 	}
 
-	RGBA Texture::getRGBA()
+	RGBA Texture::getRGBA() const
 	{
 		return RGBA(getColorMode(), getAlphaMode());
 	}
@@ -835,8 +838,8 @@ namespace MiniEngine
 	}
 
 	/// updateInfo() must be called after Texture is changed.
-
-	void Texture::updateInfo()//protected
+	//protected
+	void Texture::updateInfo()
 	{
 	    if(_get()==nullptr)
         {

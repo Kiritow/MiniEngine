@@ -20,9 +20,9 @@ namespace MiniEngine
 		SDL_Rect toSDLRect() const;
 		bool isEmpty();
 		bool operator == (const Rect&) const;
-		bool hasIntersection(const Rect&);
-		Rect getIntersection(const Rect&);
-		Rect getUnion(const Rect&);
+		bool hasIntersection(const Rect&) const;
+		Rect getIntersection(const Rect&) const;
+		Rect getUnion(const Rect&) const;
 	};
 
 	class Point
@@ -31,8 +31,8 @@ namespace MiniEngine
 		int x, y;
 		Point(int X, int Y);
 		Point();
-		SDL_Point toSDLPoint();
-		bool inRect(Rect rect);
+		SDL_Point toSDLPoint() const;
+		bool inRect(const Rect& rect) const;
 	};
 
 	class ColorMode
@@ -67,7 +67,7 @@ namespace MiniEngine
 	{
 	public:
 		void fetch();
-		std::string getError();
+		std::string getError() const;
 		const char* what() const throw() override;
 	private:
 		std::string str;
@@ -178,18 +178,18 @@ namespace MiniEngine
 	    Texture();
 		~Texture() = default;
 		Rect getSize();
-		int getw();
-		int geth();
-		bool isReady();
+		int getw() const;
+		int geth() const;
+		bool isReady() const;
 		int setBlendMode(BlendMode mode);
-		BlendMode getBlendMode();
+		BlendMode getBlendMode() const;
 		/// Alpha:  0: Transparent 255: opaque
 		int setAlphaMode(int alpha);
-		int getAlphaMode();
+		int getAlphaMode() const;
 
-		ColorMode getColorMode();
+		ColorMode getColorMode() const;
 		int setColorMode(ColorMode mode);
-		RGBA getRGBA();
+		RGBA getRGBA() const;
 		void setRGBA(RGBA pack);
 
 		void release();
@@ -200,7 +200,7 @@ namespace MiniEngine
 		std::shared_ptr<SDL_Texture> _text;
 		void _set(SDL_Texture*);
 		void _clear();
-		SDL_Texture* _get();
+		SDL_Texture* _get() const;
 		Rect rect;
 		friend class Renderer;
 	};
