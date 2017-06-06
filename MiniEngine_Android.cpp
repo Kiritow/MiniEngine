@@ -7,12 +7,12 @@ namespace MiniEngine
 #if defined(__ANDROID__) && __ANDROID__
 std::string SDLSystem::Android::GetInternal()
 {
-    return string(SDL_AndroidGetInternalStoragePath());
+    return std::string(SDL_AndroidGetInternalStoragePath());
 }
 
 std::string SDLSystem::Android::GetExternal()
 {
-    return string(SDL_AndroidGetExternalStoragePath());
+    return std::string(SDL_AndroidGetExternalStoragePath());
 }
 
 bool SDLSystem::Android::CanReadExternal()

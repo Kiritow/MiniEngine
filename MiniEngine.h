@@ -5,6 +5,8 @@
 #include <functional>
 #include <vector>
 
+#define _MINIENGINE_SDL_VERSION_ATLEAST(X,Y,Z) SDL_VERSION_ATLEAST(X,Y,Z)
+
 namespace MiniEngine
 {
 
@@ -18,9 +20,9 @@ namespace MiniEngine
 		SDL_Rect toSDLRect() const;
 		bool isEmpty();
 		bool operator == (const Rect&) const;
-		bool hasIntersection(const Rect&);
-		Rect getIntersection(const Rect&);
-		Rect getUnion(const Rect&);
+		bool hasIntersection(const Rect&) const;
+		Rect getIntersection(const Rect&) const;
+		Rect getUnion(const Rect&) const;
 	};
 
 	class Point
@@ -29,8 +31,8 @@ namespace MiniEngine
 		int x, y;
 		Point(int X, int Y);
 		Point();
-		SDL_Point toSDLPoint();
-		bool inRect(Rect rect);
+		SDL_Point toSDLPoint() const;
+		bool inRect(const Rect& rect) const;
 	};
 
 	class ColorMode
@@ -48,8 +50,8 @@ namespace MiniEngine
 		RGBA(int R, int G, int B, int A);
 		RGBA(ColorMode mode, int A);
 		RGBA();
-		SDL_Color toSDLColor();
-		ColorMode toColorMode();
+		SDL_Color toSDLColor() const;
+		ColorMode toColorMode() const;
 	};
 
 	class NonCopyable
@@ -65,7 +67,7 @@ namespace MiniEngine
 	{
 	public:
 		void fetch();
-		std::string getError();
+		std::string getError() const;
 		const char* what() const throw() override;
 	private:
 		std::string str;
@@ -84,9 +86,10 @@ namespace MiniEngine
         void release();
     private:
         std::shared_ptr<SDL_RWops> _op;
-        SDL_RWops* _get();
+        SDL_RWops* _get() const;
         void _clear();
         void _set(SDL_RWops*);
+        friend class Surface;
         friend class Renderer;
 	};
 
@@ -95,48 +98,73 @@ namespace MiniEngine
 	class Surface
 	{
 	public:
+	    Surface()=default;
+	    Surface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer);
+	    Surface(int width,int height,int depth,RGBA colorPack) throw(ErrorViewer);
+	    Surface(int width,int height,int depth,Uint32 surfaceFormat) throw(ErrorViewer);
+        Surface(const std::string& filename) throw(ErrorViewer);
+        Surface(const RWOP& rwop) throw(ErrorViewer);
 		~Surface() = default;
-        int savePNG(const std::string& filename);
-        int getw();
-        int geth();
-        BlendMode getBlendMode();
+
+		/// static functions
+		static Surface load(const std::string& filename);
+		static Surface load(const RWOP& rwop);
+		static Surface create(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask);
+		static Surface create(int width,int height,int depth,Uint32 surfaceFormat);
+
+		/// xxxAs will clear the current surface if loaded or created successfully.
+		int loadAs(const std::string& filename);
+		int loadAs(const RWOP& rwop);
+		int createAs(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask);
+		int createAs(int width,int height,int depth,Uint32 surfaceFormat);
+
+        int savePNG(const std::string& filename) const;
+        int getw() const;
+        int geth() const;
+        BlendMode getBlendMode() const;
         int setBlendMode(BlendMode mode);
 
-        int blit(Surface s,Rect src,Rect dst);
-        int blitTo(Surface t, Rect dst);
-		int blitTo(Surface t, Point lupoint);
-		int blitFill(Surface t, Rect src);
-		int blitFullFill(Surface t);
+        /// Rendering functions. Copy an external surface to this surface. So it has no constant attribute.
+        int blit(const Surface& s,const Rect& src,const Rect& dst);
+        int blitTo(const Surface& t, const Rect& dst);
+		int blitTo(const Surface& t, const Point& lupoint);
+		int blitFill(const Surface& t, const Rect& src);
+		int blitFullFill(const Surface& t);
 
-		int blitScaled(Surface s,Rect src,Rect dst);
-		int blitScaledTo(Surface t, Rect dst);
-		int blitScaledTo(Surface t, Point lupoint);
-		int blitScaledFill(Surface t, Rect src);
-		int blitScaledFullFill(Surface t);
+		int blitScaled(const Surface& s,const Rect& src,const Rect& dst);
+		int blitScaledTo(const Surface& t, const Rect& dst);
+		int blitScaledTo(const Surface& t, const Point& lupoint);
+		int blitScaledFill(const Surface& t, const Rect& src);
+		int blitScaledFullFill(const Surface& t);
+
+		int setClipRect(const Rect& clipRect);
+		Rect getClipRect() const;
+		void disableClipping();
 
         int setAlphaMode(int alpha);
-		int getAlphaMode();
+		int getAlphaMode() const;
 
-		ColorMode getColorMode();
+		ColorMode getColorMode() const;
 		int setColorMode(ColorMode mode);
-		RGBA getRGBA();
-		void setRGBA(RGBA pack);
+		RGBA getRGBA() const;
+		void setRGBA(const RGBA& pack);
 
-		bool mustlock();
+		bool mustlock() const;
         int lock();
         void unlock();
 
-        static Surface createSurface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer);
-
+        bool isReady() const;
         void release();
-	protected:
-		Surface() = default;
+
+        /// Experimental : Get SDL_Surface Pointer and then do anything you want!
+        /// In case you can do anything with this pointer, this function should not has constant attribute.
+        SDL_Surface* getRawPointer();
 	private:
 	    std::shared_ptr<SDL_Surface> _surf;
         void _set(SDL_Surface*);
+        void _set_no_delete(SDL_Surface*);
         void _clear();
-        SDL_Surface* _get();
-        std::shared_ptr<SDL_Surface>& _getex();
+        SDL_Surface* _get() const;
 
 		friend class Window;
 		friend class Renderer;
@@ -150,19 +178,19 @@ namespace MiniEngine
 	    Texture();
 		~Texture() = default;
 		Rect getSize();
-		int getw();
-		int geth();
-		bool isReady();
+		int getw() const;
+		int geth() const;
+		bool isReady() const;
 		int setBlendMode(BlendMode mode);
-		BlendMode getBlendMode();
+		BlendMode getBlendMode() const;
 		/// Alpha:  0: Transparent 255: opaque
 		int setAlphaMode(int alpha);
-		int getAlphaMode();
+		int getAlphaMode() const;
 
-		ColorMode getColorMode();
+		ColorMode getColorMode() const;
 		int setColorMode(ColorMode mode);
-		RGBA getRGBA();
-		void setRGBA(RGBA pack);
+		RGBA getRGBA() const;
+		void setRGBA(const RGBA& pack);
 
 		void release();
 	protected:
@@ -172,7 +200,7 @@ namespace MiniEngine
 		std::shared_ptr<SDL_Texture> _text;
 		void _set(SDL_Texture*);
 		void _clear();
-		SDL_Texture* _get();
+		SDL_Texture* _get() const;
 		Rect rect;
 		friend class Renderer;
 	};
@@ -185,44 +213,45 @@ namespace MiniEngine
 	{
 	public:
 	    Renderer() = default;
-		int setColor(RGBA pack);
-		RGBA getColor();
+		int setColor(const RGBA& pack);
+		RGBA getColor() const;
 		int setBlendMode(BlendMode mode);
-		BlendMode getBlendMode();
+		BlendMode getBlendMode() const;
 
 		int setTarget(Texture& t);
 		int setTarget();
 
-		int fillRect(Rect rect);
-		int drawRect(Rect rect);
-		int drawPoint(Point p);
+		int fillRect(const Rect& rect);
+		int drawRect(const Rect& rect);
+		int drawPoint(const Point& p);
 
 		int clear();
 		void update();
 
-		int copy(Texture t, Rect src, Rect dst);
-		int copyTo(Texture t, Rect dst);
-		int copyTo(Texture t, Point lupoint);
-		int copyFill(Texture t, Rect src);
-		int copyFullFill(Texture t);
+		int copy(const Texture& t, const Rect& src, const Rect& dst);
+		int copyTo(const Texture& t, const Rect& dst);
+		int copyTo(const Texture& t, const Point& lupoint);
+		int copyFill(const Texture& t, const Rect& src);
+		int copyFullFill(const Texture& t);
 
-		int supercopy(Texture t,bool srcfull,Rect src,bool dstfull,Rect dst,double angle,bool haspoint,Point center,FlipMode mode);
+		int supercopy(const Texture& t,
+                bool srcfull,const Rect& src,bool dstfull,const Rect& dst,
+                double angle,
+                bool haspoint,const Point& center,FlipMode mode);
 
-		Surface loadSurface(std::string FileName) throw(ErrorViewer);
-		Surface loadSurfaceRW(RWOP rwop) throw(ErrorViewer);
-		Texture render(Surface surf) throw (ErrorViewer);
-		Texture loadTexture(std::string FileName) throw(ErrorViewer);
-		Texture loadTextureRW(RWOP rwop) throw(ErrorViewer);
-		Texture createTexture(int Width, int Height) throw(ErrorViewer);
+		Texture render(const Surface& surf) const throw (ErrorViewer);
+		Texture loadTexture(const std::string& FileName) const throw(ErrorViewer);
+		Texture loadTextureRW(const RWOP& rwop) const throw(ErrorViewer);
+		Texture createTexture(int Width, int Height) const throw(ErrorViewer);
 
-		bool isReady();
+		bool isReady() const;
 
 		void release();
 	private:
 		std::shared_ptr<SDL_Renderer> _rnd;
 		void _set(SDL_Renderer*);
 		void _clear();
-		SDL_Renderer* _get();
+		SDL_Renderer* _get() const;
 
 		friend class Window;
 	};
@@ -238,13 +267,14 @@ namespace MiniEngine
 	class Cursor
 	{
     public:
-        static Cursor CreateSystemCursor(SystemCursorType);
-        static Cursor CreateCursor(Surface surf,Point hotspot={0,0});
+        Cursor()=default;
+        Cursor(SystemCursorType);
+        Cursor(Surface surf,Point hotspot={0,0});
 
         static Cursor GetActiveCursor();
         static Cursor GetDefaultCursor();
 
-        static void show(bool);
+        static void setShow(bool);
         static bool isShow();
 
         void activate();
@@ -273,6 +303,7 @@ namespace MiniEngine
 	class Window
 	{
 	public:
+	    Window()=default;
 		Window(std::string Title, int Width, int Height,
          std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture },
          std::initializer_list<WindowType> WindowFlags = {WindowType::Shown} ,
@@ -281,39 +312,44 @@ namespace MiniEngine
 
 		void setRenderer(RendererType Type)
 		{
-		    _internal_rndflagcalc=0;
-            _setRenderer(Type);
+		    int flagcalc=0;
+            _setRenderer(flagcalc,Type);
 		}
 
 		template<typename... Args>
 		void setRenderer(RendererType Type,Args&&... args)
 		{
-            _internal_rndflagcalc=0;
-            _setRenderer(Type,std::forward<RendererType>(args...));
+            int flagcalc=0;
+            _setRenderer(flagcalc,Type,std::forward<RendererType>(args...));
 		}
 
 		void setRenderer(std::initializer_list<RendererType>);
 
-		Rect getSize();
-		void setSize(Rect sizeRect);
+		Rect getSize() const;
+		void setSize(const Rect& sizeRect);
 		void setSize(int w, int h);
 
-		Rect getPosition();
+		Point getPosition() const;
 		void setPosition(int x, int y);
-		/// FIXME: Use class Point or class Rect ?
-		void setPosition(Point point);
+		void setPosition(const Point& point);
 
+		void setTitle(const std::string& Title);
+		std::string getTitle() const;
 
-		void setTitle(std::string Title);
-		std::string getTitle();
+		void setGrab(bool isGrab);
+		bool getGrab() const;
 
-		void setGrab(bool);
-		bool getGrab();
+		#if _MINIENGINE_SDL_VERSION_ATLEAST(2,0,5)
+		/// SDL2.0.5 Required.
+		int setOpacity(float opacity);
+		float getOpacity() const;
+		#endif
 
+		/// FIXME: Not Implemented.
 		void setResizable(bool resizable);
 
 		/// Use UTF8 in Title and Message please.
-		int showSimpleMessageBox(MessageBoxType type,std::string Title,std::string Message);
+		int showSimpleMessageBox(MessageBoxType type,const std::string& Title,const std::string& Message) const;
 
 		void show();
 		void hide();
@@ -324,48 +360,55 @@ namespace MiniEngine
 
 		_DECL_DEPRECATED Surface getSurface();
 
+		bool isScreenKeyboardShown();
+
 		void release();
+
+        /// Experimental : Free current renderer.
+        /// This will cause all existing Renderer class throw an error on delete.
+        /// This function destroy current renderer (if exist) and all Renderer class will not be notified.
+        void resetRenderer();
     protected:
         template<typename... Args>
-        void _setRenderer(RendererType Type,Args&&... args)
+        void _setRenderer(int& refcalc,RendererType Type,Args&&... args)
         {
-            _internal_rndflagcalc|=_render_caster(Type);
-            _setRenderer(args...);
+            refcalc|=_render_caster(Type);
+            _setRenderer(refcalc,args...);
         }
 
-        void _setRenderer(RendererType Type)
+        void _setRenderer(int& refcalc,RendererType Type)
         {
-            _internal_rndflagcalc|=_render_caster(Type);
-            _setRenderer_Real(_internal_rndflagcalc);
+            refcalc|=_render_caster(Type);
+            _setRenderer_Real(refcalc);
         }
 	private:
 		void _setRenderer_Real(Uint32 flags);
-		Uint32 _internal_rndflagcalc;
 		Uint32 _render_caster(RendererType);
 
 		std::shared_ptr<SDL_Window> _wnd;
 		void _set(SDL_Window*);
 		void _clear();
-		SDL_Window* _get();
+		SDL_Window* _get() const;
 
-		Renderer winrnd;
+		Renderer _winrnd;
 	};
+
+	enum class FontStyle { Normal, Bold, Italic, UnderLine, StrikeThrough };
+	enum class FontHint { Normal, Light, Mono, None , Error };
 
 	class Font
 	{
 	public:
-	    enum class Style { Normal, Bold, Italic, UnderLine, StrikeThrough };
-
 		Font() = default;
-		Font(std::string FontFileName, int size) throw(ErrorViewer);
-		int use(std::string FontFileName, int size);
-		bool isReady();
+		Font(std::string FontFileName, size_t size) throw(ErrorViewer);
+		int use(std::string FontFileName, size_t size);
+		bool isReady() const;
 
-		bool isNormal();
-        bool isBold();
-        bool isItalic();
-        bool isUnderLine();
-        bool isStrikeThrough();
+		bool isNormal() const;
+        bool isBold() const;
+        bool isItalic() const;
+        bool isUnderLine() const;
+        bool isStrikeThrough() const;
 
         void setNormal();
         void setBold(bool);
@@ -374,65 +417,95 @@ namespace MiniEngine
         void setStrikeThrough(bool);
 
 		template<typename... Args>
-		void setFontStyle(Style style,Args&&... args)
+		void setFontStyle(FontStyle style,Args&&... args)
 		{
 		    int fontcalc=0;
 		    _setFontStyle(fontcalc,style,args...);
 		}
 
-		void setFontStyle(Style style)
+		void setFontStyle(FontStyle style)
 		{
             int fontcalc=0;
             _setFontStyle(fontcalc,style);
 		}
 
-		std::vector<Style> getFontStyles();
+		std::vector<FontStyle> getFontStyles() const;
 
-        Rect sizeText(const std::string& Text) throw (ErrorViewer);
-        Rect sizeUTF8(const std::string& Text) throw (ErrorViewer);
+		int getFontHeight() const;
+		int getFontAscent() const;
+		int getFontDescent() const;
+		int getFontLineSkip() const;
 
-		Surface renderText(std::string Text, RGBA fg);
-		Surface renderTextWrapped(std::string Text, RGBA fg, int WrapLength);
-		Surface renderTextShaded(std::string Text, RGBA fg, RGBA bg);
-		Surface renderTextSolid(std::string Text, RGBA fg);
+		bool isFontKerning() const;
+		void setFontKerning(bool enableKerning);
 
-		Surface renderUTF8(std::string Text, RGBA fg);
-		Surface renderUTF8Wrapped(std::string Text, RGBA fg, int WrapLength);
-		Surface renderUTF8Shaded(std::string Text, RGBA fg, RGBA bg);
-		Surface renderUTF8Solid(std::string Text, RGBA fg);
+		long getFontFaceNum() const;
+        int getFontFaceIsFixedWidth() const;
+        std::string getFontFaceFamilyName() const;
+        std::string getFontFaceStyleName() const;
 
-		Texture renderText(Renderer rnd, std::string Text, RGBA fg);
-		Texture renderTextWrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
-		Texture renderTextShaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
-		Texture renderTextSolid(Renderer rnd, std::string Text, RGBA fg);
+		FontHint getFontHint() const;
+		void setFontHint(FontHint hint);
 
-		Texture renderUTF8(Renderer rnd, std::string Text, RGBA fg);
-		Texture renderUTF8Wrapped(Renderer rnd, std::string Text, RGBA fg, int WrapLength);
-		Texture renderUTF8Shaded(Renderer rnd, std::string Text, RGBA fg, RGBA bg);
-		Texture renderUTF8Solid(Renderer rnd, std::string Text, RGBA fg);
+
+        Rect sizeText(const std::string& Text) const throw (ErrorViewer);
+        Rect sizeUTF8(const std::string& Text) const throw (ErrorViewer);
+        Rect sizeUnicode(const uint16_t* Text) const throw (ErrorViewer);
+
+        /// Surface Rendering Functions.
+		Surface renderText(const std::string& Text, const RGBA& fg) const;
+		Surface renderTextWrapped(const std::string& Text, const RGBA& fg, size_t WrapLength) const;
+		Surface renderTextShaded(const std::string& Text, const RGBA& fg, const RGBA& bg) const;
+		Surface renderTextSolid(const std::string& Text, const RGBA& fg) const;
+
+		Surface renderUTF8(const std::string& Text, const RGBA& fg) const;
+		Surface renderUTF8Wrapped(const std::string& Text, const RGBA& fg, size_t WrapLength) const;
+		Surface renderUTF8Shaded(const std::string& Text, const RGBA& fg, const RGBA& bg) const;
+		Surface renderUTF8Solid(const std::string& Text, const RGBA& fg) const;
+
+		Surface renderUnicode(const uint16_t* Text,const RGBA& fg) const;
+		Surface renderUnicodeWrapped(const uint16_t* Text,const RGBA& fg,size_t WrapLength) const;
+		Surface renderUnicodeShaded(const uint16_t* Text,const RGBA& fg,const RGBA& bg) const;
+		Surface renderUnicodeSolid(const uint16_t* Text,const RGBA& fg) const;
+
+		/// Texture Rendering Functions.
+		Texture renderText(const Renderer& rnd, const std::string& Text, const RGBA& fg) const;
+		Texture renderTextWrapped(const Renderer& rnd, const std::string& Text, const RGBA& fg, size_t WrapLength) const;
+		Texture renderTextShaded(const Renderer& rnd, const std::string& Text, const RGBA& fg, const RGBA& bg) const;
+		Texture renderTextSolid(const Renderer& rnd, const std::string& Text, const RGBA& fg) const;
+
+		Texture renderUTF8(const Renderer& rnd, const std::string& Text, const RGBA& fg) const;
+		Texture renderUTF8Wrapped(const Renderer& rnd, const std::string& Text, const RGBA& fg, size_t WrapLength) const;
+		Texture renderUTF8Shaded(const Renderer& rnd, const std::string& Text, const RGBA& fg, const RGBA& bg) const;
+		Texture renderUTF8Solid(const Renderer& rnd, const std::string& Text, const RGBA& fg) const;
+
+		Texture renderUnicode(const Renderer& rnd,const uint16_t* Text,const RGBA& fg) const;
+		Texture renderUnicodeWrapped(const Renderer& rnd,const uint16_t* Text,const RGBA& fg,size_t WrapLength) const;
+		Texture renderUnicodeShaded(const Renderer& rnd,const uint16_t* Text,const RGBA& fg,const RGBA& bg) const;
+		Texture renderUnicodeSolid(const Renderer& rnd,const uint16_t* Text,const RGBA& fg) const;
 
 		void release();
     protected:
 		template<typename... Args>
-        void _setFontStyle(int& fontcalc,Style style,Args&&... args)
+        void _setFontStyle(int& fontcalc,FontStyle style,Args&&... args)
         {
             fontcalc|=_style_caster(style);
             _setFontStyle(fontcalc,args...);
         }
 
-        void _setFontStyle(int& fontcalc,Style style)
+        void _setFontStyle(int& fontcalc,FontStyle style)
         {
             fontcalc|=_style_caster(style);
             _real_setFontStyle(fontcalc);
         }
 	private:
 	    void _real_setFontStyle(int);
-	    int _style_caster(Style);
+	    int _style_caster(FontStyle);
 
 		std::shared_ptr<TTF_Font> _font;
 		void _set(TTF_Font*);
 		void _clear();
-		TTF_Font* _get();
+		TTF_Font* _get() const;
 	};
 
 	enum class Platform { Unknown,Windows,MacOS,Linux,iOS,Android };
@@ -453,13 +526,20 @@ namespace MiniEngine
     public:
         SharedLibrary();
         SharedLibrary(const std::string& Filename);
-        ~SharedLibrary();
+        ~SharedLibrary()=default;
         int load(const std::string& Filename);
         int unload();
-        void* get(const std::string& FunctionName);
+
+        template<typename ReturnType,typename... Arguments>
+        std::function<ReturnType(Arguments...)> get(const std::string& FunctionName)
+        {
+            return std::function<ReturnType(Arguments...)>(reinterpret_cast<ReturnType(*)(Arguments...)>(get(FunctionName)));
+        }
+
+        void* get(const std::string& FunctionName) const;
         void release();
     private:
-        void* _get();
+        void* _get() const;
         void _set(void*);
         void _clear();
         std::shared_ptr<void> _obj;
@@ -489,7 +569,13 @@ namespace MiniEngine
 		static Platform GetPlatform();
 
 		static void StartTextInput();
+		static bool IsTextInputActive();
 		static void StopTextInput();
+
+		static bool HasScreenKeyboardSupport();
+
+        static std::tuple<int,int,int> getCompileVersion();
+        static std::tuple<int,int,int> getLinkedVersion();
 
 		class Android
 		{
@@ -533,7 +619,7 @@ namespace MiniEngine
 
         int enable();
         int disable();
-        bool isenable();
+        bool isenable() const;
         void detach();
         ~Timer();
 
@@ -587,6 +673,9 @@ namespace MiniEngine
 	class MusicPlayer : public AudioPlayer
 	{
 	public:
+	    static int GetDecoderNum();
+		static std::string GetDecoderName(int index);
+
 		Music loadMusic(std::string Filename) throw (ErrorViewer);
 
 		int play(Music music, int loops);
@@ -600,6 +689,9 @@ namespace MiniEngine
 		bool isPlaying();
 		bool isPaused();
 		int isFading();
+
+		/// Experimental
+		static int SetMusicPosition(double position);
 
 	private:
 		Music m;
@@ -623,6 +715,9 @@ namespace MiniEngine
 	class SoundPlayer : public AudioPlayer
 	{
 	public:
+	    static int GetDecoderNum();
+		static std::string GetDecoderName(int index);
+
 		SoundPlayer(int Channels = 16);
 		Sound loadSound(std::string Filename) throw (ErrorViewer);
 		ChannelID playSound(Sound sound, int loops) throw (ErrorViewer);
@@ -631,6 +726,12 @@ namespace MiniEngine
 		void pause(ChannelID id);
 		void resume(ChannelID id);
 		int stop(ChannelID id);
+
+		/// Experimental
+		int setPanning(ChannelID id,uint8_t left,uint8_t right);
+		int setPosition(ChannelID id,int16_t angle,uint8_t distance);
+		int setDistance(ChannelID id,uint8_t distance);
+		int setReverseStereo(ChannelID id,int flip);
 	};
 
 	class StringEngine
@@ -649,6 +750,13 @@ namespace MiniEngine
         struct impl;
         impl* pimpl;
 	};
+
+    int SetClipboardText(const std::string& str);
+    std::string GetClipboardText();
+    bool HasClipboardText();
+
+    /// Experimental - For Experts: Use SDL ScanCode
+    bool GetScanKeyState(SDL_Scancode);
 
 }/// End of namespace MiniEngine
 
