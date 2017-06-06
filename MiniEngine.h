@@ -574,8 +574,17 @@ namespace MiniEngine
 
 		static bool HasScreenKeyboardSupport();
 
-        static std::tuple<int,int,int> getCompileVersion();
-        static std::tuple<int,int,int> getLinkedVersion();
+        static std::tuple<int,int,int> GetSDLCompileVersion();
+        static std::tuple<int,int,int> GetSDLLinkedVersion();
+
+        static std::tuple<int,int,int> GetIMGCompileVersion();
+        static std::tuple<int,int,int> GetIMGLinkedVersion();
+
+        static std::tuple<int,int,int> GetMixCompileVersion();
+        static std::tuple<int,int,int> GetMixLinkedVersion();
+
+        static std::tuple<int,int,int> GetTTFCompileVersion();
+        static std::tuple<int,int,int> GetTTFLinkedVersion();
 
 		class Android
 		{

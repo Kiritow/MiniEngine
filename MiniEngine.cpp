@@ -2088,7 +2088,7 @@ namespace MiniEngine
 	}
 
 	//static
-    std::tuple<int,int,int> SDLSystem::getCompileVersion()
+    std::tuple<int,int,int> SDLSystem::GetSDLCompileVersion()
     {
         SDL_version ver;
         SDL_VERSION(&ver);
@@ -2096,11 +2096,55 @@ namespace MiniEngine
     }
 
     //static
-    std::tuple<int,int,int> SDLSystem::getLinkedVersion()
+    std::tuple<int,int,int> SDLSystem::GetSDLLinkedVersion()
     {
         SDL_version ver;
         SDL_GetVersion(&ver);
         return std::make_tuple(ver.major,ver.minor,ver.patch);
+    }
+    //static
+    std::tuple<int,int,int> SDLSystem::GetIMGCompileVersion()
+    {
+        SDL_version ver;
+        SDL_IMAGE_VERSION(&ver);
+        return std::make_tuple(ver.major,ver.minor,ver.patch);
+    }
+
+    //static
+    std::tuple<int,int,int> SDLSystem::GetIMGLinkedVersion()
+    {
+        const SDL_version* ptr=IMG_Linked_Version();
+        return std::make_tuple();
+    }
+
+    //static
+    std::tuple<int,int,int> SDLSystem::GetMixCompileVersion()
+    {
+        SDL_version ver;
+        SDL_MIXER_VERSION(&ver);
+        return std::make_tuple(ver.major,ver.minor,ver.patch);
+    }
+
+    //static
+    std::tuple<int,int,int> SDLSystem::GetMixLinkedVersion()
+    {
+        const SDL_version* ptr=Mix_Linked_Version();
+        return std::make_tuple(ptr->major,ptr->minor,ptr->patch);
+    }
+
+    //static
+    std::tuple<int,int,int> SDLSystem::GetTTFCompileVersion()
+    {
+        SDL_version ver;
+        SDL_TTF_VERSION(&ver);
+        return std::make_tuple(ver.major,ver.minor,ver.patch);
+    }
+
+    //static
+    std::tuple<int,int,int> SDLSystem::GetTTFLinkedVersion()
+    {
+        const SDL_version* ptr=TTF_Linked_Version();
+        return std::make_tuple(ptr->major,ptr->minor,ptr->patch);
     }
 
 	/// Global Executor For class Timer
