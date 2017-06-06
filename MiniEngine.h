@@ -673,6 +673,9 @@ namespace MiniEngine
 	class MusicPlayer : public AudioPlayer
 	{
 	public:
+	    static int GetDecoderNum();
+		static std::string GetDecoderName(int index);
+
 		Music loadMusic(std::string Filename) throw (ErrorViewer);
 
 		int play(Music music, int loops);
@@ -709,6 +712,9 @@ namespace MiniEngine
 	class SoundPlayer : public AudioPlayer
 	{
 	public:
+	    static int GetDecoderNum();
+		static std::string GetDecoderName(int index);
+
 		SoundPlayer(int Channels = 16);
 		Sound loadSound(std::string Filename) throw (ErrorViewer);
 		ChannelID playSound(Sound sound, int loops) throw (ErrorViewer);

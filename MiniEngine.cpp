@@ -2231,6 +2231,18 @@ namespace MiniEngine
         return _music.get();
     }
 
+    //static
+    int MusicPlayer::GetDecoderNum()
+    {
+        return Mix_GetNumMusicDecoders();
+    }
+
+    //static
+    std::string MusicPlayer::GetDecoderName(int index)
+    {
+        return std::string(Mix_GetMusicDecoder(index));
+    }
+
 	Music MusicPlayer::loadMusic(std::string Filename) throw(ErrorViewer)
 	{
 		Mix_Music* temp = Mix_LoadMUS(Filename.c_str());
@@ -2320,6 +2332,18 @@ namespace MiniEngine
 	{
         return _sound.get();
 	}
+
+    //static
+    int SoundPlayer::GetDecoderNum()
+    {
+        return Mix_GetNumChunkDecoders();
+    }
+
+    //static
+    std::string SoundPlayer::GetDecoderName(int index)
+    {
+        return std::string(Mix_GetChunkDecoder(index));
+    }
 
 	SoundPlayer::SoundPlayer(int Channels)
 	{
