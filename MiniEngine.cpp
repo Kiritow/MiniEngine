@@ -2318,6 +2318,12 @@ namespace MiniEngine
 		}
 	}
 
+	//static
+	int MusicPlayer::SetMusicPosition(double position)
+	{
+        return Mix_SetMusicPosition(position);
+	}
+
 	void Sound::_set(Mix_Chunk* p)
 	{
         _sound.reset(p,Mix_FreeChunk);

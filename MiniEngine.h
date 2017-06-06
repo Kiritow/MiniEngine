@@ -690,6 +690,9 @@ namespace MiniEngine
 		bool isPaused();
 		int isFading();
 
+		/// Experimental
+		static int SetMusicPosition(double position);
+
 	private:
 		Music m;
 	};
