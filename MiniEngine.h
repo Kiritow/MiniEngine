@@ -394,6 +394,7 @@ namespace MiniEngine
 	};
 
 	enum class FontStyle { Normal, Bold, Italic, UnderLine, StrikeThrough };
+	enum class FontHint { Normal, Light, Mono, None , Error };
 
 	class Font
 	{
@@ -429,6 +430,23 @@ namespace MiniEngine
 		}
 
 		std::vector<FontStyle> getFontStyles() const;
+
+		int getFontHeight() const;
+		int getFontAscent() const;
+		int getFontDescent() const;
+		int getFontLineSkip() const;
+
+		bool isFontKerning() const;
+		void setFontKerning(bool enableKerning);
+
+		long getFontFaceNum() const;
+        int getFontFaceIsFixedWidth() const;
+        std::string getFontFaceFamilyName() const;
+        std::string getFontFaceStyleName() const;
+
+		FontHint getFontHint() const;
+		void setFontHint(FontHint hint);
+
 
         Rect sizeText(const std::string& Text) const throw (ErrorViewer);
         Rect sizeUTF8(const std::string& Text) const throw (ErrorViewer);

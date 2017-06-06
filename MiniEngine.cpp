@@ -1535,6 +1535,97 @@ namespace MiniEngine
         return _internal::getFontStyleVecFromMixedTTFFontStyle(styles);
     }
 
+    int Font::getFontHeight() const
+    {
+        return TTF_FontHeight(_get());
+    }
+
+    int Font::getFontAscent() const
+    {
+        return TTF_FontAscent(_get());
+    }
+
+    int Font::getFontDescent() const
+    {
+        return TTF_FontDescent(_get());
+    }
+
+    int Font::getFontLineSkip() const
+    {
+        return TTF_FontLineSkip(_get());
+    }
+
+    bool Font::isFontKerning() const
+    {
+        return (TTF_GetFontKerning(_get())!=0);
+    }
+
+    void Font::setFontKerning(bool enableKerning)
+    {
+        TTF_SetFontKerning(_get(),enableKerning?1:0);
+    }
+
+    long Font::getFontFaceNum() const
+    {
+        return TTF_FontFaces(_get());
+    }
+
+    int Font::getFontFaceIsFixedWidth() const
+    {
+        return TTF_FontFaceIsFixedWidth(_get());
+    }
+
+    std::string Font::getFontFaceFamilyName() const
+    {
+        return std::string(TTF_FontFaceFamilyName(_get()));
+    }
+
+    std::string Font::getFontFaceStyleName() const
+    {
+        return std::string(TTF_FontFaceStyleName(_get()));
+    }
+
+    FontHint Font::getFontHint() const
+    {
+       switch(TTF_GetFontHinting(_get()))
+       {
+        case TTF_HINTING_NORMAL:
+            return FontHint::Normal;
+        case TTF_HINTING_LIGHT:
+            return FontHint::Light;
+        case TTF_HINTING_MONO:
+            return FontHint::Mono;
+        case TTF_HINTING_NONE:
+            return FontHint::None;
+       }
+       /// Return Error on default.
+       return FontHint::Error;
+    }
+
+    void Font::setFontHint(FontHint hint)
+    {
+        int v=0;
+        switch(hint)
+        {
+        case FontHint::Normal:
+            v=TTF_HINTING_NORMAL;
+            break;
+        case FontHint::Light:
+            v=TTF_HINTING_LIGHT;
+            break;
+        case FontHint::Mono:
+            v=TTF_HINTING_MONO;
+            break;
+        case FontHint::None:
+            v=TTF_HINTING_NONE;
+            break;
+        case FontHint::Error:
+            /// No Action on FontHint::Error.
+            return;
+        }
+        TTF_SetFontHinting(_get(),v);
+    }
+
     Rect Font::sizeText(const std::string& Text) const throw (ErrorViewer)
     {
         int w=0,h=0;
