@@ -31,6 +31,41 @@ std::string GetMD5(unsigned char* buffer,unsigned int bufferLen)
     return str;
 }
 
+/// Notice: SDLTest_crc32Calc is an undefined symbol. So we must use these 3 functions.
+int GetCRC32(unsigned char* buffer,unsigned int bufferLen,uint32_t& out_CRCResult)
+{
+    uint32_t result;
+    SDLTest_Crc32Context ct;
+    SDLTest_Crc32Init(&ct);
+
+    int ret=-2;
+    do
+    {
+        if (SDLTest_Crc32CalcStart(&ct,&result))
+        {
+            ret=-1;
+            break;
+        }
+        if (SDLTest_Crc32CalcBuffer(&ct, buffer, bufferLen, &result))
+        {
+            ret=-1;
+            break;
+        }
+        if (SDLTest_Crc32CalcEnd(&ct, &result))
+        {
+            ret=-1;
+            break;
+        }
+        ret=0;
+        out_CRCResult=result;
+        break;
+    }while(0);
+
+    SDLTest_Crc32Done(&ct);
+
+    return ret;
+}
+
 /// Compare two surfaces. Currently, Surface::getRawPointer() does not has constant attribute.
 int CompareSurface(Surface& surface1, Surface& surface2, int allowableError)
 {
@@ -59,7 +94,6 @@ uint32_t UniRandom::get()
 {
     return SDLTest_Random(&(_sp.get()->context));
 }
-
 
 }/// End of namespace MiniEngine::Test
 
