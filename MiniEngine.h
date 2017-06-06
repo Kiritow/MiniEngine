@@ -723,6 +723,12 @@ namespace MiniEngine
 		void pause(ChannelID id);
 		void resume(ChannelID id);
 		int stop(ChannelID id);
+
+		/// Experimental
+		int setPanning(ChannelID id,uint8_t left,uint8_t right);
+		int setPosition(ChannelID id,int16_t angle,uint8_t distance);
+		int setDistance(ChannelID id,uint8_t distance);
+		int setReverseStereo(ChannelID id,int flip);
 	};
 
 	class StringEngine

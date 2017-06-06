@@ -2408,6 +2408,26 @@ namespace MiniEngine
 		return Mix_HaltChannel(id);
 	}
 
+    int SoundPlayer::setPanning(ChannelID id, uint8_t left, uint8_t right)
+    {
+        return Mix_SetPanning(id,left,right);
+    }
+
+    int SoundPlayer::setPosition(ChannelID id, int16_t angle, uint8_t distance)
+    {
+        return Mix_SetPosition(id,angle,distance);
+    }
+
+    int SoundPlayer::setDistance(ChannelID id, uint8_t distance)
+    {
+        return Mix_SetDistance(id,distance);
+    }
+
+    int SoundPlayer::setReverseStereo(ChannelID id, int flip)
+    {
+        return Mix_SetReverseStereo(id,flip);
+    }
+
 	AudioPlayer::_Audio* AudioPlayer::_sysAudio = nullptr;
 	int AudioPlayer::_sysAudioCounter = 0;
 
