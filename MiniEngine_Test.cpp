@@ -31,10 +31,35 @@ std::string GetMD5(unsigned char* buffer,unsigned int bufferLen)
     return str;
 }
 
-int CompareSurface(const Surface& surface1, const Surface& surface2, int allowableError)
+/// Compare two surfaces. Currently, Surface::getRawPointer() does not has constant attribute.
+int CompareSurface(Surface& surface1, Surface& surface2, int allowableError)
 {
     return SDLTest_CompareSurfaces(surface1.getRawPointer(),surface2.getRawPointer(),allowableError);
 }
+
+//private
+struct UniRandom::_impl
+{
+    SDLTest_RandomContext context;
+};
+
+UniRandom::UniRandom()
+{
+    _sp.reset(new _impl);
+    SDLTest_RandomInitTime(&(_sp.get()->context));
+}
+
+UniRandom::UniRandom(unsigned int A, unsigned int B)
+{
+    _sp.reset(new _impl);
+    SDLTest_RandomInit(&(_sp.get()->context),A,B);
+}
+
+uint32_t UniRandom::get()
+{
+    return SDLTest_Random(&(_sp.get()->context));
+}
+
 
 }/// End of namespace MiniEngine::Test
 
