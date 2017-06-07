@@ -2347,6 +2347,24 @@ namespace MiniEngine
         return std::make_tuple(ptr->major,ptr->minor,ptr->patch);
     }
 
+    //static
+    int SDLSystem::GetCPUCount()
+    {
+        return SDL_GetCPUCount();
+    }
+
+    //static
+    int SDLSystem::GetCPUCacheLineSize()
+    {
+        return SDL_GetCPUCacheLineSize();
+    }
+
+    //static
+    int SDLSystem::GetSystemRAM()
+    {
+        return SDL_GetSystemRAM();
+    }
+
 	/// Global Executor For class Timer
 	Uint32 _global_timer_executor(Uint32 interval,void* param)
 	{

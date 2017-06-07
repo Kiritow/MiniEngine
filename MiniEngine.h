@@ -634,6 +634,11 @@ namespace MiniEngine
         static std::tuple<int,int,int> GetTTFCompileVersion();
         static std::tuple<int,int,int> GetTTFLinkedVersion();
 
+        static int GetCPUCount();
+        static int GetCPUCacheLineSize();
+        /// RAM is calculated in MB.
+        static int GetSystemRAM();
+
 		class Android
 		{
         public:
