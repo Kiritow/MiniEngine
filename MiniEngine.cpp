@@ -780,6 +780,13 @@ namespace MiniEngine
     }
 
     //private
+    void Texture::_set_no_delete(SDL_Texture* p)
+    {
+        _text.reset(p,[](SDL_Texture*){});
+        updateInfo();
+    }
+
+    //private
     void Texture::_clear()
     {
         _text.reset();
@@ -938,6 +945,13 @@ namespace MiniEngine
 	int Renderer::setTarget()
 	{
 		return SDL_SetRenderTarget(_get(), nullptr);
+	}
+
+	Texture Renderer::getTarget()
+	{
+        Texture t;
+        t._set_no_delete(SDL_GetRenderTarget(_get()));
+        return t;
 	}
 
 	int Renderer::fillRect(const Rect& rect)

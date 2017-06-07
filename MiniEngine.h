@@ -15,7 +15,7 @@ namespace MiniEngine
 	public:
 		int x, y, w, h;
 		Rect(int X, int Y, int W, int H);
-		Rect(const SDL_Rect&);
+		explicit Rect(const SDL_Rect&);
 		Rect();
 		SDL_Rect toSDLRect() const;
 		bool isEmpty();
@@ -199,6 +199,8 @@ namespace MiniEngine
 	private:
 		std::shared_ptr<SDL_Texture> _text;
 		void _set(SDL_Texture*);
+		/// Just used for "SDL_GetRenderTarget"
+		void _set_no_delete(SDL_Texture*);
 		void _clear();
 		SDL_Texture* _get() const;
 		Rect rect;
@@ -220,6 +222,7 @@ namespace MiniEngine
 
 		int setTarget(Texture& t);
 		int setTarget();
+		Texture getTarget();
 
 		int fillRect(const Rect& rect);
 		int drawRect(const Rect& rect);
