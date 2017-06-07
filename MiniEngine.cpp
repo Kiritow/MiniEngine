@@ -2114,7 +2114,7 @@ namespace MiniEngine
     std::tuple<int,int,int> SDLSystem::GetIMGLinkedVersion()
     {
         const SDL_version* ptr=IMG_Linked_Version();
-        return std::make_tuple();
+        return std::make_tuple(ptr->major,ptr->minor,ptr->patch);
     }
 
     //static
