@@ -216,6 +216,22 @@ namespace MiniEngine
 
             return vec;
         }
+
+        SDL_RendererFlip getSDLRendererFlipFromFlipMode(FlipMode mode)
+        {
+            switch(mode)
+            {
+            case FlipMode::None:
+                return SDL_FLIP_NONE;
+            case FlipMode::Horizontal:
+                return SDL_FLIP_HORIZONTAL;
+            case FlipMode::Vertical:
+                return SDL_FLIP_VERTICAL;
+            default:
+                /// return non-flip mode on default.
+                return SDL_FLIP_NONE;
+            }
+        }
     }/// End of namespace _internal
 
 	Rect::Rect(int X, int Y, int W, int H)
@@ -1117,6 +1133,70 @@ namespace MiniEngine
 		return SDL_RenderCopy(_get(), t._get(), NULL, NULL);
 	}
 
+	/// ----- Super Copy Extend ----- (Begin)
+    int Renderer::copy(const Texture& t, const Rect& src, const Rect& dst, double angle, FlipMode mode)
+    {
+        auto s=src.toSDLRect();
+        auto d=src.toSDLRect();
+        return SDL_RenderCopyEx(_get(),t._get(),&s,&d,angle,NULL,_internal::getSDLRendererFlipFromFlipMode(mode));
+    }
+
+    int Renderer::copyTo(const Texture& t, const Rect& dst, double angle, FlipMode mode)
+    {
+        auto d=dst.toSDLRect();
+        return SDL_RenderCopyEx(_get(),t._get(),NULL,&d,angle,NULL,_internal::getSDLRendererFlipFromFlipMode(mode));
+    }
+
+    int Renderer::copyTo(const Texture& t, const Point& lupoint, double angle, FlipMode mode)
+    {
+        return copyTo(t,Rect(lupoint.x,lupoint.y,t.getw(),t.geth()),angle,mode);
+    }
+
+    int Renderer::copyFill(const Texture& t, const Rect& src, double angle, FlipMode mode)
+    {
+        auto s=src.toSDLRect();
+        return SDL_RenderCopyEx(_get(),t._get(),&s,NULL,angle,NULL,_internal::getSDLRendererFlipFromFlipMode(mode));
+    }
+
+    int Renderer::copyFullFill(const Texture& t, double angle, FlipMode mode)
+    {
+        return SDL_RenderCopyEx(_get(),t._get(),NULL,NULL,angle,NULL,_internal::getSDLRendererFlipFromFlipMode(mode));
+    }
+
+    int Renderer::copy(const Texture& t, const Rect& src, const Rect& dst, const Point& centerPoint, double angle, FlipMode mode)
+    {
+        auto s=src.toSDLRect();
+        auto d=src.toSDLRect();
+        auto c=centerPoint.toSDLPoint();
+        return SDL_RenderCopyEx(_get(),t._get(),&s,&d,angle,&c,_internal::getSDLRendererFlipFromFlipMode(mode));
+    }
+
+    int Renderer::copyTo(const Texture& t, const Rect& dst, const Point& centerPoint, double angle, FlipMode mode)
+    {
+        auto d=dst.toSDLRect();
+        auto c=centerPoint.toSDLPoint();
+        return SDL_RenderCopyEx(_get(),t._get(),NULL,&d,angle,&c,_internal::getSDLRendererFlipFromFlipMode(mode));
+    }
+
+    int Renderer::copyTo(const Texture& t, const Point& lupoint, const Point& centerPoint, double angle, FlipMode mode)
+    {
+        return copyTo(t,lupoint,centerPoint,angle,mode);
+    }
+
+    int Renderer::copyFill(const Texture& t, const Rect& src, const Point& centerPoint, double angle, FlipMode mode)
+    {
+        auto s=src.toSDLRect();
+        auto c=centerPoint.toSDLPoint();
+        return SDL_RenderCopyEx(_get(),t._get(),&s,NULL,angle,&c,_internal::getSDLRendererFlipFromFlipMode(mode));
+    }
+
+    int Renderer::copyFullFill(const Texture& t, const Point& centerPoint, double angle, FlipMode mode)
+    {
+        auto c=centerPoint.toSDLPoint();
+        return SDL_RenderCopyEx(_get(),t._get(),NULL,NULL,angle,&c,_internal::getSDLRendererFlipFromFlipMode(mode));
+    }
+    /// ----- Super Copy Extend ----- (End)
+
 	int Renderer::supercopy(const Texture& t,
                          bool srcfull,const Rect& src,bool dstfull,const Rect& dst,
                          double angle,
@@ -1144,20 +1224,7 @@ namespace MiniEngine
             pPoint=&P;
         }
 
-        switch(mode)
-        {
-        case FlipMode::None:
-            flip=SDL_FLIP_NONE;
-            break;
-        case FlipMode::Horizontal:
-            flip=SDL_FLIP_HORIZONTAL;
-            break;
-        case FlipMode::Vertical:
-            flip=SDL_FLIP_VERTICAL;
-            break;
-        default:
-            flip=SDL_FLIP_NONE;
-        }
+        flip=_internal::getSDLRendererFlipFromFlipMode(mode);
 
         return SDL_RenderCopyEx(_get(),t._get(),pR1,pR2,angle,pPoint,flip);
 	}

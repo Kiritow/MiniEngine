@@ -264,6 +264,20 @@ namespace MiniEngine
 		int copyFill(const Texture& t, const Rect& src);
 		int copyFullFill(const Texture& t);
 
+		/// Super copy without center point.
+		int copy(const Texture& t, const Rect& src, const Rect& dst,double angle,FlipMode mode);
+		int copyTo(const Texture& t, const Rect& dst,double angle,FlipMode mode);
+		int copyTo(const Texture& t, const Point& lupoint,double angle,FlipMode mode);
+		int copyFill(const Texture& t, const Rect& src,double angle,FlipMode mode);
+		int copyFullFill(const Texture& t,double angle,FlipMode mode);
+		/// Super copy with center point
+		int copy(const Texture& t, const Rect& src, const Rect& dst,const Point& centerPoint,double angle,FlipMode mode);
+		int copyTo(const Texture& t, const Rect& dst,const Point& centerPoint,double angle,FlipMode mode);
+		int copyTo(const Texture& t, const Point& lupoint,const Point& centerPoint,double angle,FlipMode mode);
+		int copyFill(const Texture& t, const Rect& src,const Point& centerPoint,double angle,FlipMode mode);
+		int copyFullFill(const Texture& t,const Point& centerPoint,double angle,FlipMode mode);
+
+		/// Reserved for compatibility
 		int supercopy(const Texture& t,
                 bool srcfull,const Rect& src,bool dstfull,const Rect& dst,
                 double angle,
