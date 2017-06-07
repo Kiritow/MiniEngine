@@ -224,6 +224,33 @@ namespace MiniEngine
 		int fillRect(const Rect& rect);
 		int drawRect(const Rect& rect);
 		int drawPoint(const Point& p);
+		int drawLine(const Point& A,const Point& B);
+
+		/// Experimental
+        int fillRects(const SDL_Rect* pRectArray,int n);
+        int drawRects(const SDL_Rect* pRectArray,int n);
+        int drawPoints(const SDL_Point* pPointArray,int n);
+        int drawLines(const SDL_Point* pPointArray,int n);
+        /// Experimental
+        int fillRects(const std::vector<SDL_Rect>& rectvec);
+        int drawRects(const std::vector<SDL_Rect>& rectvec);
+        int drawPoints(const std::vector<SDL_Point>& pointvec);
+        int drawLines(const std::vector<SDL_Point>& pointvec);
+
+        int setScale(float scaleX,float scaleY);
+        std::tuple<float,float> getScale() const;
+
+        int setViewport(const Rect& viewport);
+        Rect getViewport() const;
+
+        int setLogicalSize(int w,int h);
+        Rect getLogicalSize() const;
+
+        int setClipRect(const Rect& cliprect);
+        Rect getClipRect() const;
+        bool isClipEnabled() const;
+
+        Rect getOutputSize() const;
 
 		int clear();
 		void update();
@@ -244,9 +271,13 @@ namespace MiniEngine
 		Texture loadTextureRW(const RWOP& rwop) const throw(ErrorViewer);
 		Texture createTexture(int Width, int Height) const throw(ErrorViewer);
 
+		bool isRenderTargetSupported() const;
 		bool isReady() const;
 
 		void release();
+
+		/// Experimental
+		static int GetDriversNum();
 	private:
 		std::shared_ptr<SDL_Renderer> _rnd;
 		void _set(SDL_Renderer*);

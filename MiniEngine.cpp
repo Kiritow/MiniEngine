@@ -888,16 +888,19 @@ namespace MiniEngine
         _clear();
 	}
 
+	//private
 	void Renderer::_set(SDL_Renderer* p)
 	{
         _rnd.reset(p,SDL_DestroyRenderer);
 	}
 
+	//private
 	void Renderer::_clear()
 	{
         _rnd.reset();
 	}
 
+	//private
 	SDL_Renderer* Renderer::_get() const
 	{
         return _rnd.get();
@@ -927,8 +930,6 @@ namespace MiniEngine
 		return _internal::getBlendModeFromSDLBlendMode(temp);
 	}
 
-
-
 	int Renderer::setTarget(Texture & t)
 	{
 		return SDL_SetRenderTarget(_get(), t._get());
@@ -955,6 +956,113 @@ namespace MiniEngine
 	{
         return SDL_RenderDrawPoint(_get(),p.x,p.y);
 	}
+
+	int Renderer::drawLine(const Point& A,const Point& B)
+	{
+        return SDL_RenderDrawLine(_get(),A.x,A.y,B.x,B.y);
+	}
+
+    int Renderer::fillRects(const SDL_Rect* pRectArray, int n)
+    {
+        return SDL_RenderFillRects(_get(),pRectArray,n);
+    }
+
+    int Renderer::drawRects(const SDL_Rect* pRectArray, int n)
+    {
+        return SDL_RenderDrawRects(_get(),pRectArray,n);
+    }
+
+    int Renderer::drawPoints(const SDL_Point* pPointArray, int n)
+    {
+        return SDL_RenderDrawPoints(_get(),pPointArray,n);
+    }
+
+    int Renderer::drawLines(const SDL_Point* pPointArray, int n)
+    {
+        return SDL_RenderDrawLines(_get(),pPointArray,n);
+    }
+
+    int Renderer::fillRects(const std::vector<SDL_Rect>& rectvec)
+    {
+        return fillRects(rectvec.data(),rectvec.size());
+    }
+
+    int Renderer::drawRects(const std::vector<SDL_Rect>& rectvec)
+    {
+        return drawRects(rectvec.data(),rectvec.size());
+    }
+
+    int Renderer::drawPoints(const std::vector<SDL_Point>& pointvec)
+    {
+        return drawPoints(pointvec.data(),pointvec.size());
+    }
+
+    int Renderer::drawLines(const std::vector<SDL_Point>& pointvec)
+    {
+        return drawLines(pointvec.data(),pointvec.size());
+    }
+
+    int Renderer::setScale(float scaleX, float scaleY)
+    {
+        return SDL_RenderSetScale(_get(),scaleX,scaleY);
+    }
+
+    std::tuple<float,float> Renderer::getScale() const
+    {
+        float sx,sy;
+        SDL_RenderGetScale(_get(),&sx,&sy);
+        return std::make_tuple(sx,sy);
+    }
+
+    int Renderer::setViewport(const Rect& viewport)
+    {
+        auto rect=viewport.toSDLRect();
+        return SDL_RenderSetViewport(_get(),&rect);
+    }
+
+    Rect Renderer::getViewport() const
+    {
+        SDL_Rect rect;
+        SDL_RenderGetViewport(_get(),&rect);
+        return Rect(rect);
+    }
+
+    int Renderer::setLogicalSize(int w, int h)
+    {
+        return SDL_RenderSetLogicalSize(_get(),w,h);
+    }
+
+    Rect Renderer::getLogicalSize() const
+    {
+        int w,h;
+        SDL_RenderGetLogicalSize(_get(),&w,&h);
+        return Rect(0,0,w,h);
+    }
+
+    int Renderer::setClipRect(const Rect& cliprect)
+    {
+        auto r=cliprect.toSDLRect();
+        return SDL_RenderSetClipRect(_get(),&r);
+    }
+
+    Rect Renderer::getClipRect() const
+    {
+        SDL_Rect r;
+        SDL_RenderGetClipRect(_get(),&r);
+        return Rect(r);
+    }
+
+    bool Renderer::isClipEnabled() const
+    {
+        return (SDL_RenderIsClipEnabled(_get())==SDL_TRUE);
+    }
+
+    Rect Renderer::getOutputSize() const
+    {
+        int w,h;
+        SDL_GetRendererOutputSize(_get(),&w,&h);
+        return Rect(0,0,w,h);
+    }
 
 	int Renderer::clear()
 	{
@@ -1096,6 +1204,11 @@ namespace MiniEngine
 		return t;
 	}
 
+    bool Renderer::isRenderTargetSupported() const
+    {
+        return (SDL_RenderTargetSupported(_get())==SDL_TRUE);
+    }
+
     bool Renderer::isReady() const
 	{
 		return (_get() != nullptr);
@@ -1105,6 +1218,12 @@ namespace MiniEngine
 	{
         _clear();
 	}
+
+	//static
+    int Renderer::GetDriversNum()
+    {
+        return SDL_GetNumRenderDrivers();
+    }
 
 	//private
 	void Cursor::_set(SDL_Cursor* p)
