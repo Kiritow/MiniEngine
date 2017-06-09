@@ -58,7 +58,7 @@ public:
 private:
     int _exec_real(const std::string& SQLCommand,SQLCallback callback,void* param);
 
-    sqlite3* _get();
+    sqlite3* _get() const;
     void _set(sqlite3*);
     std::shared_ptr<sqlite3> _db;
     char* _errmsg;

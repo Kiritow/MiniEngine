@@ -42,13 +42,13 @@ int _global_sqldb_executor(void* ExParam,int colNum,char** colVal,char** colName
     return (*p)(colNum,colVal,colName);
 }
 
-
+//private
 void SQLDB::_set(sqlite3* p)
 {
     _db.reset(p,sqlite3_close);
 }
-
-sqlite3* SQLDB::_get()
+//private
+sqlite3* SQLDB::_get() const
 {
     return _db.get();
 }
@@ -85,7 +85,7 @@ int SQLDB::exec_raw(const std::string& SQLCommand,SQLCallback callback,void* par
 {
     return _exec_real(SQLCommand,callback,param);
 }
-
+//private
 int SQLDB::_exec_real(const std::string& SQLCommand,SQLCallback callback,void* param)
 {
     return sqlite3_exec(_get(),SQLCommand.c_str(),callback,param,&_errmsg);
