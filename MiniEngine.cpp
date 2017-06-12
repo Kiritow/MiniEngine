@@ -1384,16 +1384,83 @@ namespace MiniEngine
         }
     }
 
+    WindowMessageBoxButton::WindowMessageBoxButton()
+    {
+        _hitoption=0;
+        text="Button";
+        callback=[](){};
+    }
+
+    WindowMessageBoxButton::WindowMessageBoxButton(const std::string& ButtonText,const std::function<void()>& CallbackFunc) : text(ButtonText)
+    {
+        _hitoption=0;
+        callback=CallbackFunc;
+    }
+
+    void WindowMessageBoxButton::setHitAsEscape(bool enable)
+    {
+        _hitoption=enable?1:0;
+    }
+
+    void WindowMessageBoxButton::setHitAsReturn(bool enable)
+    {
+        _hitoption=enable?2:0;
+    }
+
+    bool WindowMessageBoxButton::isHitAsEscape() const
+    {
+        return _hitoption==1;
+    }
+
+    bool WindowMessageBoxButton::isHitAsReturn() const
+    {
+        return _hitoption==2;
+    }
+
+    WindowMessageBox::WindowMessageBox()
+    {
+        boxtype=MessageBoxType::Information;
+    }
+
+    WindowMessageBox::WindowMessageBox(const std::string& Title,const std::string& Text,MessageBoxType BoxType,const std::function<void()>& DefaultCallback) : title(Title), text(Text)
+    {
+        boxtype=BoxType;
+        defaultcallback=DefaultCallback;
+    }
+
+    void WindowMessageBox::addButton(const WindowMessageBoxButton& button)
+    {
+        _vec.push_back(button);
+    }
+
+    int WindowMessageBox::getButtonNum() const
+    {
+        return _vec.size();
+    }
+
+    WindowMessageBoxButton& WindowMessageBox::getButton(int index)
+    {
+        return _vec.at(index);
+    }
+
+    const WindowMessageBoxButton& WindowMessageBox::getButtonConst(int index) const
+    {
+        return _vec.at(index);
+    }
+
+    //private
 	void Window::_set(SDL_Window* p)
 	{
         _wnd.reset(p,SDL_DestroyWindow);
 	}
 
+	//private
 	void Window::_clear()
 	{
         _wnd.reset();
 	}
 
+	//private
 	SDL_Window* Window::_get() const
 	{
 	    return _wnd.get();
@@ -1594,6 +1661,74 @@ namespace MiniEngine
             break;
 	    }
         return SDL_ShowSimpleMessageBox(flags,Title.c_str(),Message.c_str(),_get());
+	}
+
+	int Window::showMessageBox(const WindowMessageBox& box) const
+	{
+	    SDL_MessageBoxData mboxdata;
+	    mboxdata.title=box.title.c_str();
+	    mboxdata.message=box.text.c_str();
+	    mboxdata.window=_get();
+	    mboxdata.colorScheme=nullptr;
+	    mboxdata.numbuttons=box.getButtonNum();
+	    SDL_MessageBoxButtonData* pButtonArr=(SDL_MessageBoxButtonData*)malloc(sizeof(SDL_MessageBoxButtonData)*(mboxdata.numbuttons));
+	    if(pButtonArr==nullptr)
+        {
+            /// Failed to malloc
+            return -2;
+        }
+	    for(int i=0;i<mboxdata.numbuttons;i++)
+        {
+            pButtonArr[i].buttonid=i+1;
+            pButtonArr[i].text=box.getButtonConst(i).text.c_str();
+            pButtonArr[i].flags=
+            (box.getButtonConst(i).isHitAsEscape()) ? SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT
+            :(
+                (box.getButtonConst(i).isHitAsReturn()) ?SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT
+              :0
+            );
+        }
+        mboxdata.buttons=pButtonArr;
+        switch(box.boxtype)
+	    {
+        case MessageBoxType::Error:
+            mboxdata.flags=SDL_MESSAGEBOX_ERROR;
+            break;
+        case MessageBoxType::Information:
+            mboxdata.flags=SDL_MESSAGEBOX_INFORMATION;
+            break;
+        case MessageBoxType::Warning:
+            mboxdata.flags=SDL_MESSAGEBOX_WARNING;
+            break;
+	    }
+
+	    int clickret=-2;
+
+	    /// Call SDL2 to show MessageBox.
+        int ret=SDL_ShowMessageBox(&mboxdata,&clickret);
+
+        if(ret==0)
+        {
+            /// Success.
+            if(clickret>=1)
+            {
+                /// If any button is clicked, call the callback function associated with it.
+                if(box.getButtonConst(clickret-1).callback)
+                {
+                    box.getButtonConst(clickret-1).callback();
+                }
+            }
+            else
+            {
+                /// ... else, call the default callback
+                if(box.defaultcallback) box.defaultcallback();
+            }
+        }
+
+        /// Free allocated memory
+        free(pButtonArr);
+
+        return ret;
 	}
 
     bool Window::isScreenKeyboardShown()
