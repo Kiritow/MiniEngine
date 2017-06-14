@@ -2831,6 +2831,22 @@ namespace MiniEngine
         return Mix_SetReverseStereo(id,flip);
     }
 
+    int SoundPlayer::addEffect(ChannelID id,Mix_EffectFunc_t f, Mix_EffectDone_t d, void* arg)
+    {
+        return Mix_RegisterEffect(id,f,d,arg);
+    }
+
+    int SoundPlayer::removeEffect(ChannelID id,Mix_EffectFunc_t f)
+    {
+        return Mix_UnregisterEffect(id,f);
+    }
+
+    int SoundPlayer::removeAllEffect(ChannelID id)
+    {
+        return Mix_UnregisterAllEffects(id);
+    }
+
+
 	AudioPlayer::_Audio* AudioPlayer::_sysAudio = nullptr;
 	int AudioPlayer::_sysAudioCounter = 0;
 

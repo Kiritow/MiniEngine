@@ -834,6 +834,11 @@ namespace MiniEngine
 		int setPosition(ChannelID id,int16_t angle,uint8_t distance);
 		int setDistance(ChannelID id,uint8_t distance);
 		int setReverseStereo(ChannelID id,int flip);
+
+		/// Experimental: Direct Add/Remove Effect
+		int addEffect(ChannelID id,Mix_EffectFunc_t f, Mix_EffectDone_t d, void *arg);
+		int removeEffect(ChannelID id,Mix_EffectFunc_t f);
+		int removeAllEffect(ChannelID id);
 	};
 
 	class StringEngine
