@@ -1467,7 +1467,6 @@ namespace MiniEngine
 	}
 
 	Window::Window(std::string Title, int Width, int Height,
-                std::initializer_list<RendererType> RendererFlags,
                 std::initializer_list<WindowType> WindowFlags , int WindowPositionX, int WindowPositionY) throw(ErrorViewer)
 	{
 	    /// Calculate Window Flags
@@ -1484,23 +1483,26 @@ namespace MiniEngine
 			e.fetch();
 			throw e;
 		}
+
 		_set(temp);
-		setRenderer(RendererFlags);
 	}
 
-	Renderer Window::getRenderer() const
+	Renderer::Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags) throw (ErrorViewer)
 	{
-		return _winrnd;
+        if(createRenderer(wnd,RendererFlags)!=0)
+        {
+            throw ErrorViewer();
+        }
 	}
 
-	void Window::setRenderer(std::initializer_list<RendererType> RendererFlags)
+	int Renderer::createRenderer(Window& wnd,std::initializer_list<RendererType> RendererFlags)
 	{
 		Uint32 flag = 0;
 		for (auto v : RendererFlags)
 		{
-			flag |= _render_caster(v);
+			flag |= _rendertype_caster(v);
 		}
-		_setRenderer_Real(flag);
+		return _createRenderer_Real(wnd,flag);
 	}
 
 	Rect Window::getSize() const
@@ -1621,7 +1623,7 @@ namespace MiniEngine
 	}
 
 	// private
-	Uint32 Window::_render_caster(RendererType Type)
+	Uint32 Renderer::_rendertype_caster(RendererType Type)
 	{
 	    switch(Type)
 	    {
@@ -1640,9 +1642,18 @@ namespace MiniEngine
 	}
 
 	// private
-	void Window::_setRenderer_Real(Uint32 flags)
+	int Renderer::_createRenderer_Real(Window& wnd,Uint32 flags)
 	{
-		_winrnd._rnd.reset(SDL_CreateRenderer(_get(), -1, flags), SDL_DestroyRenderer);
+		SDL_Renderer* pSDLRnd=SDL_CreateRenderer(wnd._get(), -1, flags);
+		if(pSDLRnd!=nullptr)
+        {
+            _set(pSDLRnd);
+            return 0;
+        }
+        else
+        {
+            return -1;
+        }
 	}
 
 	int Window::showSimpleMessageBox(MessageBoxType type,const std::string& Title,const std::string& Message) const
@@ -1734,24 +1745,6 @@ namespace MiniEngine
     bool Window::isScreenKeyboardShown()
     {
         return SDL_IsScreenKeyboardShown(_get())==SDL_TRUE;
-    }
-
-    /// Experimental
-    void Window::resetRenderer()
-    {
-        /// Check if there is a renderer exists.
-        if(SDL_GetRenderer(_get())!=nullptr)
-        {
-            /// Clear internal Renderer class.
-            _winrnd._clear();
-            /// Check again.
-            if(SDL_GetRenderer(_get())!=nullptr)
-            {
-                /// If it still exists, (May be some other Renderer is holding)
-                /// then destroy it.
-                SDL_DestroyRenderer(SDL_GetRenderer(_get()));
-            }
-        }
     }
 
 	void Font::_set(TTF_Font* p)

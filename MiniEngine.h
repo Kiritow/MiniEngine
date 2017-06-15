@@ -207,103 +207,6 @@ namespace MiniEngine
 		friend class Renderer;
 	};
 
-	enum class RendererType { Software, Accelerated, PresentSync, TargetTexture };
-
-	enum class FlipMode { None, Horizontal, Vertical };
-
-	class Renderer
-	{
-	public:
-	    Renderer() = default;
-		int setColor(const RGBA& pack);
-		RGBA getColor() const;
-		int setBlendMode(BlendMode mode);
-		BlendMode getBlendMode() const;
-
-		int setTarget(Texture& t);
-		int setTarget();
-		Texture getTarget();
-
-		int fillRect(const Rect& rect);
-		int drawRect(const Rect& rect);
-		int drawPoint(const Point& p);
-		int drawLine(const Point& A,const Point& B);
-
-		/// Experimental
-        int fillRects(const SDL_Rect* pRectArray,int n);
-        int drawRects(const SDL_Rect* pRectArray,int n);
-        int drawPoints(const SDL_Point* pPointArray,int n);
-        int drawLines(const SDL_Point* pPointArray,int n);
-        /// Experimental
-        int fillRects(const std::vector<SDL_Rect>& rectvec);
-        int drawRects(const std::vector<SDL_Rect>& rectvec);
-        int drawPoints(const std::vector<SDL_Point>& pointvec);
-        int drawLines(const std::vector<SDL_Point>& pointvec);
-
-        int setScale(float scaleX,float scaleY);
-        std::tuple<float,float> getScale() const;
-
-        int setViewport(const Rect& viewport);
-        Rect getViewport() const;
-
-        int setLogicalSize(int w,int h);
-        Rect getLogicalSize() const;
-
-        int setClipRect(const Rect& cliprect);
-        Rect getClipRect() const;
-        bool isClipEnabled() const;
-
-        Rect getOutputSize() const;
-
-		int clear();
-		void update();
-
-		int copy(const Texture& t, const Rect& src, const Rect& dst);
-		int copyTo(const Texture& t, const Rect& dst);
-		int copyTo(const Texture& t, const Point& lupoint);
-		int copyFill(const Texture& t, const Rect& src);
-		int copyFullFill(const Texture& t);
-
-		/// Super copy without center point.
-		int copy(const Texture& t, const Rect& src, const Rect& dst,double angle,FlipMode mode);
-		int copyTo(const Texture& t, const Rect& dst,double angle,FlipMode mode);
-		int copyTo(const Texture& t, const Point& lupoint,double angle,FlipMode mode);
-		int copyFill(const Texture& t, const Rect& src,double angle,FlipMode mode);
-		int copyFullFill(const Texture& t,double angle,FlipMode mode);
-		/// Super copy with center point
-		int copy(const Texture& t, const Rect& src, const Rect& dst,const Point& centerPoint,double angle,FlipMode mode);
-		int copyTo(const Texture& t, const Rect& dst,const Point& centerPoint,double angle,FlipMode mode);
-		int copyTo(const Texture& t, const Point& lupoint,const Point& centerPoint,double angle,FlipMode mode);
-		int copyFill(const Texture& t, const Rect& src,const Point& centerPoint,double angle,FlipMode mode);
-		int copyFullFill(const Texture& t,const Point& centerPoint,double angle,FlipMode mode);
-
-		/// Reserved for compatibility
-		int supercopy(const Texture& t,
-                bool srcfull,const Rect& src,bool dstfull,const Rect& dst,
-                double angle,
-                bool haspoint,const Point& center,FlipMode mode);
-
-		Texture render(const Surface& surf) const throw (ErrorViewer);
-		Texture loadTexture(const std::string& FileName) const throw(ErrorViewer);
-		Texture loadTextureRW(const RWOP& rwop) const throw(ErrorViewer);
-		Texture createTexture(int Width, int Height) const throw(ErrorViewer);
-
-		bool isRenderTargetSupported() const;
-		bool isReady() const;
-
-		void release();
-
-		/// Experimental
-		static int GetDriversNum();
-	private:
-		std::shared_ptr<SDL_Renderer> _rnd;
-		void _set(SDL_Renderer*);
-		void _clear();
-		SDL_Renderer* _get() const;
-
-		friend class Window;
-	};
-
 	enum class SystemCursorType
 	{
 	    Arrow, Ibeam, CrossHair,
@@ -391,25 +294,8 @@ namespace MiniEngine
 	public:
 	    Window()=default;
 		Window(std::string Title, int Width, int Height,
-         std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture },
          std::initializer_list<WindowType> WindowFlags = {WindowType::Shown} ,
          int WindowPositionX=SDL_WINDOWPOS_CENTERED, int WindowPositionY=SDL_WINDOWPOS_CENTERED) throw(ErrorViewer);
-		Renderer getRenderer() const;
-
-		void setRenderer(RendererType Type)
-		{
-		    int flagcalc=0;
-            _setRenderer(flagcalc,Type);
-		}
-
-		template<typename... Args>
-		void setRenderer(RendererType Type,Args&&... args)
-		{
-            int flagcalc=0;
-            _setRenderer(flagcalc,Type,std::forward<RendererType>(args...));
-		}
-
-		void setRenderer(std::initializer_list<RendererType>);
 
 		Rect getSize() const;
 		void setSize(const Rect& sizeRect);
@@ -451,34 +337,147 @@ namespace MiniEngine
 		bool isScreenKeyboardShown();
 
 		void release();
-
-        /// Experimental : Free current renderer.
-        /// This will cause all existing Renderer class throw an error on delete.
-        /// This function destroy current renderer (if exist) and all Renderer class will not be notified.
-        void resetRenderer();
-    protected:
-        template<typename... Args>
-        void _setRenderer(int& refcalc,RendererType Type,Args&&... args)
-        {
-            refcalc|=_render_caster(Type);
-            _setRenderer(refcalc,args...);
-        }
-
-        void _setRenderer(int& refcalc,RendererType Type)
-        {
-            refcalc|=_render_caster(Type);
-            _setRenderer_Real(refcalc);
-        }
 	private:
-		void _setRenderer_Real(Uint32 flags);
-		Uint32 _render_caster(RendererType);
-
 		std::shared_ptr<SDL_Window> _wnd;
+
 		void _set(SDL_Window*);
 		void _clear();
 		SDL_Window* _get() const;
 
-		Renderer _winrnd;
+		friend class Renderer;
+	};
+
+	enum class RendererType { Software, Accelerated, PresentSync, TargetTexture };
+
+	enum class FlipMode { None, Horizontal, Vertical };
+
+	class Renderer
+	{
+	public:
+	    Renderer() = default;
+	    Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw (ErrorViewer);
+	    ~Renderer() = default;
+
+	    /// If Renderer is current not ready, setRenderer will create Renderer.
+	    /// Otherwise, setRenderer will fail.
+	    int createRenderer(Window& wnd,RendererType Type)
+		{
+		    int flagcalc=0;
+            return _createRenderer(wnd,flagcalc,Type);
+		}
+
+	    template<typename... Args>
+		int createRenderer(Window& wnd,RendererType Type,Args&&... args)
+		{
+            int flagcalc=0;
+            return _createRenderer(wnd,flagcalc,Type,std::forward<RendererType>(args...));
+		}
+
+		int createRenderer(Window& wnd,std::initializer_list<RendererType>);
+
+		int setColor(const RGBA& pack);
+		RGBA getColor() const;
+		int setBlendMode(BlendMode mode);
+		BlendMode getBlendMode() const;
+
+		int setTarget(Texture& t);
+		int setTarget();
+		Texture getTarget();
+
+		int fillRect(const Rect& rect);
+		int drawRect(const Rect& rect);
+		int drawPoint(const Point& p);
+		int drawLine(const Point& A,const Point& B);
+
+		/// Experimental
+        int fillRects(const SDL_Rect* pRectArray,int n);
+        int drawRects(const SDL_Rect* pRectArray,int n);
+        int drawPoints(const SDL_Point* pPointArray,int n);
+        int drawLines(const SDL_Point* pPointArray,int n);
+        /// Experimental
+        int fillRects(const std::vector<SDL_Rect>& rectvec);
+        int drawRects(const std::vector<SDL_Rect>& rectvec);
+        int drawPoints(const std::vector<SDL_Point>& pointvec);
+        int drawLines(const std::vector<SDL_Point>& pointvec);
+
+        int setScale(float scaleX,float scaleY);
+        std::tuple<float,float> getScale() const;
+
+        int setViewport(const Rect& viewport);
+        Rect getViewport() const;
+
+        int setLogicalSize(int w,int h);
+        Rect getLogicalSize() const;
+
+        int setClipRect(const Rect& cliprect);
+        Rect getClipRect() const;
+        bool isClipEnabled() const;
+
+        Rect getOutputSize() const;
+
+		int clear();
+		void update();
+
+		int copy(const Texture& t, const Rect& src, const Rect& dst);
+		int copyTo(const Texture& t, const Rect& dst);
+		int copyTo(const Texture& t, const Point& lupoint);
+		int copyFill(const Texture& t, const Rect& src);
+		int copyFullFill(const Texture& t);
+
+		/// Super copy without center point.
+		int copy(const Texture& t, const Rect& src, const Rect& dst,double angle,FlipMode mode);
+		int copyTo(const Texture& t, const Rect& dst,double angle,FlipMode mode);
+		int copyTo(const Texture& t, const Point& lupoint,double angle,FlipMode mode);
+		int copyFill(const Texture& t, const Rect& src,double angle,FlipMode mode);
+		int copyFullFill(const Texture& t,double angle,FlipMode mode);
+		/// Super copy with center point
+		int copy(const Texture& t, const Rect& src, const Rect& dst,const Point& centerPoint,double angle,FlipMode mode);
+		int copyTo(const Texture& t, const Rect& dst,const Point& centerPoint,double angle,FlipMode mode);
+		int copyTo(const Texture& t, const Point& lupoint,const Point& centerPoint,double angle,FlipMode mode);
+		int copyFill(const Texture& t, const Rect& src,const Point& centerPoint,double angle,FlipMode mode);
+		int copyFullFill(const Texture& t,const Point& centerPoint,double angle,FlipMode mode);
+
+		/// Reserved for compatibility
+		int supercopy(const Texture& t,
+                bool srcfull,const Rect& src,bool dstfull,const Rect& dst,
+                double angle,
+                bool haspoint,const Point& center,FlipMode mode);
+
+		Texture render(const Surface& surf) const throw (ErrorViewer);
+		Texture loadTexture(const std::string& FileName) const throw(ErrorViewer);
+		Texture loadTextureRW(const RWOP& rwop) const throw(ErrorViewer);
+		Texture createTexture(int Width, int Height) const throw(ErrorViewer);
+
+		bool isRenderTargetSupported() const;
+		bool isReady() const;
+
+		void release();
+
+		/// Experimental
+		static int GetDriversNum();
+    protected:
+        template<typename... Args>
+        int _createRenderer(Window& wnd,int& refcalc,RendererType Type,Args&&... args)
+        {
+            refcalc|=_rendertype_caster(Type);
+            return _createRenderer(wnd,refcalc,args...);
+        }
+
+        // template<>
+        int _createRenderer(Window& wnd,int& refcalc,RendererType Type)
+        {
+            refcalc|=_rendertype_caster(Type);
+            return _createRenderer_Real(wnd,refcalc);
+        }
+	private:
+	    std::shared_ptr<SDL_Renderer> _rnd;
+
+        int _createRenderer_Real(Window& wnd,Uint32 flags);
+		Uint32 _rendertype_caster(RendererType);
+
+		void _set(SDL_Renderer*);
+		void _clear();
+		SDL_Renderer* _get() const;
 	};
 
 	enum class FontStyle { Normal, Bold, Italic, UnderLine, StrikeThrough };
