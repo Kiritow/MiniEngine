@@ -1,4 +1,5 @@
 #pragma once
+#include "begin_code.h"
 enum class BlendMode
 {
     None,
@@ -6,3 +7,4 @@ enum class BlendMode
     Add,
     Mod
 };
+#include "end_code.h"

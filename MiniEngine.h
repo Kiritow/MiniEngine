@@ -7,8 +7,6 @@
 
 namespace MiniEngine
 {
-
-
 	class StringEngine
 	{
     public:

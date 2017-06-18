@@ -1,4 +1,5 @@
 #pragma once
+#include "begin_code.h"
 enum class WindowType
 {
     FullScreen, OpenGL, Shown, Hidden,
@@ -8,3 +9,4 @@ enum class WindowType
     MouseCapture, AlwaysOnTop, SkipTaskBar,
     Utility, ToolTip, PopUpMenu
 };
+#include "end_code.h"

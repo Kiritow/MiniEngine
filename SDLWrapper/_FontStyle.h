@@ -1,4 +1,5 @@
 #pragma once
+#include "begin_code.h"
 enum class FontStyle
 {
     Normal,
@@ -7,3 +8,4 @@ enum class FontStyle
     UnderLine,
     StrikeThrough
 };
+#include "end_code.h"

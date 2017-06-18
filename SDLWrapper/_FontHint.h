@@ -1,4 +1,5 @@
 #pragma once
+#include "begin_code.h"
 enum class FontHint
 {
     Normal,
@@ -7,3 +8,4 @@ enum class FontHint
     None,
     Error
 };
+#include "end_code.h"
