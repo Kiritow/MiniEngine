@@ -19,25 +19,6 @@ namespace MiniEngine
 		bool inRect(const Rect& rect) const;
 	};
 
-	class ColorMode
-	{
-	public:
-		int r, g, b;
-		ColorMode(int R, int G, int B);
-		ColorMode();
-	};
-
-	class RGBA
-	{
-	public:
-		int r, g, b, a;
-		RGBA(int R, int G, int B, int A);
-		RGBA(ColorMode mode, int A);
-		RGBA();
-		SDL_Color toSDLColor() const;
-		ColorMode toColorMode() const;
-	};
-
 	class NonCopyable
 	{
 	protected:
