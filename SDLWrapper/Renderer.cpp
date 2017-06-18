@@ -19,6 +19,24 @@ SDL_Renderer* Renderer::_get() const
     return _rnd.get();
 }
 
+Renderer::Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags) throw (ErrorViewer)
+{
+    if(createRenderer(wnd,RendererFlags)!=0)
+    {
+        throw ErrorViewer();
+    }
+}
+
+int Renderer::createRenderer(Window& wnd,std::initializer_list<RendererType> RendererFlags)
+{
+    Uint32 flag = 0;
+    for (auto v : RendererFlags)
+    {
+        flag |= _rendertype_caster(v);
+    }
+    return _createRenderer_Real(wnd,flag);
+}
+
 int Renderer::setColor(const RGBA& pack)
 {
     return SDL_SetRenderDrawColor(_get(), pack.r, pack.g, pack.b, pack.a);
