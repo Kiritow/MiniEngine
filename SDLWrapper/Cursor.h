@@ -1,5 +1,8 @@
 #pragma once
 #include "include.h"
+#include "_SystemCursorType.h"
+#include "Point.h"
+#include "Surface.h"
 #include "begin_code.h"
 class Cursor
 {

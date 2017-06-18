@@ -1,5 +1,6 @@
 #pragma once
 #include "include.h"
+#include "ColorMode.h"
 #include "begin_code.h"
 
 class RGBA

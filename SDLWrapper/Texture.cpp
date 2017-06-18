@@ -1,4 +1,5 @@
 #include "Texture.h"
+#include "_caster.h"
 #include "begin_code.h"
 //private
 void Texture::_set(SDL_Texture* p)
@@ -34,17 +35,17 @@ Texture::Texture()
 
 Rect Texture::getSize()
 {
-    return rect;
+    return _rect;
 }
 
 int Texture::getw() const
 {
-    return rect.w;
+    return _rect.w;
 }
 
 int Texture::geth() const
 {
-    return rect.h;
+    return _rect.h;
 }
 
 bool Texture::isReady() const
@@ -112,10 +113,10 @@ void Texture::updateInfo()
 {
     if(_get()==nullptr)
     {
-        rect.x=rect.y=rect.w=rect.h=0;
+        _rect.x=_rect.y=_rect.w=_rect.h=0;
     }
-    SDL_QueryTexture(_get(), NULL, NULL, &rect.w, &rect.h);
-    rect.x = rect.y = 0;
+    SDL_QueryTexture(_get(), NULL, NULL, &_rect.w, &_rect.h);
+    _rect.x = _rect.y = 0;
 }
 
 void Texture::release()

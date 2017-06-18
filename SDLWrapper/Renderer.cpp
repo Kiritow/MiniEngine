@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "_caster.h"
 #include "begin_code.h"
 
 //private
@@ -412,6 +413,40 @@ void Renderer::release()
 int Renderer::GetDriversNum()
 {
     return SDL_GetNumRenderDrivers();
+}
+
+// private
+Uint32 Renderer::_rendertype_caster(RendererType Type)
+{
+    switch(Type)
+    {
+    case RendererType::Accelerated:
+        return SDL_RENDERER_ACCELERATED;
+    case RendererType::PresentSync:
+        return SDL_RENDERER_PRESENTVSYNC;
+    case RendererType::Software:
+        return SDL_RENDERER_SOFTWARE;
+    case RendererType::TargetTexture:
+        return SDL_RENDERER_TARGETTEXTURE;
+    }
+
+    /// If an error occurs, return 0 by default.
+    return 0;
+}
+
+// private
+int Renderer::_createRenderer_Real(Window& wnd,Uint32 flags)
+{
+    SDL_Renderer* pSDLRnd=SDL_CreateRenderer(wnd._get(), -1, flags);
+    if(pSDLRnd!=nullptr)
+    {
+        _set(pSDLRnd);
+        return 0;
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 #include "end_code.h"

@@ -1,8 +1,11 @@
 #pragma once
 #include "include.h"
+#include "_BlendMode.h"
+#include "RGBA.h"
+#include "Point.h"
+#include "RWOP.h"
+#include "ErrorViewer.h"
 #include "begin_code.h"
-
-
 class Surface
 {
 public:

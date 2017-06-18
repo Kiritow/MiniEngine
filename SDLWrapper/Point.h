@@ -1,5 +1,6 @@
 #pragma once
 #include "include.h"
+#include "Rect.h"
 #include "begin_code.h"
 class Point
 {

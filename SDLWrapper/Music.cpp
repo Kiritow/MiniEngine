@@ -55,7 +55,7 @@ std::string MusicPlayer::GetDecoderName(int index)
     return std::string(Mix_GetMusicDecoder(index));
 }
 
-Music MusicPlayer::loadMusic(std::string Filename) throw(ErrorViewer)
+Music MusicPlayer::loadMusic(const std::string& Filename) throw(ErrorViewer)
 {
     Mix_Music* temp = Mix_LoadMUS(Filename.c_str());
     if (temp == nullptr)

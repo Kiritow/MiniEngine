@@ -1,0 +1,11 @@
+#pragma once
+#include "Rect.h"
+#include "Point.h"
+#include "Renderer.h"
+#include "Texture.h"
+#include "Surface.h"
+#include "Window.h"
+#include "Font.h"
+#include "Music.h"
+#include "Log.h"
+#include "SDLSystem.h"

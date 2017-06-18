@@ -1,4 +1,5 @@
 #include "Surface.h"
+#include "_caster.h"
 #include "begin_code.h"
 //private
 void Surface::_set(SDL_Surface* p)

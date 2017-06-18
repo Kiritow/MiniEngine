@@ -1,5 +1,10 @@
 #pragma once
 #include "include.h"
+#include "Rect.h"
+#include "RGBA.h"
+#include "ColorMode.h"
+#include "_BlendMode.h"
+#include <memory>
 #include "begin_code.h"
 
 class Texture
@@ -33,7 +38,7 @@ private:
     void _set_no_delete(SDL_Texture*);
     void _clear();
     SDL_Texture* _get() const;
-    Rect rect;
+    Rect _rect;
     friend class Renderer;
 };
 

@@ -1,5 +1,8 @@
 #pragma once
 #include "include.h"
+#include <memory>
+#include <string>
+#include "ErrorViewer.h"
 #include "begin_code.h"
 class AudioPlayer
 {
@@ -39,7 +42,7 @@ public:
     static int GetDecoderNum();
     static std::string GetDecoderName(int index);
 
-    Music loadMusic(std::string Filename) throw (ErrorViewer);
+    Music loadMusic(const std::string& Filename) throw (ErrorViewer);
 
     int play(Music music, int loops);
     void pause();

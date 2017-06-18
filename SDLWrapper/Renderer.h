@@ -1,5 +1,11 @@
 #pragma once
 #include "include.h"
+#include "_RendererType.h"
+#include "_FlipMode.h"
+#include "Window.h"
+#include "Surface.h"
+#include "Texture.h"
+#include <initializer_list>
 #include "begin_code.h"
 class Renderer
 {

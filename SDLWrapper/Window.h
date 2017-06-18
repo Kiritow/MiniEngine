@@ -1,5 +1,10 @@
 #pragma once
-#include "includes.h"
+#include "include.h"
+#include "_WindowType.h"
+#include "_MessageBoxType.h"
+#include "ErrorViewer.h"
+#include "MessageBox.h"
+#include "Surface.h"
 #include "begin_code.h"
 class Window
 {

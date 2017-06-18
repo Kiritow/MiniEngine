@@ -1,5 +1,6 @@
 #pragma once
-#include "includes.h"
+#include "include.h"
+#include <functional>
 #include "begin_code.h"
 Uint32 _global_timer_executor(Uint32 interval,void* param);
 
@@ -37,9 +38,7 @@ public:
 
     static void _delete_delegator(std::function<Uint32(Uint32)>* Delegator);
 private:
-
     void _real_timer_call(SDL_TimerCallback callback,Uint32 interval,void* param);
-
     SDL_TimerCallback _callback;
     Uint32 _interval;
     void* _param;

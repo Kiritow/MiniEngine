@@ -1,12 +1,19 @@
 #pragma once
 #include "include.h"
+#include "_FontStyle.h"
+#include "_FontHint.h"
+#include "Rect.h"
+#include "Surface.h"
+#include "Texture.h"
+#include "Renderer.h"
+#include <vector>
 #include "begin_code.h"
 class Font
 {
 public:
     Font() = default;
-    Font(std::string FontFileName, size_t size) throw(ErrorViewer);
-    int use(std::string FontFileName, size_t size);
+    Font(const std::string& FontFileName, size_t size) throw(ErrorViewer);
+    int use(const std::string& FontFileName, size_t size);
     bool isReady() const;
 
     bool isNormal() const;

@@ -10,6 +10,7 @@ Rect::Rect(int X, int Y, int W, int H)
     h = H;
 }
 
+// explicit
 Rect::Rect(const SDL_Rect& r):Rect(r.x,r.y,r.w,r.h)
 {
 
@@ -30,7 +31,7 @@ SDL_Rect Rect::toSDLRect() const
     return r;
 }
 
-bool Rect::isEmpty()
+bool Rect::isEmpty() const
 {
     SDL_Rect r=toSDLRect();
     return SDL_RectEmpty(&r)==SDL_TRUE;

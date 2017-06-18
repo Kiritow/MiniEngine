@@ -1,21 +1,23 @@
 #include "Font.h"
+#include "_caster.h"
 #include "begin_code.h"
+// private
 void Font::_set(TTF_Font* p)
 {
     _font.reset(p,TTF_CloseFont);
 }
-
+// private
 void Font::_clear()
 {
     _font.reset();
 }
-
+// private
 TTF_Font* Font::_get() const
 {
     return _font.get();
 }
 
-Font::Font(std::string FontFileName, size_t size) throw(ErrorViewer)
+Font::Font(const std::string& FontFileName, size_t size) throw(ErrorViewer)
 {
     if (use(FontFileName, size) != 0)
     {
@@ -25,7 +27,7 @@ Font::Font(std::string FontFileName, size_t size) throw(ErrorViewer)
     }
 }
 
-int Font::use(std::string FontFileName, size_t size)
+int Font::use(const std::string& FontFileName, size_t size)
 {
     TTF_Font* temp = TTF_OpenFont(FontFileName.c_str(), size);
     if (temp == NULL) return -1;

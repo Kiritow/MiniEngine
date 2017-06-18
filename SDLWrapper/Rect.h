@@ -11,7 +11,7 @@ public:
     explicit Rect(const SDL_Rect&);
     Rect();
     SDL_Rect toSDLRect() const;
-    bool isEmpty();
+    bool isEmpty() const;
     bool operator == (const Rect&) const;
     bool hasIntersection(const Rect&) const;
     Rect getIntersection(const Rect&) const;

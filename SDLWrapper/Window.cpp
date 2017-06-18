@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "_caster.h"
 #include "begin_code.h"
 //private
 void Window::_set(SDL_Window* p)
@@ -154,5 +155,96 @@ _DECL_DEPRECATED Surface Window::getSurface()
 void Window::release()
 {
     _clear();
+}
+
+int Window::showSimpleMessageBox(MessageBoxType type,const std::string& Title,const std::string& Message) const
+{
+    Uint32 flags=0;
+    switch(type)
+    {
+    case MessageBoxType::Error:
+        flags=SDL_MESSAGEBOX_ERROR;
+        break;
+    case MessageBoxType::Information:
+        flags=SDL_MESSAGEBOX_INFORMATION;
+        break;
+    case MessageBoxType::Warning:
+        flags=SDL_MESSAGEBOX_WARNING;
+        break;
+    }
+    return SDL_ShowSimpleMessageBox(flags,Title.c_str(),Message.c_str(),_get());
+}
+
+int Window::showMessageBox(const WindowMessageBox& box) const
+{
+    SDL_MessageBoxData mboxdata;
+    mboxdata.title=box.title.c_str();
+    mboxdata.message=box.text.c_str();
+    mboxdata.window=_get();
+    mboxdata.colorScheme=nullptr;
+    mboxdata.numbuttons=box.getButtonNum();
+    SDL_MessageBoxButtonData* pButtonArr=(SDL_MessageBoxButtonData*)malloc(sizeof(SDL_MessageBoxButtonData)*(mboxdata.numbuttons));
+    if(pButtonArr==nullptr)
+    {
+        /// Failed to malloc
+        return -2;
+    }
+    for(int i=0; i<mboxdata.numbuttons; i++)
+    {
+        pButtonArr[i].buttonid=i+1;
+        pButtonArr[i].text=box.getButtonConst(i).text.c_str();
+        pButtonArr[i].flags=
+            (box.getButtonConst(i).isHitAsEscape()) ? SDL_MESSAGEBOX_BUTTON_ESCAPEKEY_DEFAULT
+            :(
+                (box.getButtonConst(i).isHitAsReturn()) ?SDL_MESSAGEBOX_BUTTON_RETURNKEY_DEFAULT
+                :0
+            );
+    }
+    mboxdata.buttons=pButtonArr;
+    switch(box.boxtype)
+    {
+    case MessageBoxType::Error:
+        mboxdata.flags=SDL_MESSAGEBOX_ERROR;
+        break;
+    case MessageBoxType::Information:
+        mboxdata.flags=SDL_MESSAGEBOX_INFORMATION;
+        break;
+    case MessageBoxType::Warning:
+        mboxdata.flags=SDL_MESSAGEBOX_WARNING;
+        break;
+    }
+
+    int clickret=-2;
+
+    /// Call SDL2 to show MessageBox.
+    int ret=SDL_ShowMessageBox(&mboxdata,&clickret);
+
+    if(ret==0)
+    {
+        /// Success.
+        if(clickret>=1)
+        {
+            /// If any button is clicked, call the callback function associated with it.
+            if(box.getButtonConst(clickret-1).callback)
+            {
+                box.getButtonConst(clickret-1).callback();
+            }
+        }
+        else
+        {
+            /// ... else, call the default callback
+            if(box.defaultcallback) box.defaultcallback();
+        }
+    }
+
+    /// Free allocated memory
+    free(pButtonArr);
+
+    return ret;
+}
+
+bool Window::isScreenKeyboardShown()
+{
+    return SDL_IsScreenKeyboardShown(_get())==SDL_TRUE;
 }
 #include "end_code.h"
