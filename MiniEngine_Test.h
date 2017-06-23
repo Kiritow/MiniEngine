@@ -13,7 +13,8 @@ void GetMD5Raw(unsigned char* buffer,unsigned int bufferLen,unsigned char* outbu
 
 int GetCRC32(unsigned char* buffer,unsigned int bufferLen,uint32_t& out_CRCResult);
 
-int CompareSurface(const Surface& surface1,const Surface& surface2,int allowableError);
+/// Compare two surfaces. Currently, Surface::getRawPointer() does not has constant attribute.
+int CompareSurface(Surface& surface1,Surface& surface2,int allowableError);
 
 class UniRandom
 {
