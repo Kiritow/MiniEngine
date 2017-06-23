@@ -1,18 +1,34 @@
 #include "Music.h"
 #include "begin_code.h"
-void Music::_set(Mix_Music* p)//private
+//private
+void Music::_set(Mix_Music* p)
 {
     _music.reset(p,Mix_FreeMusic);
 }
-
-void Music::_clear()//private
+//private
+void Music::_clear()
 {
     _music.reset();
 }
-
-Mix_Music* Music::_get()//private
+//private
+Mix_Music* Music::_get() const
 {
     return _music.get();
+}
+
+Music::Music(const std::string& Filename)
+{
+    _set(Mix_LoadMUS(Filename.c_str()));
+}
+
+bool Music::isReady() const
+{
+    return (_get()!=nullptr);
+}
+
+void Music::release()
+{
+    _clear();
 }
 
 //static
@@ -25,20 +41,6 @@ int MusicPlayer::GetDecoderNum()
 std::string MusicPlayer::GetDecoderName(int index)
 {
     return std::string(Mix_GetMusicDecoder(index));
-}
-
-Music MusicPlayer::loadMusic(const std::string& Filename) throw(ErrorViewer)
-{
-    Mix_Music* temp = Mix_LoadMUS(Filename.c_str());
-    if (temp == nullptr)
-    {
-        ErrorViewer e;
-        e.fetch();
-        throw e;
-    }
-    Music m;
-    m._set(temp);
-    return m;
 }
 
 int MusicPlayer::play(Music music, int loops)
@@ -77,17 +79,17 @@ int MusicPlayer::fadeOut(int ms)
     return Mix_FadeOutMusic(ms);
 }
 
-bool MusicPlayer::isPlaying()
+bool MusicPlayer::isPlaying() const
 {
     return (Mix_PlayingMusic() == 1);
 }
 
-bool MusicPlayer::isPaused()
+bool MusicPlayer::isPaused() const
 {
     return (Mix_PausedMusic() == 1);
 }
 
-int MusicPlayer::isFading()
+int MusicPlayer::isFading() const
 {
     switch (Mix_FadingMusic())
     {
@@ -102,10 +104,9 @@ int MusicPlayer::isFading()
     }
 }
 
-//static
-int MusicPlayer::SetMusicPosition(double position)
+int MusicPlayer::setPosition(double second)
 {
-    return Mix_SetMusicPosition(position);
+    return Mix_SetMusicPosition(second);
 }
 
 #include "end_code.h"
