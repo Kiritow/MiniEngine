@@ -11,7 +11,10 @@ class Renderer
 {
 public:
     Renderer() = default;
+    /// Create a Renderer associated with Window
     Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw (ErrorViewer);
+    /// Create a software Renderer
+    Renderer(Surface& surf) throw (ErrorViewer);
     ~Renderer() = default;
 
     /// If Renderer is current not ready, setRenderer will create Renderer.
@@ -30,6 +33,8 @@ public:
     }
 
     int createRenderer(Window& wnd,std::initializer_list<RendererType>);
+
+    int createSoftRenderer(Surface& surf);
 
     int setColor(const RGBA& pack);
     RGBA getColor() const;
