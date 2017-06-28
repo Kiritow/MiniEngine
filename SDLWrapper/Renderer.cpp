@@ -141,6 +141,47 @@ int Renderer::drawLines(const std::vector<SDL_Point>& pointvec)
     return drawLines(pointvec.data(),pointvec.size());
 }
 
+int Renderer::fillRects(const std::vector<Rect>& rectvec)
+{
+    std::vector<SDL_Rect> thisvec;
+    for(auto& rectref:rectvec)
+    {
+        thisvec.push_back(rectref.toSDLRect());
+    }
+    return fillRects(thisvec);
+}
+
+int Renderer::drawRects(const std::vector<Rect>& rectvec)
+{
+    std::vector<SDL_Rect> thisvec;
+    for(auto& rectref:rectvec)
+    {
+        thisvec.push_back(rectref.toSDLRect());
+    }
+    return drawRects(thisvec);
+}
+
+int Renderer::drawPoints(const std::vector<Point>& pointvec)
+{
+    std::vector<SDL_Point> thisvec;
+    for(auto& pointref:pointvec)
+    {
+        thisvec.push_back(pointref.toSDLPoint());
+    }
+    return drawPoints(thisvec);
+}
+
+int Renderer::drawLines(const std::vector<Point>& pointvec)
+{
+    std::vector<SDL_Point> thisvec;
+    for(auto& pointref:pointvec)
+    {
+        thisvec.push_back(pointref.toSDLPoint());
+    }
+    return drawLines(thisvec);
+}
+
+
 int Renderer::setScale(float scaleX, float scaleY)
 {
     return SDL_RenderSetScale(_get(),scaleX,scaleY);

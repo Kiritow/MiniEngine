@@ -56,6 +56,12 @@ public:
     int drawPoints(const std::vector<SDL_Point>& pointvec);
     int drawLines(const std::vector<SDL_Point>& pointvec);
 
+    /// Slower Functions (Need Convert First, then call Experimental Functions.)
+    int fillRects(const std::vector<Rect>& rectvec);
+    int drawRects(const std::vector<Rect>& rectvec);
+    int drawPoints(const std::vector<Point>& pointvec);
+    int drawLines(const std::vector<Point>& pointvec);
+
     int setScale(float scaleX,float scaleY);
     std::tuple<float,float> getScale() const;
 
