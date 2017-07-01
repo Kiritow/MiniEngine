@@ -4,7 +4,6 @@
 #include <functional>
 #include "SDLWrapper/IncludeAll.h"
 
-
 namespace MiniEngine
 {
 	class StringEngine
@@ -23,10 +22,6 @@ namespace MiniEngine
         struct impl;
         impl* pimpl;
 	};
-
-    int SetClipboardText(const std::string& str);
-    std::string GetClipboardText();
-    bool HasClipboardText();
 
     /// Experimental - For Experts: Use SDL ScanCode
     bool GetScanKeyState(SDL_Scancode);

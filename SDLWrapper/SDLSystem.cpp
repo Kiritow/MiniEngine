@@ -31,7 +31,7 @@ SDLSystem::SDLSystem(const std::initializer_list<SDLInitFlag>& flag_sdl,
     }
 
     ret=IMG_Init(img_flag);
-    if(ret!=0)
+    if(ret!=img_flag) /// IMG_Init returns its parameter on success.
     {
         ErrorViewer e;
         e.fetch();
@@ -39,7 +39,7 @@ SDLSystem::SDLSystem(const std::initializer_list<SDLInitFlag>& flag_sdl,
     }
 
     ret=Mix_Init(mix_flag);
-    if(ret!=0)
+    if(ret!=mix_flag) /// Mix_Init returns its parameter on success.
     {
         ErrorViewer e;
         e.fetch();
