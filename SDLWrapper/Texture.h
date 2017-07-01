@@ -4,6 +4,7 @@
 #include "RGBA.h"
 #include "ColorMode.h"
 #include "_BlendMode.h"
+#include "__Plugin.h"
 #include <memory>
 #include "begin_code.h"
 
@@ -40,6 +41,8 @@ private:
     SDL_Texture* _get() const;
     Rect _rect;
     friend class Renderer;
+
+    friend class _internal::Plugin;
 };
 
 #include "end_code.h"

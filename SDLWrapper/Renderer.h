@@ -5,6 +5,7 @@
 #include "Window.h"
 #include "Surface.h"
 #include "Texture.h"
+#include "__Plugin.h"
 #include <initializer_list>
 #include "begin_code.h"
 class Renderer
@@ -145,5 +146,7 @@ private:
     void _set(SDL_Renderer*);
     void _clear();
     SDL_Renderer* _get() const;
+
+    friend class _internal::Plugin;
 };
 #include "end_code.h"

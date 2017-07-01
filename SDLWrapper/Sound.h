@@ -4,6 +4,7 @@
 #include <string>
 #include "Audio.h"
 #include "ErrorViewer.h"
+#include "__Plugin.h"
 #include "begin_code.h"
 class Sound
 {
@@ -19,6 +20,7 @@ private:
     Mix_Chunk* _get() const;
 
     friend class Channel;
+    friend class _internal::Plugin;
 };
 
 class Channel

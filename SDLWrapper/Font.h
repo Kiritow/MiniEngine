@@ -7,6 +7,7 @@
 #include "Texture.h"
 #include "Renderer.h"
 #include <vector>
+#include "__Plugin.h"
 #include "begin_code.h"
 class Font
 {
@@ -118,5 +119,7 @@ private:
     void _set(TTF_Font*);
     void _clear();
     TTF_Font* _get() const;
+
+    friend class _internal::Plugin;
 };
 #include "end_code.h"

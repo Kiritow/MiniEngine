@@ -5,6 +5,7 @@
 #include "ErrorViewer.h"
 #include "Audio.h"
 #include "__Noncopyable.h"
+#include "__Plugin.h"
 #include "begin_code.h"
 /// Forward Declaration
 class Music
@@ -19,7 +20,9 @@ private:
     void _set(Mix_Music*);
     void _clear();
     Mix_Music* _get() const;
+
     friend class MusicPlayer;
+    friend class _internal::Plugin;
 };
 
 class MusicPlayer : public AudioPlayer, public NonCopyable
