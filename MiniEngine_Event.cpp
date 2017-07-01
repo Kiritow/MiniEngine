@@ -1,5 +1,8 @@
 #include "MiniEngine_Event.h"
 
+namespace MiniEngine
+{
+
 int PollEvent(Event& refEvent)
 {
     return SDL_PollEvent(&refEvent);
@@ -279,3 +282,5 @@ void LooperWithTime::run()
 		}
 	}
 }
+
+}/// End of namespace MiniEngine
