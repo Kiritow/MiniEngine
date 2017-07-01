@@ -39,13 +39,3 @@ bool canread(std::string Path);
 bool canwrite(std::string Path);
 bool isexist(std::string Path);
 bool canexecute(std::string Path);
-
- /// Your Program Should Start Here
-int AppMain();
-
-/// MiniEngine Provides main
-int main(int argc,char* argv[]);
-
-/// MiniEngine Provided API: Get Start Parameters
-int GetArgc();
-char** GetArgv();
