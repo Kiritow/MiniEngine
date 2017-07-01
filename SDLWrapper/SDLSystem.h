@@ -52,6 +52,10 @@ public:
     /// RAM is calculated in MB.
     static int GetSystemRAM();
 
+    static int SetClipboardText(const std::string& str);
+    static std::string GetClipboardText();
+    static bool HasClipboardText();
+
     class Android
     {
     public:

@@ -244,4 +244,33 @@ int SDLSystem::GetSystemRAM()
 {
     return SDL_GetSystemRAM();
 }
+
+//static
+int SDLSystem::SetClipboardText(const std::string& str)
+{
+    return SDL_SetClipboardText(str.c_str());
+}
+
+//static
+std::string SDLSystem::GetClipboardText()
+{
+    char* pstr=SDL_GetClipboardText();
+    if(pstr==nullptr)
+    {
+        return std::string();
+    }
+    else
+    {
+        std::string s(pstr);
+        SDL_free(pstr);
+        return s;
+    }
+}
+
+//static
+bool SDLSystem::HasClipboardText()
+{
+    return SDL_HasClipboardText()==SDL_TRUE;
+}
+
 #include "end_code.h"
