@@ -1,69 +1,73 @@
 #include "SDLSystem.h"
+#include "_caster.h"
 #include "begin_code.h"
-//static
-int SDLSystem::SDLInit()
+SDLSystem::SDLSystem(const std::initializer_list<SDLInitFlag>& flag_sdl,
+                     const std::initializer_list<IMGInitFlag>& flag_img,
+                     const std::initializer_list<MixInitFlag>& flag_mix,
+                     bool init_ttf ) throw (ErrorViewer)
 {
-    return SDL_Init(SDL_INIT_EVERYTHING);
+    Uint32 sdl_flag=0;
+    for(auto& v:flag_sdl)
+    {
+        sdl_flag |= _internal::getUint32FromSDLInitFlag(v);
+    }
+    int img_flag=0;
+    for(auto& v:flag_img)
+    {
+        img_flag |= _internal::getIntFromIMGInitFlag(v);
+    }
+    int mix_flag=0;
+    for(auto& v:flag_mix)
+    {
+        mix_flag |= _internal::getIntFromMixInitFlag(v);
+    }
+
+    int ret=SDL_Init(sdl_flag);
+    if(ret!=0)
+    {
+        ErrorViewer e;
+        e.fetch();
+        throw e;
+    }
+
+    ret=IMG_Init(img_flag);
+    if(ret!=0)
+    {
+        ErrorViewer e;
+        e.fetch();
+        throw e;
+    }
+
+    ret=Mix_Init(mix_flag);
+    if(ret!=0)
+    {
+        ErrorViewer e;
+        e.fetch();
+        throw e;
+    }
+
+    if(init_ttf)
+    {
+        ret=TTF_Init();
+        if(ret!=0)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+    }
 }
 
-//static
-void SDLSystem::SDLQuit()
+SDLSystem::~SDLSystem()
 {
-    SDL_Quit();
-}
+    if(TTF_WasInit())
+    {
+        TTF_Quit();
+    }
 
-//static
-int SDLSystem::IMGInit()
-{
-    return IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
-}
-
-//static
-void SDLSystem::IMGQuit()
-{
-    IMG_Quit();
-}
-
-//static
-int SDLSystem::TTFInit()
-{
-    return TTF_Init();
-}
-
-//static
-void SDLSystem::TTFQuit()
-{
-    TTF_Quit();
-}
-
-//static
-int SDLSystem::MixInit()
-{
-    return Mix_Init(MIX_INIT_MP3);
-}
-
-//static
-void SDLSystem::MixQuit()
-{
     Mix_Quit();
-}
-
-//static
-void SDLSystem::Init()
-{
-    SDLInit();
-    IMGInit();
-    TTFInit();
-    MixInit();
-}
-
-//static
-void SDLSystem::Quit()
-{
-    MixQuit();
-    TTFQuit();
-    IMGQuit();
-    SDLQuit();
+    IMG_Quit();
+    SDL_Quit();
 }
 
 //static

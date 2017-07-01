@@ -215,5 +215,66 @@ SDL_RendererFlip getSDLRendererFlipFromFlipMode(FlipMode mode)
         return SDL_FLIP_NONE;
     }
 }
+
+Uint32 getUint32FromSDLInitFlag(SDLInitFlag flag)
+{
+    switch(flag)
+    {
+    case SDLInitFlag::Timer:
+        return SDL_INIT_TIMER;
+    case SDLInitFlag::Audio:
+        return SDL_INIT_AUDIO;
+    case SDLInitFlag::Video:
+        return SDL_INIT_VIDEO;
+    case SDLInitFlag::Joystick:
+        return SDL_INIT_JOYSTICK;
+    case SDLInitFlag::Haptic:
+        return SDL_INIT_HAPTIC;
+    case SDLInitFlag::GameController:
+        return SDL_INIT_GAMECONTROLLER;
+    case SDLInitFlag::Events:
+        return SDL_INIT_EVENTS;
+    case SDLInitFlag::All:
+        return SDL_INIT_EVERYTHING;
+    }
+}
+
+
+int getIntFromIMGInitFlag(IMGInitFlag flag)
+{
+    switch(flag)
+    {
+    case IMGInitFlag::JPG:
+        return IMG_INIT_JPG;
+    case IMGInitFlag::PNG:
+        return IMG_INIT_PNG;
+    case IMGInitFlag::TIF:
+        return IMG_INIT_TIF;
+    case IMGInitFlag::WEBP:
+        return IMG_INIT_WEBP;
+    case IMGInitFlag::ALL:
+        return ( IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP );
+    }
+}
+
+int getIntFromMixInitFlag(MixInitFlag flag)
+{
+    switch(flag)
+    {
+    case MixInitFlag::FLAC:
+        return MIX_INIT_FLAC;
+    case MixInitFlag::MOD:
+        return MIX_INIT_MOD;
+    case MixInitFlag::MODPLUG:
+        return MIX_INIT_MODPLUG;
+    case MixInitFlag::MP3:
+        return MIX_INIT_MP3;
+    case MixInitFlag::OGG:
+        return MIX_INIT_OGG;
+    case MixInitFlag::FLUIDSYNTH:
+        return MIX_INIT_FLUIDSYNTH;
+    }
+}
+
 }/// End of namespace _internal
 #include "end_code.h"

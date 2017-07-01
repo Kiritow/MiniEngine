@@ -2,23 +2,24 @@
 #include "include.h"
 #include "_PowerState.h"
 #include "_Platform.h"
+#include "_SDLInitFlag.h"
+#include "_IMGInitFlag.h"
+#include "_MixInitFlag.h"
+#include "__Noncopyable.h"
+#include "__Nonmoveable.h"
+#include "ErrorViewer.h"
 #include <tuple>
 #include <string>
 #include "begin_code.h"
-class SDLSystem
+
+class SDLSystem : public NonCopyable, public NonMoveable
 {
 public:
-    static int SDLInit();
-    static void SDLQuit();
-    static int IMGInit();
-    static void IMGQuit();
-    static int TTFInit();
-    static void TTFQuit();
-    static int MixInit();
-    static void MixQuit();
-
-    static void Init();
-    static void Quit();
+    SDLSystem(const std::initializer_list<SDLInitFlag>& flag_sdl = {SDLInitFlag::All} ,
+              const std::initializer_list<IMGInitFlag>& flag_img = {IMGInitFlag::JPG,IMGInitFlag::PNG} ,
+              const std::initializer_list<MixInitFlag>& flag_mix = {MixInitFlag::MP3} ,
+              bool init_ttf = true ) throw (ErrorViewer);
+    ~SDLSystem();
 
     static void Delay(int ms);
 
