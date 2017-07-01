@@ -66,7 +66,6 @@ public:
     void run();
     Event GetLastEvent();
     void needupdate();
-    void needstop();
     void stop();
     void reset();
 
