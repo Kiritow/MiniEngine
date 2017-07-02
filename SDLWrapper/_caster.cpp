@@ -236,6 +236,8 @@ Uint32 getUint32FromSDLInitFlag(SDLInitFlag flag)
         return SDL_INIT_EVENTS;
     case SDLInitFlag::All:
         return SDL_INIT_EVERYTHING;
+    default:
+        return 0; /// Return 0 by default. (Fix warning)
     }
 }
 
@@ -254,6 +256,8 @@ int getIntFromIMGInitFlag(IMGInitFlag flag)
         return IMG_INIT_WEBP;
     case IMGInitFlag::ALL:
         return ( IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP );
+    default:
+        return 0; /// Return 0 by default. (Fix warning)
     }
 }
 
@@ -273,6 +277,8 @@ int getIntFromMixInitFlag(MixInitFlag flag)
         return MIX_INIT_OGG;
     case MixInitFlag::FLUIDSYNTH:
         return MIX_INIT_FLUIDSYNTH;
+    default:
+        return 0; /// Return 0 by default. (Fix warning)
     }
 }
 
