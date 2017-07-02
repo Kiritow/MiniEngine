@@ -19,6 +19,8 @@ public:
               const std::initializer_list<IMGInitFlag>& flag_img = {IMGInitFlag::JPG,IMGInitFlag::PNG} ,
               const std::initializer_list<MixInitFlag>& flag_mix = {MixInitFlag::MP3} ,
               bool init_ttf = true ) throw (ErrorViewer);
+    /// Experimental Constructor
+    SDLSystem(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf) throw (ErrorViewer);
     ~SDLSystem();
 
     static void Delay(int ms);
@@ -66,5 +68,9 @@ public:
         static std::string GetExternal();
         static void* GetJNIEnv();
     };
+
+private:
+    void _init(Uint32,Uint32,Uint32,bool) throw (ErrorViewer);
+    void _quit();
 };
 #include "end_code.h"

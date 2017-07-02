@@ -1,6 +1,46 @@
 #include "SDLSystem.h"
 #include "_caster.h"
 #include "begin_code.h"
+// private
+void SDLSystem::_init(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf) throw (ErrorViewer)
+{
+    int ret=SDL_Init(sdl_flag);
+    if(ret!=0)
+    {
+        ErrorViewer e;
+        e.fetch();
+        throw e;
+    }
+
+    Uint32 uret=0;
+    uret=IMG_Init(img_flag);
+    if(uret!=img_flag) /// IMG_Init returns its parameter on success.
+    {
+        ErrorViewer e;
+        e.fetch();
+        throw e;
+    }
+
+    uret=Mix_Init(mix_flag);
+    if(uret!=mix_flag) /// Mix_Init returns its parameter on success.
+    {
+        ErrorViewer e;
+        e.fetch();
+        throw e;
+    }
+
+    if(init_ttf)
+    {
+        ret=TTF_Init();
+        if(ret!=0)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+    }
+}
+
 SDLSystem::SDLSystem(const std::initializer_list<SDLInitFlag>& flag_sdl,
                      const std::initializer_list<IMGInitFlag>& flag_img,
                      const std::initializer_list<MixInitFlag>& flag_mix,
@@ -22,41 +62,28 @@ SDLSystem::SDLSystem(const std::initializer_list<SDLInitFlag>& flag_sdl,
         mix_flag |= _internal::getIntFromMixInitFlag(v);
     }
 
-    int ret=SDL_Init(sdl_flag);
-    if(ret!=0)
+    try
     {
-        ErrorViewer e;
-        e.fetch();
-        throw e;
+        _init(sdl_flag,img_flag,mix_flag,init_ttf);
     }
-
-    ret=IMG_Init(img_flag);
-    if(ret!=img_flag) /// IMG_Init returns its parameter on success.
+    catch(ErrorViewer& e)
     {
-        ErrorViewer e;
-        e.fetch();
         throw e;
-    }
-
-    ret=Mix_Init(mix_flag);
-    if(ret!=mix_flag) /// Mix_Init returns its parameter on success.
-    {
-        ErrorViewer e;
-        e.fetch();
-        throw e;
-    }
-
-    if(init_ttf)
-    {
-        ret=TTF_Init();
-        if(ret!=0)
-        {
-            ErrorViewer e;
-            e.fetch();
-            throw e;
-        }
     }
 }
+
+SDLSystem::SDLSystem(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf) throw (ErrorViewer)
+{
+    try
+    {
+        _init(sdl_flag,img_flag,mix_flag,init_ttf);
+    }
+    catch(ErrorViewer& e)
+    {
+        throw e;
+    }
+}
+
 
 SDLSystem::~SDLSystem()
 {
