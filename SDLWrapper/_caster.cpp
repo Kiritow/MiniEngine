@@ -282,5 +282,64 @@ int getIntFromMixInitFlag(MixInitFlag flag)
     }
 }
 
+MusicType getMusicTypeFromMixMusicType(Mix_MusicType type)
+{
+    switch(type)
+    {
+    case MUS_NONE:
+        return MusicType::None;
+    case MUS_CMD:
+        return MusicType::CMD;
+    case MUS_WAV:
+        return MusicType::WAV;
+    case MUS_MOD:
+        return MusicType::MOD;
+    case MUS_MID:
+        return MusicType::MID;
+    case MUS_OGG:
+        return MusicType::OGG;
+    case MUS_MP3:
+        return MusicType::MP3;
+    case MUS_MP3_MAD:
+        return MusicType::MP3MAD;
+    case MUS_FLAC:
+        return MusicType::FLAC;
+    case MUS_MODPLUG:
+        return MusicType::MODPLUG;
+    default:
+        return MusicType::None;
+    }
+}
+
+Mix_MusicType getMixMusicTypeFromMusicType(MusicType type)
+{
+    switch(type)
+    {
+    case MusicType::None:
+        return MUS_NONE;
+    case MusicType::CMD:
+        return MUS_CMD;
+    case MusicType::WAV:
+        return MUS_WAV;
+    case MusicType::MOD:
+        return MUS_MOD;
+    case MusicType::MID:
+        return MUS_MID;
+    case MusicType::OGG:
+        return MUS_OGG;
+    case MusicType::MP3:
+        return MUS_MP3;
+    case MusicType::MP3MAD:
+        return MUS_MP3_MAD;
+    case MusicType::FLAC:
+        return MUS_FLAC;
+    case MusicType::MODPLUG:
+        return MUS_MODPLUG;
+    default:
+        return MUS_NONE;
+    }
+}
+
+
 }/// End of namespace _internal
 #include "end_code.h"

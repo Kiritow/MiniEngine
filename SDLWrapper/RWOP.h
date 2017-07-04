@@ -23,6 +23,8 @@ private:
     void _set(SDL_RWops*);
     friend class Surface;
     friend class Renderer;
+    friend class Sound;
+    friend class Music;
 
     friend class _internal::Plugin;
 };

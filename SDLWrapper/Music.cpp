@@ -1,4 +1,5 @@
 #include "Music.h"
+#include "_caster.h"
 #include "begin_code.h"
 //private
 void Music::_set(Mix_Music* p)
@@ -19,6 +20,11 @@ Mix_Music* Music::_get() const
 Music::Music(const std::string& Filename)
 {
     _set(Mix_LoadMUS(Filename.c_str()));
+}
+
+Music::Music(const RWOP& rwop,MusicType musicType)
+{
+    _set(Mix_LoadMUSType_RW(rwop._get(),_internal::getMixMusicTypeFromMusicType(musicType),0));
 }
 
 bool Music::isReady() const

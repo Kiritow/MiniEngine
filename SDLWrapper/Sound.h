@@ -4,6 +4,7 @@
 #include <string>
 #include "Audio.h"
 #include "ErrorViewer.h"
+#include "RWOP.h"
 #include "__Plugin.h"
 #include "begin_code.h"
 class Sound
@@ -11,6 +12,7 @@ class Sound
 public:
     Sound() = default;
     Sound(const std::string& WAVFilename);
+    Sound(const RWOP& rwop);
     bool isReady() const;
     void release();
 private:

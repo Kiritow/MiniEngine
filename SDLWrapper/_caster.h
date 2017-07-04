@@ -8,6 +8,7 @@
 #include "_SDLInitFlag.h"
 #include "_IMGInitFlag.h"
 #include "_MixInitFlag.h"
+#include "_MusicType.h"
 #include <vector>
 #include "begin_code.h"
 namespace _internal
@@ -24,5 +25,7 @@ SDL_RendererFlip getSDLRendererFlipFromFlipMode(FlipMode mode);
 Uint32 getUint32FromSDLInitFlag(SDLInitFlag flag);
 int getIntFromIMGInitFlag(IMGInitFlag flag);
 int getIntFromMixInitFlag(MixInitFlag flag);
+MusicType getMusicTypeFromMixMusicType(Mix_MusicType);
+Mix_MusicType getMixMusicTypeFromMusicType(MusicType);
 }/// End of namespace _internal
 #include "end_code.h"

@@ -4,6 +4,8 @@
 #include <string>
 #include "ErrorViewer.h"
 #include "Audio.h"
+#include "RWOP.h"
+#include "_MusicType.h"
 #include "__Noncopyable.h"
 #include "__Plugin.h"
 #include "begin_code.h"
@@ -13,8 +15,10 @@ class Music
 public:
     Music()=default;
     Music(const std::string& Filename);
+    Music(const RWOP& rwop,MusicType musicType);
     bool isReady() const;
     void release();
+    MusicType getType() const;
 private:
     std::shared_ptr<Mix_Music> _music;
     void _set(Mix_Music*);

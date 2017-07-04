@@ -21,6 +21,11 @@ Sound::Sound(const std::string& WAVFilename)
     _set(Mix_LoadWAV(WAVFilename.c_str()));
 }
 
+Sound::Sound(const RWOP& rwop)
+{
+    _set(Mix_LoadWAV_RW(rwop._get(),0));
+}
+
 bool Sound::isReady() const
 {
     return (_get()!=nullptr);
