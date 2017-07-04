@@ -42,6 +42,7 @@ public:
     void rewind();
     int setPosition(double second);
     int stop();
+    int fadeIn(Music music,int loops,int ms);
     int fadeIn(int loops, int ms);
     int fadeOut(int ms);
 

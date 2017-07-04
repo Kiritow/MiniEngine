@@ -37,6 +37,11 @@ void Music::release()
     _clear();
 }
 
+MusicType Music::getType() const
+{
+    return _internal::getMusicTypeFromMixMusicType(Mix_GetMusicType(_get()));
+}
+
 //static
 int MusicPlayer::GetDecoderNum()
 {
@@ -73,6 +78,12 @@ void MusicPlayer::rewind()
 int MusicPlayer::stop()
 {
     return Mix_HaltMusic();
+}
+
+int MusicPlayer::fadeIn(Music music, int loops, int ms)
+{
+    m=music;
+    return fadeIn(loops,ms);
 }
 
 int MusicPlayer::fadeIn(int loops, int ms)
