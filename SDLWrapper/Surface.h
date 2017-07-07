@@ -5,6 +5,7 @@
 #include "Point.h"
 #include "RWOP.h"
 #include "ErrorViewer.h"
+#include "__Plugin.h"
 #include "begin_code.h"
 class Surface
 {
@@ -81,6 +82,8 @@ private:
     friend class Renderer;
     friend class Font;
     friend class Cursor;
+
+    friend class _internal::Plugin;
 };
 
 #include "end_code.h"

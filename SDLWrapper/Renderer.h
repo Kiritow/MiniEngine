@@ -5,13 +5,17 @@
 #include "Window.h"
 #include "Surface.h"
 #include "Texture.h"
+#include "__Plugin.h"
 #include <initializer_list>
 #include "begin_code.h"
 class Renderer
 {
 public:
     Renderer() = default;
+    /// Create a Renderer associated with Window
     Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw (ErrorViewer);
+    /// Create a software Renderer
+    Renderer(Surface& surf) throw (ErrorViewer);
     ~Renderer() = default;
 
     /// If Renderer is current not ready, setRenderer will create Renderer.
@@ -30,6 +34,8 @@ public:
     }
 
     int createRenderer(Window& wnd,std::initializer_list<RendererType>);
+
+    int createSoftRenderer(Surface& surf);
 
     int setColor(const RGBA& pack);
     RGBA getColor() const;
@@ -55,6 +61,12 @@ public:
     int drawRects(const std::vector<SDL_Rect>& rectvec);
     int drawPoints(const std::vector<SDL_Point>& pointvec);
     int drawLines(const std::vector<SDL_Point>& pointvec);
+
+    /// Slower Functions (Need Convert First, then call Experimental Functions.)
+    int fillRects(const std::vector<Rect>& rectvec);
+    int drawRects(const std::vector<Rect>& rectvec);
+    int drawPoints(const std::vector<Point>& pointvec);
+    int drawLines(const std::vector<Point>& pointvec);
 
     int setScale(float scaleX,float scaleY);
     std::tuple<float,float> getScale() const;
@@ -134,5 +146,7 @@ private:
     void _set(SDL_Renderer*);
     void _clear();
     SDL_Renderer* _get() const;
+
+    friend class _internal::Plugin;
 };
 #include "end_code.h"

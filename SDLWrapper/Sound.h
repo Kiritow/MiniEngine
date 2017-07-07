@@ -4,12 +4,15 @@
 #include <string>
 #include "Audio.h"
 #include "ErrorViewer.h"
+#include "RWOP.h"
+#include "__Plugin.h"
 #include "begin_code.h"
 class Sound
 {
 public:
     Sound() = default;
     Sound(const std::string& WAVFilename);
+    Sound(const RWOP& rwop);
     bool isReady() const;
     void release();
 private:
@@ -19,6 +22,7 @@ private:
     Mix_Chunk* _get() const;
 
     friend class Channel;
+    friend class _internal::Plugin;
 };
 
 class Channel

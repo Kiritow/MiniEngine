@@ -1,69 +1,100 @@
 #include "SDLSystem.h"
+#include "_caster.h"
 #include "begin_code.h"
-//static
-int SDLSystem::SDLInit()
+// private
+void SDLSystem::_init(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf) throw (ErrorViewer)
 {
-    return SDL_Init(SDL_INIT_EVERYTHING);
+    int ret=SDL_Init(sdl_flag);
+    if(ret!=0)
+    {
+        ErrorViewer e;
+        e.fetch();
+        throw e;
+    }
+
+    Uint32 uret=0;
+    uret=IMG_Init(img_flag);
+    if(uret!=img_flag) /// IMG_Init returns its parameter on success.
+    {
+        ErrorViewer e;
+        e.fetch();
+        throw e;
+    }
+
+    uret=Mix_Init(mix_flag);
+    if(uret!=mix_flag) /// Mix_Init returns its parameter on success.
+    {
+        ErrorViewer e;
+        e.fetch();
+        throw e;
+    }
+
+    if(init_ttf)
+    {
+        ret=TTF_Init();
+        if(ret!=0)
+        {
+            ErrorViewer e;
+            e.fetch();
+            throw e;
+        }
+    }
 }
 
-//static
-void SDLSystem::SDLQuit()
+SDLSystem::SDLSystem(const std::initializer_list<SDLInitFlag>& flag_sdl,
+                     const std::initializer_list<IMGInitFlag>& flag_img,
+                     const std::initializer_list<MixInitFlag>& flag_mix,
+                     bool init_ttf ) throw (ErrorViewer)
 {
-    SDL_Quit();
+    Uint32 sdl_flag=0;
+    for(auto& v:flag_sdl)
+    {
+        sdl_flag |= _internal::getUint32FromSDLInitFlag(v);
+    }
+    int img_flag=0;
+    for(auto& v:flag_img)
+    {
+        img_flag |= _internal::getIntFromIMGInitFlag(v);
+    }
+    int mix_flag=0;
+    for(auto& v:flag_mix)
+    {
+        mix_flag |= _internal::getIntFromMixInitFlag(v);
+    }
+
+    try
+    {
+        _init(sdl_flag,img_flag,mix_flag,init_ttf);
+    }
+    catch(ErrorViewer& e)
+    {
+        throw e;
+    }
 }
 
-//static
-int SDLSystem::IMGInit()
+SDLSystem::SDLSystem(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf) throw (ErrorViewer)
 {
-    return IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG);
+    try
+    {
+        _init(sdl_flag,img_flag,mix_flag,init_ttf);
+    }
+    catch(ErrorViewer& e)
+    {
+        throw e;
+    }
 }
 
-//static
-void SDLSystem::IMGQuit()
-{
-    IMG_Quit();
-}
 
-//static
-int SDLSystem::TTFInit()
+SDLSystem::~SDLSystem()
 {
-    return TTF_Init();
-}
+    if(TTF_WasInit())
+    {
+        TTF_Quit();
+    }
 
-//static
-void SDLSystem::TTFQuit()
-{
-    TTF_Quit();
-}
-
-//static
-int SDLSystem::MixInit()
-{
-    return Mix_Init(MIX_INIT_MP3);
-}
-
-//static
-void SDLSystem::MixQuit()
-{
     Mix_Quit();
-}
-
-//static
-void SDLSystem::Init()
-{
-    SDLInit();
-    IMGInit();
-    TTFInit();
-    MixInit();
-}
-
-//static
-void SDLSystem::Quit()
-{
-    MixQuit();
-    TTFQuit();
-    IMGQuit();
-    SDLQuit();
+    IMG_Quit();
+    SDL_Quit();
 }
 
 //static
@@ -240,4 +271,33 @@ int SDLSystem::GetSystemRAM()
 {
     return SDL_GetSystemRAM();
 }
+
+//static
+int SDLSystem::SetClipboardText(const std::string& str)
+{
+    return SDL_SetClipboardText(str.c_str());
+}
+
+//static
+std::string SDLSystem::GetClipboardText()
+{
+    char* pstr=SDL_GetClipboardText();
+    if(pstr==nullptr)
+    {
+        return std::string();
+    }
+    else
+    {
+        std::string s(pstr);
+        SDL_free(pstr);
+        return s;
+    }
+}
+
+//static
+bool SDLSystem::HasClipboardText()
+{
+    return SDL_HasClipboardText()==SDL_TRUE;
+}
+
 #include "end_code.h"

@@ -4,7 +4,10 @@
 #include <string>
 #include "ErrorViewer.h"
 #include "Audio.h"
+#include "RWOP.h"
+#include "_MusicType.h"
 #include "__Noncopyable.h"
+#include "__Plugin.h"
 #include "begin_code.h"
 /// Forward Declaration
 class Music
@@ -12,14 +15,18 @@ class Music
 public:
     Music()=default;
     Music(const std::string& Filename);
+    Music(const RWOP& rwop,MusicType musicType);
     bool isReady() const;
     void release();
+    MusicType getType() const;
 private:
     std::shared_ptr<Mix_Music> _music;
     void _set(Mix_Music*);
     void _clear();
     Mix_Music* _get() const;
+
     friend class MusicPlayer;
+    friend class _internal::Plugin;
 };
 
 class MusicPlayer : public AudioPlayer, public NonCopyable
@@ -35,6 +42,7 @@ public:
     void rewind();
     int setPosition(double second);
     int stop();
+    int fadeIn(Music music,int loops,int ms);
     int fadeIn(int loops, int ms);
     int fadeOut(int ms);
 

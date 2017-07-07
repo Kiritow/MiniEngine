@@ -5,6 +5,7 @@
 #include "ErrorViewer.h"
 #include "MessageBox.h"
 #include "Surface.h"
+#include "__Plugin.h"
 #include "begin_code.h"
 class Window
 {
@@ -62,5 +63,6 @@ private:
     SDL_Window* _get() const;
 
     friend class Renderer;
+    friend class _internal::Plugin;
 };
 #include "end_code.h"

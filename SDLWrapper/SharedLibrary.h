@@ -2,6 +2,7 @@
 #include "include.h"
 #include <string>
 #include <memory>
+#include <functional>
 #include "begin_code.h"
 class SharedLibrary
 {

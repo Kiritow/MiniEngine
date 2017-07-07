@@ -1,5 +1,8 @@
 #include "MiniEngine_Event.h"
 
+namespace MiniEngine
+{
+
 int PollEvent(Event& refEvent)
 {
     return SDL_PollEvent(&refEvent);
@@ -64,22 +67,22 @@ Looper::Looper()
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<int(Looper&,Event&)>& event_callback)
 {
     _evmap[event_type].push_front(std::make_pair(_loop_cnt,event_callback));
-	return _getNextID(event_type);
+    return _getNextID(event_type);
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<int(Event&)>& event_callback)
 {
     _evmap[event_type].push_front(std::make_pair(_loop_cnt,[=](Looper& lp,Event& ev)->int{return event_callback(ev);}));
-	return _getNextID(event_type);
+    return _getNextID(event_type);
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<int(Looper&)>& event_callback)
 {
     _evmap[event_type].push_front(std::make_pair(_loop_cnt,[=](Looper& lp,Event& ev)->int{return event_callback(lp);}));
-	return _getNextID(event_type);
+    return _getNextID(event_type);
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<int()>& event_callback)
 {
     _evmap[event_type].push_front(std::make_pair(_loop_cnt,[=](Looper& lp,Event& ev)->int{return event_callback();}));
-	return _getNextID(event_type);
+    return _getNextID(event_type);
 }
 
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<void(Looper&,Event&)>& event_callback)
@@ -96,7 +99,7 @@ LooperID Looper::add(_SDLEventType_ event_type,const std::function<void(Looper&)
 }
 LooperID Looper::add(_SDLEventType_ event_type,const std::function<void()>& event_callback)
 {
-    return add(event_type,std::function<int(Looper&,Event&)>([=](Looper& lp,Event& ev)->int{event_callback();return 0;}));
+    return add(event_type,std::function<int(Looper&,Event&)>([=](Looper& lp,Event& ev)->int{event_callback(); return 0;}));
 }
 
 LooperID Looper::operator + (const std::pair<_SDLEventType_,std::function<int(Looper&,Event&)>>& event_callback)
@@ -137,10 +140,10 @@ LooperID Looper::operator + (const std::pair<_SDLEventType_,std::function<void()
 bool Looper::remove(const LooperID& looperid)
 {
     for(auto beginIter=_evmap[looperid._type_id].begin(),
-        endIter=_evmap[looperid._type_id].end(),
-        iter=beginIter;
-    iter!=endIter;
-    ++iter)
+            endIter=_evmap[looperid._type_id].end(),
+            iter=beginIter;
+            iter!=endIter;
+            ++iter)
     {
         if(iter->first==looperid._looper_cnt)
         {
@@ -166,17 +169,20 @@ void Looper::dispatch()
 }
 void Looper::run()
 {
-    while(_running)
+    do
     {
+        if(_update)
+        {
+            updater();
+            _update=false;
+        }
+
         while(!_update&&WaitEvent(_e))
         {
             dispatch();
         }
-
-        updater();
-
-        _update=false;
     }
+    while(_running);
 }
 Event Looper::GetLastEvent()
 {
@@ -186,14 +192,10 @@ void Looper::needupdate()
 {
     _update=true;
 }
-void Looper::needstop()
-{
-    _running=false;
-}
 void Looper::stop()
 {
-    needstop();
-    needupdate();
+    _running=false;
+    _update=true;
 }
 void Looper::reset()
 {
@@ -206,30 +208,37 @@ void Looper::reset()
 
 LooperID Looper::_getNextID(const _SDLEventType_& event_type)
 {
-	LooperID id;
-	id._looper_cnt = _loop_cnt;
-	id._type_id = event_type;
+    LooperID id;
+    id._looper_cnt = _loop_cnt;
+    id._type_id = event_type;
 
-	++_loop_cnt;
-	return id;
+    ++_loop_cnt;
+    return id;
 }
 
 Poller::Poller()
 {
-    idler=[](){};
+    idler=[]() {};
 }
 
 void Poller::reset()
 {
     Looper::reset();
-    idler=[](){};
+    idler=[]() {};
 }
 
 void Poller::run()
 {
     int pollret=1;
-    while(_running)
+
+    do
     {
+        if(_update)
+        {
+            updater();
+            _update=false;
+        }
+
         while(!_update&&(pollret=PollEvent(_e)))
         {
             dispatch();
@@ -237,45 +246,46 @@ void Poller::run()
 
         /// If pollret is not 0 (new event requests update), or pollret is 0 (No New Event) but Idle function requests update, then call updater.
         if(!pollret) idler();
-        if(_update)
-        {
-            updater();
-            _update=false;
-        }
+
     }
+    while(_running);
 }
 
 LooperWithTime::LooperWithTime(int Timeout_ms)
 {
-	_timeout_ms = Timeout_ms;
+    _timeout_ms = Timeout_ms;
 }
 
 void LooperWithTime::setTimeout(int ms)
 {
-	_timeout_ms = ms;
+    _timeout_ms = ms;
 }
 
 int LooperWithTime::getTimeout() const
 {
-	return _timeout_ms;
+    return _timeout_ms;
 }
 
 void LooperWithTime::run()
 {
-	int timeret = 1;
-	while (_running)
-	{
-		while (!_update&&(timeret=WaitEventTimeout(_e, _timeout_ms)))
-		{
-			dispatch();
-		}
+    int timeret = 1;
+    do
+    {
+        if (_update)
+        {
+            updater();
+            _update = false;
+        }
 
-		/// If timeret is not 0 (new event request update), or timeret is 0 (Time out) but Idle function requests update, then call updater.
-		if (!timeret) idler();
-		if (_update)
-		{
-			updater();
-			_update = false;
-		}
-	}
+        while (!_update&&(timeret=WaitEventTimeout(_e, _timeout_ms)))
+        {
+            dispatch();
+        }
+
+        /// If timeret is not 0 (new event request update), or timeret is 0 (Time out) but Idle function requests update, then call updater.
+        if (!timeret) idler();
+    }
+    while (_running);
 }
+
+}/// End of namespace MiniEngine

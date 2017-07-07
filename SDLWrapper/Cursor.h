@@ -3,6 +3,7 @@
 #include "_SystemCursorType.h"
 #include "Point.h"
 #include "Surface.h"
+#include "__Plugin.h"
 #include "begin_code.h"
 class Cursor
 {
@@ -26,5 +27,7 @@ private:
     void _set_no_delete(SDL_Cursor*);
     SDL_Cursor* _get();
     void _clear();
+
+    friend class _internal::Plugin;
 };
 #include "end_code.h"

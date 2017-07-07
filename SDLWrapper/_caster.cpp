@@ -215,5 +215,131 @@ SDL_RendererFlip getSDLRendererFlipFromFlipMode(FlipMode mode)
         return SDL_FLIP_NONE;
     }
 }
+
+Uint32 getUint32FromSDLInitFlag(SDLInitFlag flag)
+{
+    switch(flag)
+    {
+    case SDLInitFlag::Timer:
+        return SDL_INIT_TIMER;
+    case SDLInitFlag::Audio:
+        return SDL_INIT_AUDIO;
+    case SDLInitFlag::Video:
+        return SDL_INIT_VIDEO;
+    case SDLInitFlag::Joystick:
+        return SDL_INIT_JOYSTICK;
+    case SDLInitFlag::Haptic:
+        return SDL_INIT_HAPTIC;
+    case SDLInitFlag::GameController:
+        return SDL_INIT_GAMECONTROLLER;
+    case SDLInitFlag::Events:
+        return SDL_INIT_EVENTS;
+    case SDLInitFlag::All:
+        return SDL_INIT_EVERYTHING;
+    default:
+        return 0; /// Return 0 by default. (Fix warning)
+    }
+}
+
+
+int getIntFromIMGInitFlag(IMGInitFlag flag)
+{
+    switch(flag)
+    {
+    case IMGInitFlag::JPG:
+        return IMG_INIT_JPG;
+    case IMGInitFlag::PNG:
+        return IMG_INIT_PNG;
+    case IMGInitFlag::TIF:
+        return IMG_INIT_TIF;
+    case IMGInitFlag::WEBP:
+        return IMG_INIT_WEBP;
+    case IMGInitFlag::ALL:
+        return ( IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF | IMG_INIT_WEBP );
+    default:
+        return 0; /// Return 0 by default. (Fix warning)
+    }
+}
+
+int getIntFromMixInitFlag(MixInitFlag flag)
+{
+    switch(flag)
+    {
+    case MixInitFlag::FLAC:
+        return MIX_INIT_FLAC;
+    case MixInitFlag::MOD:
+        return MIX_INIT_MOD;
+    case MixInitFlag::MODPLUG:
+        return MIX_INIT_MODPLUG;
+    case MixInitFlag::MP3:
+        return MIX_INIT_MP3;
+    case MixInitFlag::OGG:
+        return MIX_INIT_OGG;
+    case MixInitFlag::FLUIDSYNTH:
+        return MIX_INIT_FLUIDSYNTH;
+    default:
+        return 0; /// Return 0 by default. (Fix warning)
+    }
+}
+
+MusicType getMusicTypeFromMixMusicType(Mix_MusicType type)
+{
+    switch(type)
+    {
+    case MUS_NONE:
+        return MusicType::None;
+    case MUS_CMD:
+        return MusicType::CMD;
+    case MUS_WAV:
+        return MusicType::WAV;
+    case MUS_MOD:
+        return MusicType::MOD;
+    case MUS_MID:
+        return MusicType::MID;
+    case MUS_OGG:
+        return MusicType::OGG;
+    case MUS_MP3:
+        return MusicType::MP3;
+    case MUS_MP3_MAD:
+        return MusicType::MP3MAD;
+    case MUS_FLAC:
+        return MusicType::FLAC;
+    case MUS_MODPLUG:
+        return MusicType::MODPLUG;
+    default:
+        return MusicType::None;
+    }
+}
+
+Mix_MusicType getMixMusicTypeFromMusicType(MusicType type)
+{
+    switch(type)
+    {
+    case MusicType::None:
+        return MUS_NONE;
+    case MusicType::CMD:
+        return MUS_CMD;
+    case MusicType::WAV:
+        return MUS_WAV;
+    case MusicType::MOD:
+        return MUS_MOD;
+    case MusicType::MID:
+        return MUS_MID;
+    case MusicType::OGG:
+        return MUS_OGG;
+    case MusicType::MP3:
+        return MUS_MP3;
+    case MusicType::MP3MAD:
+        return MUS_MP3_MAD;
+    case MusicType::FLAC:
+        return MUS_FLAC;
+    case MusicType::MODPLUG:
+        return MUS_MODPLUG;
+    default:
+        return MUS_NONE;
+    }
+}
+
+
 }/// End of namespace _internal
 #include "end_code.h"

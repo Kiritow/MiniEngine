@@ -1,4 +1,5 @@
 #include "Music.h"
+#include "_caster.h"
 #include "begin_code.h"
 //private
 void Music::_set(Mix_Music* p)
@@ -21,6 +22,11 @@ Music::Music(const std::string& Filename)
     _set(Mix_LoadMUS(Filename.c_str()));
 }
 
+Music::Music(const RWOP& rwop,MusicType musicType)
+{
+    _set(Mix_LoadMUSType_RW(rwop._get(),_internal::getMixMusicTypeFromMusicType(musicType),0));
+}
+
 bool Music::isReady() const
 {
     return (_get()!=nullptr);
@@ -29,6 +35,11 @@ bool Music::isReady() const
 void Music::release()
 {
     _clear();
+}
+
+MusicType Music::getType() const
+{
+    return _internal::getMusicTypeFromMixMusicType(Mix_GetMusicType(_get()));
 }
 
 //static
@@ -67,6 +78,12 @@ void MusicPlayer::rewind()
 int MusicPlayer::stop()
 {
     return Mix_HaltMusic();
+}
+
+int MusicPlayer::fadeIn(Music music, int loops, int ms)
+{
+    m=music;
+    return fadeIn(loops,ms);
 }
 
 int MusicPlayer::fadeIn(int loops, int ms)

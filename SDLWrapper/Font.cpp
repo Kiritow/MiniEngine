@@ -215,7 +215,9 @@ Rect Font::sizeText(const std::string& Text) const throw (ErrorViewer)
     if(TTF_SizeText(_get(),Text.c_str(),&w,&h)!=0)
     {
         /// Something might be wrong
-        throw ErrorViewer();
+        ErrorViewer e;
+        e.fetch();
+        throw e;
     }
     return Rect(0,0,w,h);
 }
@@ -226,7 +228,9 @@ Rect Font::sizeUTF8(const std::string& Text) const throw (ErrorViewer)
     if(TTF_SizeUTF8(_get(),Text.c_str(),&w,&h)!=0)
     {
         /// Something might be wrong
-        throw ErrorViewer();
+        ErrorViewer e;
+        e.fetch();
+        throw e;
     }
     return Rect(0,0,w,h);
 }
@@ -237,7 +241,9 @@ Rect Font::sizeUnicode(const uint16_t* Text) const throw (ErrorViewer)
     if(TTF_SizeUNICODE(_get(),Text,&w,&h)!=0)
     {
         /// Something might be wrong
-        throw ErrorViewer();
+        ErrorViewer e;
+        e.fetch();
+        throw e;
     }
     return Rect(0,0,w,h);
 }

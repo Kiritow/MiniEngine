@@ -74,31 +74,6 @@ namespace MiniEngine
         delete pimpl;
     }
 
-    int SetClipboardText(const std::string& str)
-    {
-        return SDL_SetClipboardText(str.c_str());
-    }
-
-    std::string GetClipboardText()
-    {
-        char* pstr=SDL_GetClipboardText();
-        if(pstr==nullptr)
-        {
-            return std::string();
-        }
-        else
-        {
-            std::string s(pstr);
-            SDL_free(pstr);
-            return s;
-        }
-    }
-
-    bool HasClipboardText()
-    {
-        return SDL_HasClipboardText()==SDL_TRUE;
-    }
-
     bool GetScanKeyState(SDL_Scancode code)
     {
         return SDL_GetKeyboardState(NULL)[code];
@@ -130,27 +105,3 @@ bool canexecute(std::string Path)
 #else /// _MINIENGINE_HAS_UNISTD == 0
 /// File Functions will be implied in platform specific source file.
 #endif
-
-int _miniengine_argc;
-char** _miniengine_argv;
-
- /// Default Setup Code
-int main(int argc, char* argv[])
-{
-    _miniengine_argc=argc;
-    _miniengine_argv=argv;
-	MiniEngine::SDLSystem::Init();
-	int ret = AppMain();
-	MiniEngine::SDLSystem::Quit();
-	return ret;
-}
-
-int GetArgc()
-{
-    return _miniengine_argc;
-}
-
-char** GetArgv()
-{
-    return _miniengine_argv;
-}

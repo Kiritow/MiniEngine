@@ -4,6 +4,9 @@
 #include <list>
 #include <functional>
 
+namespace MiniEngine
+{
+
 typedef SDL_Event Event;
 typedef decltype(Event::type) _SDLEventType_;
 
@@ -63,7 +66,6 @@ public:
     void run();
     Event GetLastEvent();
     void needupdate();
-    void needstop();
     void stop();
     void reset();
 
@@ -97,3 +99,5 @@ public:
 protected:
 	int _timeout_ms;
 };
+
+}/// End of namespace MiniEngine
