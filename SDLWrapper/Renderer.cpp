@@ -58,7 +58,9 @@ Renderer::Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags
 {
     if(createRenderer(wnd,RendererFlags)!=0)
     {
-        throw ErrorViewer();
+        ErrorViewer e;
+        e.fetch();
+        throw e;
     }
 }
 
@@ -66,7 +68,9 @@ Renderer::Renderer(Surface& surf) throw (ErrorViewer)
 {
     if(createSoftRenderer(surf)!=0)
     {
-        throw ErrorViewer();
+        ErrorViewer e;
+        e.fetch();
+        throw e;
     }
 }
 
