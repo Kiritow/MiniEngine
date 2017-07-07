@@ -9,16 +9,18 @@ C++编写的SDL2引擎.
 
 ### 编译说明
 
-Windows: 请使用Codeblocks 16.01(推荐)载入所有.cpp文件.接下来Codeblocks会完成其余的工作.  
+Windows/Linux: 请使用Codeblocks 16.01(推荐)载入所有.cpp文件.接下来Codeblocks会完成其余的工作.  
 > 依赖库  
 > SDL2 (SDL2.lib, SDL2main.lib, SDL2test.lib)  
 > SDL2 Image (SDL2_image.lib)  
 > SDL2 Mixer (SDL2_mixer.lib)  
 > SDL2 TTF (SDL2_ttf.lib)  
 
+Linux Codeblocks PPA 参见: [Code::Blocks Release Builds](https://launchpad.net/~damien-moore/+archive/ubuntu/codeblocks-stable)
+
 Windows-Visual Studio: 使用VS编译本项目可能会出现某些错误,目前还没有很好的解决办法.  
 
-C4droid: 长按编译键选择编译模式为Makefile. 选择编译目标为SDL2 Application. 修改程序名称为program_name(此处与makefile对应即可)
+C4droid: 使用Makefile Generator生成makefile文件. 选择编译目标为SDL2 Application. 修改程序名称为program_name(与makefile对应)
 > 依赖库  
 > C4droid本体  
 > GCC Plugin For C4droid  
