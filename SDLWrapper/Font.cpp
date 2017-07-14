@@ -17,7 +17,7 @@ TTF_Font* Font::_get() const
     return _font.get();
 }
 
-Font::Font(const std::string& FontFileName, size_t size) throw(ErrorViewer)
+Font::Font(const std::string& FontFileName, size_t size)
 {
     if (use(FontFileName, size) != 0)
     {

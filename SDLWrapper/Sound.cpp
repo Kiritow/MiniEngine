@@ -157,14 +157,14 @@ SoundPlayer::SoundPlayer(int Channels)
     Mix_AllocateChannels(Channels);
 }
 
-Channel SoundPlayer::playSound(Sound sound, int loops) throw(ErrorViewer)
+Channel SoundPlayer::playSound(Sound sound, int loops)
 {
     Channel c;
     c.playSound(sound,loops);
     return c;
 }
 
-Channel SoundPlayer::fadeIn(Sound sound, int loops, int ms) throw(ErrorViewer)
+Channel SoundPlayer::fadeIn(Sound sound, int loops, int ms)
 {
     Channel c;
     c.fadeIn(sound,loops,ms);

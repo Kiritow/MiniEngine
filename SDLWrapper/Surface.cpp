@@ -25,7 +25,7 @@ void Surface::_set_no_delete(SDL_Surface* p)
     _surf.reset(p,[](SDL_Surface*) {});
 }
 
-Surface::Surface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer)
+Surface::Surface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask)
 {
     if(createAs(width,height,depth,Rmask,Gmask,Bmask,Amask)!=0)
     {
@@ -35,13 +35,13 @@ Surface::Surface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,in
     }
 }
 
-Surface::Surface(int width,int height,int depth,RGBA maskPack) throw (ErrorViewer)
+Surface::Surface(int width,int height,int depth,RGBA maskPack)
     : Surface(width,height,depth,maskPack.r,maskPack.g,maskPack.b,maskPack.a)
 {
 
 }
 
-Surface::Surface(int width,int height,int depth,Uint32 surfaceFormat) throw(ErrorViewer)
+Surface::Surface(int width,int height,int depth,Uint32 surfaceFormat)
 {
     if(createAs(width,height,depth,surfaceFormat)!=0)
     {
@@ -51,7 +51,7 @@ Surface::Surface(int width,int height,int depth,Uint32 surfaceFormat) throw(Erro
     }
 }
 
-Surface::Surface(const std::string& filename) throw(ErrorViewer)
+Surface::Surface(const std::string& filename)
 {
     if(loadAs(filename)!=0)
     {
@@ -61,7 +61,7 @@ Surface::Surface(const std::string& filename) throw(ErrorViewer)
     }
 }
 
-Surface::Surface(const RWOP& rwop) throw (ErrorViewer)
+Surface::Surface(const RWOP& rwop)
 {
     if(loadAs(rwop)!=0)
     {

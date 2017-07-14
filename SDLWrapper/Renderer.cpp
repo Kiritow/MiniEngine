@@ -439,7 +439,7 @@ int Renderer::supercopy(const Texture& t,
     return SDL_RenderCopyEx(_get(),t._get(),pR1,pR2,angle,pPoint,flip);
 }
 
-Texture Renderer::render(const Surface& surf) const throw(ErrorViewer)
+Texture Renderer::render(const Surface& surf) const
 {
     Texture t;
     SDL_Texture* temp = SDL_CreateTextureFromSurface(_get(), surf._get());
@@ -453,7 +453,7 @@ Texture Renderer::render(const Surface& surf) const throw(ErrorViewer)
     return t;
 }
 
-Texture Renderer::loadTexture(const std::string& FileName) const throw(ErrorViewer)
+Texture Renderer::loadTexture(const std::string& FileName) const
 {
     Texture t;
     SDL_Texture* temp = IMG_LoadTexture(_get(), FileName.c_str());
@@ -467,7 +467,7 @@ Texture Renderer::loadTexture(const std::string& FileName) const throw(ErrorView
     return t;
 }
 
-Texture Renderer::loadTextureRW(const RWOP& rwop) const throw (ErrorViewer)
+Texture Renderer::loadTextureRW(const RWOP& rwop) const
 {
     Texture t;
     SDL_Texture* temp=IMG_LoadTexture_RW(_get(),rwop._get(),0);
@@ -481,7 +481,7 @@ Texture Renderer::loadTextureRW(const RWOP& rwop) const throw (ErrorViewer)
     return t;
 }
 
-Texture Renderer::createTexture(int Width, int Height) const throw(ErrorViewer)
+Texture Renderer::createTexture(int Width, int Height) const
 {
     SDL_Texture* temp = SDL_CreateTexture(_get(), SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, Width, Height);
     if (temp == NULL)

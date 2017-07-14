@@ -7,7 +7,7 @@ class ErrorViewer : public std::exception
 public:
     void fetch();
     std::string getError() const;
-    const char* what() const throw() override;
+    const char* what() const noexcept override;
 private:
     std::string str;
 };

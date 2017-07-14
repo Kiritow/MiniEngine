@@ -13,7 +13,7 @@ class Font
 {
 public:
     Font() = default;
-    Font(const std::string& FontFileName, size_t size) throw(ErrorViewer);
+    Font(const std::string& FontFileName, size_t size);
     int use(const std::string& FontFileName, size_t size);
     bool isReady() const;
 

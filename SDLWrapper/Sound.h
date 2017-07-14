@@ -64,7 +64,7 @@ public:
     static std::string GetDecoderName(int index);
 
     SoundPlayer(int NumChannels = 16);
-    Channel playSound(Sound sound, int loops) throw (ErrorViewer);
-    Channel fadeIn(Sound sound, int loops, int ms) throw (ErrorViewer);
+    Channel playSound(Sound sound, int loops);
+    Channel fadeIn(Sound sound, int loops, int ms);
 };
 #include "end_code.h"

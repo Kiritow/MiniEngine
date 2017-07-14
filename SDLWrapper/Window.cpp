@@ -20,7 +20,7 @@ SDL_Window* Window::_get() const
 }
 
 Window::Window(std::string Title, int Width, int Height,
-               std::initializer_list<WindowType> WindowFlags, int WindowPositionX, int WindowPositionY) throw(ErrorViewer)
+               std::initializer_list<WindowType> WindowFlags, int WindowPositionX, int WindowPositionY)
 {
     /// Calculate Window Flags
     Uint32 windowFlag=0;

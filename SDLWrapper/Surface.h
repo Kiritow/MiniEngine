@@ -11,11 +11,11 @@ class Surface
 {
 public:
     Surface()=default;
-    Surface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask) throw(ErrorViewer);
-    Surface(int width,int height,int depth,RGBA colorPack) throw(ErrorViewer);
-    Surface(int width,int height,int depth,Uint32 surfaceFormat) throw(ErrorViewer);
-    Surface(const std::string& filename) throw(ErrorViewer);
-    Surface(const RWOP& rwop) throw(ErrorViewer);
+    Surface(int width,int height,int depth,int Rmask,int Gmask,int Bmask,int Amask);
+    Surface(int width,int height,int depth,RGBA colorPack);
+    Surface(int width,int height,int depth,Uint32 surfaceFormat);
+    Surface(const std::string& filename);
+    Surface(const RWOP& rwop);
     ~Surface() = default;
 
     /// static functions
