@@ -54,7 +54,7 @@ Uint32 Renderer::_rendertype_caster(RendererType Type)
     return 0;
 }
 
-Renderer::Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags) throw (ErrorViewer)
+Renderer::Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags)
 {
     if(createRenderer(wnd,RendererFlags)!=0)
     {
@@ -64,7 +64,7 @@ Renderer::Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags
     }
 }
 
-Renderer::Renderer(Surface& surf) throw (ErrorViewer)
+Renderer::Renderer(Surface& surf)
 {
     if(createSoftRenderer(surf)!=0)
     {

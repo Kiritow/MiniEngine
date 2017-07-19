@@ -57,7 +57,7 @@ Channel::Channel()
     _id=-1;
 }
 
-Channel& Channel::playSound(Sound sound, int loops) throw (ErrorViewer)
+Channel& Channel::playSound(Sound sound, int loops)
 {
     int cret=Mix_PlayChannel(_get(),sound._get(),loops);
     if(cret==-1)
@@ -70,7 +70,7 @@ Channel& Channel::playSound(Sound sound, int loops) throw (ErrorViewer)
     return *this;
 }
 
-Channel& Channel::fadeIn(Sound sound, int loops, int ms) throw (ErrorViewer)
+Channel& Channel::fadeIn(Sound sound, int loops, int ms)
 {
     int cret=Mix_FadeInChannel(_get(),sound._get(),loops,ms);
     if(cret==-1)

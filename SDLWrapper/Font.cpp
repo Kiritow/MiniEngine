@@ -209,7 +209,7 @@ void Font::setFontHint(FontHint hint)
     TTF_SetFontHinting(_get(),v);
 }
 
-Rect Font::sizeText(const std::string& Text) const throw (ErrorViewer)
+Rect Font::sizeText(const std::string& Text) const
 {
     int w=0,h=0;
     if(TTF_SizeText(_get(),Text.c_str(),&w,&h)!=0)
@@ -222,7 +222,7 @@ Rect Font::sizeText(const std::string& Text) const throw (ErrorViewer)
     return Rect(0,0,w,h);
 }
 
-Rect Font::sizeUTF8(const std::string& Text) const throw (ErrorViewer)
+Rect Font::sizeUTF8(const std::string& Text) const
 {
     int w=0,h=0;
     if(TTF_SizeUTF8(_get(),Text.c_str(),&w,&h)!=0)
@@ -235,7 +235,7 @@ Rect Font::sizeUTF8(const std::string& Text) const throw (ErrorViewer)
     return Rect(0,0,w,h);
 }
 
-Rect Font::sizeUnicode(const uint16_t* Text) const throw (ErrorViewer)
+Rect Font::sizeUnicode(const uint16_t* Text) const
 {
     int w=0,h=0;
     if(TTF_SizeUNICODE(_get(),Text,&w,&h)!=0)

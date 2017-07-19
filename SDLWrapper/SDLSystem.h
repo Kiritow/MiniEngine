@@ -18,9 +18,9 @@ public:
     SDLSystem(const std::initializer_list<SDLInitFlag>& flag_sdl = {SDLInitFlag::All} ,
               const std::initializer_list<IMGInitFlag>& flag_img = {IMGInitFlag::JPG,IMGInitFlag::PNG} ,
               const std::initializer_list<MixInitFlag>& flag_mix = {MixInitFlag::MP3} ,
-              bool init_ttf = true ) throw (ErrorViewer);
+              bool init_ttf = true );
     /// Experimental Constructor
-    SDLSystem(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf) throw (ErrorViewer);
+    SDLSystem(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf);
     ~SDLSystem();
 
     static void Delay(int ms);
@@ -70,7 +70,7 @@ public:
     };
 
 private:
-    void _init(Uint32,Uint32,Uint32,bool) throw (ErrorViewer);
+    void _init(Uint32,Uint32,Uint32,bool);
     void _quit();
 };
 #include "end_code.h"

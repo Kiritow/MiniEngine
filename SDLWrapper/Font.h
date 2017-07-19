@@ -61,9 +61,9 @@ public:
     void setFontHint(FontHint hint);
 
 
-    Rect sizeText(const std::string& Text) const throw (ErrorViewer);
-    Rect sizeUTF8(const std::string& Text) const throw (ErrorViewer);
-    Rect sizeUnicode(const uint16_t* Text) const throw (ErrorViewer);
+    Rect sizeText(const std::string& Text) const;
+    Rect sizeUTF8(const std::string& Text) const;
+    Rect sizeUnicode(const uint16_t* Text) const;
 
     /// Surface Rendering Functions.
     Surface renderText(const std::string& Text, const RGBA& fg) const;

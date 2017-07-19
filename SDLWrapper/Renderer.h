@@ -13,9 +13,9 @@ class Renderer
 public:
     Renderer() = default;
     /// Create a Renderer associated with Window
-    Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw (ErrorViewer);
+    Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture });
     /// Create a software Renderer
-    Renderer(Surface& surf) throw (ErrorViewer);
+    Renderer(Surface& surf);
     ~Renderer() = default;
 
     /// If Renderer is current not ready, setRenderer will create Renderer.

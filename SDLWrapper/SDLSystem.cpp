@@ -2,7 +2,7 @@
 #include "_caster.h"
 #include "begin_code.h"
 // private
-void SDLSystem::_init(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf) throw (ErrorViewer)
+void SDLSystem::_init(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf)
 {
     int ret=SDL_Init(sdl_flag);
     if(ret!=0)
@@ -44,7 +44,7 @@ void SDLSystem::_init(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool in
 SDLSystem::SDLSystem(const std::initializer_list<SDLInitFlag>& flag_sdl,
                      const std::initializer_list<IMGInitFlag>& flag_img,
                      const std::initializer_list<MixInitFlag>& flag_mix,
-                     bool init_ttf ) throw (ErrorViewer)
+                     bool init_ttf )
 {
     Uint32 sdl_flag=0;
     for(auto& v:flag_sdl)
@@ -72,7 +72,7 @@ SDLSystem::SDLSystem(const std::initializer_list<SDLInitFlag>& flag_sdl,
     }
 }
 
-SDLSystem::SDLSystem(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf) throw (ErrorViewer)
+SDLSystem::SDLSystem(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf)
 {
     try
     {
