@@ -13,7 +13,7 @@ public:
     Window()=default;
     Window(std::string Title, int Width, int Height,
            std::initializer_list<WindowType> WindowFlags = {WindowType::Shown},
-           int WindowPositionX=SDL_WINDOWPOS_CENTERED, int WindowPositionY=SDL_WINDOWPOS_CENTERED) throw(ErrorViewer);
+           int WindowPositionX=SDL_WINDOWPOS_CENTERED, int WindowPositionY=SDL_WINDOWPOS_CENTERED);
 
     Rect getSize() const;
     void setSize(const Rect& sizeRect);

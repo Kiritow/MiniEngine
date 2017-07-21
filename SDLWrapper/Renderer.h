@@ -13,9 +13,9 @@ class Renderer
 public:
     Renderer() = default;
     /// Create a Renderer associated with Window
-    Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture }) throw (ErrorViewer);
+    Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture });
     /// Create a software Renderer
-    Renderer(Surface& surf) throw (ErrorViewer);
+    Renderer(Surface& surf);
     ~Renderer() = default;
 
     /// If Renderer is current not ready, setRenderer will create Renderer.
@@ -111,10 +111,10 @@ public:
                   double angle,
                   bool haspoint,const Point& center,FlipMode mode);
 
-    Texture render(const Surface& surf) const throw (ErrorViewer);
-    Texture loadTexture(const std::string& FileName) const throw(ErrorViewer);
-    Texture loadTextureRW(const RWOP& rwop) const throw(ErrorViewer);
-    Texture createTexture(int Width, int Height) const throw(ErrorViewer);
+    Texture render(const Surface& surf) const;
+    Texture loadTexture(const std::string& FileName) const;
+    Texture loadTextureRW(const RWOP& rwop) const;
+    Texture createTexture(int Width, int Height) const;
 
     bool isRenderTargetSupported() const;
     bool isReady() const;

@@ -11,7 +11,7 @@ std::string ErrorViewer::getError() const
     return str;
 }
 
-const char * ErrorViewer::what() const throw()
+const char * ErrorViewer::what() const noexcept
 {
     return str.c_str();
 }
