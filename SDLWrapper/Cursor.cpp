@@ -22,36 +22,33 @@ SDL_Cursor* Cursor::_get()
 //private
 void Cursor::_clear()
 {
-    _cur.reset();
+    _cur.release();
 }
 
 Cursor::Cursor(Surface surf,Point hotspot)
 {
-    Cursor ns;
-    SDL_Cursor* cursor=SDL_CreateColorCursor(surf._get(),hotspot.x,hotspot.y);
-    ns._set(cursor);
+    _set(SDL_CreateColorCursor(surf._get(),hotspot.x,hotspot.y));
 }
 
 Cursor::Cursor(SystemCursorType type)
 {
-    Cursor ns;
-    ns._set(SDL_CreateSystemCursor(_internal::getSDLSystemCursorFromSystemCursorType(type)));
+    _set(SDL_CreateSystemCursor(_internal::getSDLSystemCursorFromSystemCursorType(type)));
 }
 
 //static
-Cursor Cursor::GetActiveCursor()
+Cursor&& Cursor::GetActiveCursor()
 {
     Cursor ns;
     ns._set_no_delete(SDL_GetCursor());
-    return ns;
+    return std::move(ns);
 }
 
 //static
-Cursor Cursor::GetDefaultCursor()
+Cursor&& Cursor::GetDefaultCursor()
 {
     Cursor ns;
     ns._set_no_delete(SDL_GetDefaultCursor());
-    return ns;
+    return std::move(ns);
 }
 
 //static

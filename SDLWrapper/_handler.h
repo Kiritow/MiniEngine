@@ -8,7 +8,7 @@ template<typename T>
 class res_ptr
 {
 public:
-    res_ptr(T* ptr) : _ptr(ptr) {}
+    res_ptr() : _ptr(nullptr) {}
     res_ptr(T* ptr,const std::function<void(T*)>& delFunc) : _ptr(ptr), _delfunc(delFunc) {}
     res_ptr(const res_ptr&)=delete;
     res_ptr& operator = (const res_ptr&)=delete;
@@ -30,26 +30,34 @@ public:
     {
         release();
     }
+
     void release()
     {
         if(_ptr)
         {
-            if(_delfunc)
-            {
-                _delfunc(_ptr);
-            }
-            else
-            {
-
-            }
+            _delfunc(_ptr);
             _ptr=nullptr;
         }
     }
-    T* get() const
+    void reset(T* ptr,const std::function<void(T*)>& delFunc)
+    {
+        release();
+        _ptr=ptr;
+        _delfunc=delFunc;
+    }
+    T* get()
     {
         return _ptr;
     }
-    void reset()
+    const T* get() const
+    {
+        return _ptr;
+    }
+    T* operator -> ()
+    {
+        return _ptr;
+    }
+
 private:
     T* _ptr;
     std::function<void(T*)> _delfunc;
