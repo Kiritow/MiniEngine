@@ -4,35 +4,55 @@
 namespace MiniEngine
 {
 
-class ResourceHandler
+template<typename T>
+class res_ptr
 {
 public:
-    using RawDeleter = std::function<void(void*)>;
-
-    template<typename T>
-    ResourceHandler(T* ResourcePtr,RawDeleter RawDelFunc) :
-        _ptr(ResourcePtr),
-        _delfunc(RawDelFunc) {}
-
-    ~ResourceHandler()
+    res_ptr(T* ptr) : _ptr(ptr) {}
+    res_ptr(T* ptr,const std::function<void(T*)>& delFunc) : _ptr(ptr), _delfunc(delFunc) {}
+    res_ptr(const res_ptr&)=delete;
+    res_ptr& operator = (const res_ptr&)=delete;
+    res_ptr(res_ptr&& t)
     {
-        _delfunc(_ptr);
+        _ptr=t._ptr;
+        _delfunc=t._delfunc;
+        t._ptr=nullptr;
     }
+    res_ptr& operator = (res_ptr&& t)
+    {
+        release();
+        _ptr=t._ptr;
+        _delfunc=t._delfunc;
+        t._ptr=nullptr;
+        return *this;
+    }
+    ~res_ptr()
+    {
+        release();
+    }
+    void release()
+    {
+        if(_ptr)
+        {
+            if(_delfunc)
+            {
+                _delfunc(_ptr);
+            }
+            else
+            {
 
-    template<typename T>
+            }
+            _ptr=nullptr;
+        }
+    }
     T* get() const
     {
-        return (T*)(_ptr);
+        return _ptr;
     }
-
-    template<typename T>
-    const T* cget() const
-    {
-        return (const T*)(_ptr);
-    }
+    void reset()
 private:
-    void* _ptr;
-    RawDeleter _delfunc;
+    T* _ptr;
+    std::function<void(T*)> _delfunc;
 };
 
 }/// End of namespace MiniEngine
