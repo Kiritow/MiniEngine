@@ -10,12 +10,12 @@ void Font::_set(TTF_Font* p)
 // private
 void Font::_clear()
 {
-    _font.reset();
+    _font.release();
 }
 // private
 TTF_Font* Font::_get() const
 {
-    return _font.get();
+    return const_cast<TTF_Font*>(_font.get());
 }
 
 Font::Font(const std::string& FontFileName, size_t size)
@@ -400,5 +400,5 @@ void Font::release()
 {
     _clear();
 }
-} /// End of namespace MiniEngine 
+} /// End of namespace MiniEngine
 

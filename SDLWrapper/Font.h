@@ -8,9 +8,11 @@
 #include "Renderer.h"
 #include <vector>
 #include "__Plugin.h"
+#include "__Noncopyable.h"
+#include "_handler.h"
 namespace MiniEngine
 {
-class Font
+class Font : public NonCopyable
 {
 public:
     Font() = default;
@@ -116,12 +118,13 @@ private:
     void _real_setFontStyle(int);
     int _style_caster(FontStyle);
 
-    std::shared_ptr<TTF_Font> _font;
+    res_ptr<TTF_Font> _font;
+
     void _set(TTF_Font*);
     void _clear();
     TTF_Font* _get() const;
 
     friend class _internal::Plugin;
 };
-} /// End of namespace MiniEngine 
+} /// End of namespace MiniEngine
 
