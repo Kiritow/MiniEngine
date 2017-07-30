@@ -1,6 +1,7 @@
 #pragma once
 #include "include.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 class LogSystem
 {
     static void v(const char* fmt,...);/// Verbose
@@ -10,4 +11,5 @@ class LogSystem
     static void e(const char* fmt,...);/// Error
     static void critical(const char* fmt,...);/// Critical
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

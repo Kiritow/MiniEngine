@@ -1,6 +1,7 @@
 #include "Window.h"
 #include "_caster.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 //private
 void Window::_set(SDL_Window* p)
 {
@@ -247,4 +248,5 @@ bool Window::isScreenKeyboardShown()
 {
     return SDL_IsScreenKeyboardShown(_get())==SDL_TRUE;
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

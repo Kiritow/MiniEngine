@@ -6,7 +6,8 @@
 #include "ErrorViewer.h"
 #include "RWOP.h"
 #include "__Plugin.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 class Sound
 {
 public:
@@ -67,4 +68,5 @@ public:
     Channel playSound(Sound sound, int loops);
     Channel fadeIn(Sound sound, int loops, int ms);
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

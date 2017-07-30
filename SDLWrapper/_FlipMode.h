@@ -1,9 +1,11 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 enum class FlipMode
 {
     None,
     Horizontal,
     Vertical
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

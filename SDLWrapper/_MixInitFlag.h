@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 enum class MixInitFlag
 {
     FLAC,
@@ -9,4 +10,5 @@ enum class MixInitFlag
     OGG,
     FLUIDSYNTH
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

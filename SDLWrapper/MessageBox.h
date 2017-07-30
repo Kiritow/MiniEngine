@@ -4,7 +4,8 @@
 #include <string>
 #include <functional>
 #include <vector>
-#include "begin_code.h"
+namespace MiniEngine
+{
 class WindowMessageBoxButton
 {
 public:
@@ -42,4 +43,5 @@ public:
 private:
     std::vector<WindowMessageBoxButton> _vec;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

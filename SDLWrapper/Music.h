@@ -8,7 +8,8 @@
 #include "_MusicType.h"
 #include "__Noncopyable.h"
 #include "__Plugin.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 /// Forward Declaration
 class Music
 {
@@ -54,4 +55,5 @@ private:
 };
 
 
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

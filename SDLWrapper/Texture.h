@@ -6,7 +6,8 @@
 #include "_BlendMode.h"
 #include "__Plugin.h"
 #include <memory>
-#include "begin_code.h"
+namespace MiniEngine
+{
 
 class Texture
 {
@@ -45,4 +46,5 @@ private:
     friend class _internal::Plugin;
 };
 
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

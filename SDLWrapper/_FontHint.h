@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 enum class FontHint
 {
     Normal,
@@ -8,4 +9,5 @@ enum class FontHint
     None,
     Error
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

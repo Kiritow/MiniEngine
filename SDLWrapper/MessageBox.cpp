@@ -1,5 +1,6 @@
 #include "MessageBox.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 WindowMessageBoxButton::WindowMessageBoxButton()
 {
     _hitoption=0;
@@ -63,4 +64,5 @@ const WindowMessageBoxButton& WindowMessageBox::getButtonConst(int index) const
 {
     return _vec.at(index);
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

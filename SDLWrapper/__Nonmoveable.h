@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 class NonMoveable
 {
 public:
@@ -8,4 +9,5 @@ public:
     NonMoveable(NonMoveable&&) =delete;
     NonMoveable& operator = (NonMoveable&&)=delete;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

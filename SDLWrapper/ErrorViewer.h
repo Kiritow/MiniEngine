@@ -1,7 +1,8 @@
 #pragma once
 #include <exception>
 #include <string>
-#include "begin_code.h"
+namespace MiniEngine
+{
 class ErrorViewer : public std::exception
 {
 public:
@@ -11,4 +12,5 @@ public:
 private:
     std::string str;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

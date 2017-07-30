@@ -1,7 +1,8 @@
 #pragma once
 #include "include.h"
 #include "Rect.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 class Point
 {
 public:
@@ -11,4 +12,5 @@ public:
     SDL_Point toSDLPoint() const;
     bool inRect(const Rect& rect) const;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

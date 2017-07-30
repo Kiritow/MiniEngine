@@ -1,5 +1,6 @@
 #include "Timer.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 /// Global Executor For class Timer
 Uint32 _global_timer_executor(Uint32 interval,void* param)
 {
@@ -84,4 +85,5 @@ void Timer::_delete_delegator(std::function<Uint32(Uint32)>* param)
 {
     delete param;
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

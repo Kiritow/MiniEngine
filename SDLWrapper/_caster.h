@@ -10,7 +10,8 @@
 #include "_MixInitFlag.h"
 #include "_MusicType.h"
 #include <vector>
-#include "begin_code.h"
+namespace MiniEngine
+{
 namespace _internal
 {
 BlendMode getBlendModeFromSDLBlendMode(SDL_BlendMode mode);
@@ -28,4 +29,5 @@ int getIntFromMixInitFlag(MixInitFlag flag);
 MusicType getMusicTypeFromMixMusicType(Mix_MusicType);
 Mix_MusicType getMixMusicTypeFromMusicType(MusicType);
 }/// End of namespace _internal
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

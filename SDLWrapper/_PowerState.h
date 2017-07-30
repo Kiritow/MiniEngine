@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 enum class PowerState
 {
     Unknown,
@@ -8,4 +9,5 @@ enum class PowerState
     Charging,
     Charged
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

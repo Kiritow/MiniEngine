@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 enum class Platform
 {
     Unknown,
@@ -9,4 +10,5 @@ enum class Platform
     iOS,
     Android
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

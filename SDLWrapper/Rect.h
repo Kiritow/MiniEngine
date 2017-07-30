@@ -1,7 +1,8 @@
 #pragma once
 #include "include.h"
 
-#include "begin_code.h"
+namespace MiniEngine
+{
 
 class Rect
 {
@@ -18,4 +19,5 @@ public:
     Rect getUnion(const Rect&) const;
 };
 
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

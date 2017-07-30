@@ -10,7 +10,8 @@
 #include "ErrorViewer.h"
 #include <tuple>
 #include <string>
-#include "begin_code.h"
+namespace MiniEngine
+{
 
 class SDLSystem : public NonCopyable, public NonMoveable
 {
@@ -73,4 +74,5 @@ private:
     void _init(Uint32,Uint32,Uint32,bool);
     void _quit();
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

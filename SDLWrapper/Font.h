@@ -8,7 +8,8 @@
 #include "Renderer.h"
 #include <vector>
 #include "__Plugin.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 class Font
 {
 public:
@@ -122,4 +123,5 @@ private:
 
     friend class _internal::Plugin;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

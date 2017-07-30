@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 enum class SDLInitFlag
 {
     Timer,
@@ -11,4 +12,5 @@ enum class SDLInitFlag
     Events,
     All
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

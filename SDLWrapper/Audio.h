@@ -1,6 +1,7 @@
 #pragma once
 #include "include.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 class AudioPlayer
 {
 public:
@@ -17,4 +18,5 @@ private:
     static _Audio* _sysAudio;
     static int _sysAudioCounter;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

@@ -1,6 +1,7 @@
 #include "ErrorViewer.h"
 #include "include.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 void ErrorViewer::fetch()
 {
     str = SDL_GetError();
@@ -15,4 +16,5 @@ const char * ErrorViewer::what() const noexcept
 {
     return str.c_str();
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

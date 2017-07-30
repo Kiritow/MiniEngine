@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 enum class IMGInitFlag
 {
     JPG,
@@ -8,4 +9,5 @@ enum class IMGInitFlag
     WEBP,
     ALL
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

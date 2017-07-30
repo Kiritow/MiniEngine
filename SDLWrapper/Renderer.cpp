@@ -1,6 +1,7 @@
 #include "Renderer.h"
 #include "_caster.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 
 //private
 void Renderer::_set(SDL_Renderer* p)
@@ -516,4 +517,5 @@ int Renderer::GetDriversNum()
     return SDL_GetNumRenderDrivers();
 }
 
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 namespace _internal
 {
 
@@ -33,4 +34,5 @@ public:
 };
 
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

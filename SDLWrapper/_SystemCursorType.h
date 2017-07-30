@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 enum class SystemCursorType
 {
     Arrow, Ibeam, CrossHair,
@@ -7,4 +8,5 @@ enum class SystemCursorType
     SizeNWSE, SizeNESW, SizeWE, SizeNS, SizeAll,
     No, Hand
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

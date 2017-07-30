@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 enum class BlendMode
 {
     None,
@@ -7,4 +8,5 @@ enum class BlendMode
     Add,
     Mod
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

@@ -3,7 +3,8 @@
 #include <string>
 #include <memory>
 #include <functional>
-#include "begin_code.h"
+namespace MiniEngine
+{
 class SharedLibrary
 {
 public:
@@ -27,4 +28,5 @@ private:
     void _clear();
     std::shared_ptr<void> _obj;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

@@ -1,6 +1,7 @@
 #include "Surface.h"
 #include "_caster.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 //private
 void Surface::_set(SDL_Surface* p)
 {
@@ -356,4 +357,5 @@ SDL_Surface* Surface::getRawPointer()
 {
     return _get();
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

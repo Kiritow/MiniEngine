@@ -1,6 +1,7 @@
 #include "Cursor.h"
 #include "_caster.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 //private
 void Cursor::_set(SDL_Cursor* p)
 {
@@ -75,4 +76,5 @@ void Cursor::activate()
         SDL_SetCursor(_get());
     }
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

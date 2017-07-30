@@ -1,5 +1,6 @@
 #pragma once
-#include "begin_code.h"
+namespace MiniEngine
+{
 class NonCopyable
 {
 protected:
@@ -8,4 +9,5 @@ protected:
     NonCopyable(const NonCopyable&) = delete;
     NonCopyable& operator = (const NonCopyable&) = delete;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

@@ -1,7 +1,8 @@
 #pragma once
 #include "include.h"
 #include "ColorMode.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 
 class RGBA
 {
@@ -14,4 +15,5 @@ public:
     ColorMode toColorMode() const;
 };
 
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

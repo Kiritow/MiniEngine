@@ -1,6 +1,7 @@
 #pragma once
 #include "include.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 class ColorMode
 {
 public:
@@ -8,4 +9,5 @@ public:
     ColorMode(int R, int G, int B);
     ColorMode();
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

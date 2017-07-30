@@ -6,7 +6,8 @@
 #include "Point.h"
 #include "Surface.h"
 #include "__Plugin.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 class Cursor : public NonCopyable
 {
 public:
@@ -33,4 +34,5 @@ private:
 
     friend class _internal::Plugin;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

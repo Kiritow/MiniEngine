@@ -6,7 +6,8 @@
 #include "MessageBox.h"
 #include "Surface.h"
 #include "__Plugin.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 class Window
 {
 public:
@@ -65,4 +66,5 @@ private:
     friend class Renderer;
     friend class _internal::Plugin;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

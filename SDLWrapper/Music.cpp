@@ -1,6 +1,7 @@
 #include "Music.h"
 #include "_caster.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 //private
 void Music::_set(Mix_Music* p)
 {
@@ -126,4 +127,5 @@ int MusicPlayer::setPosition(double second)
     return Mix_SetMusicPosition(second);
 }
 
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

@@ -1,5 +1,6 @@
 #include "RGBA.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 RGBA::RGBA(int R, int G, int B, int A)
 {
     r = R;
@@ -35,4 +36,5 @@ ColorMode RGBA::toColorMode() const
 {
     return ColorMode(r, g, b);
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

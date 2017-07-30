@@ -1,7 +1,8 @@
 #pragma once
 #include "include.h"
 #include <functional>
-#include "begin_code.h"
+namespace MiniEngine
+{
 Uint32 _global_timer_executor(Uint32 interval,void* param);
 
 class Timer
@@ -48,4 +49,5 @@ private:
     /// Reserved Variable For Template variable Parameter
     bool _delete_on_disable;
 };
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+

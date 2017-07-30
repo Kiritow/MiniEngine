@@ -1,5 +1,6 @@
 #include "Audio.h"
-#include "begin_code.h"
+namespace MiniEngine
+{
 AudioPlayer::AudioPlayer()
 {
     if (!_sysAudioCounter)
@@ -30,4 +31,5 @@ AudioPlayer::_Audio::~_Audio()
 
 AudioPlayer::_Audio* AudioPlayer::_sysAudio = nullptr;
 int AudioPlayer::_sysAudioCounter = 0;
-#include "end_code.h"
+} /// End of namespace MiniEngine 
+
