@@ -84,6 +84,50 @@ string GBKToUTF8(string GBKString)
     return s;
 }
 
+bool _ANSIToUnicode(const string& str,wstring& _out_wstr)
+{
+    int unicodeLen=MultiByteToWideChar(CP_ACP,0,str.c_str(),-1,NULL,0);
+    unique_ptr<wchar_t[]> pUnicode(new wchar_t[unicodeLen+1]);
+    if(!pUnicode.get()) { return false; }
+    memset(pUnicode.get(),0,sizeof(wchar_t)*(unicodeLen+1));
+    MultiByteToWideChar(CP_ACP,0,str.c_str(),-1,pUnicode.get(),unicodeLen);
+    _out_wstr=wstring(pUnicode.get());
+    return true;
+}
+
+bool _UnicodeToANSI(const wstring& str,string& _out_str)
+{
+    int iTextLen=WideCharToMultiByte(CP_ACP,0,str.c_str(),-1,NULL,0,NULL,NULL);
+    unique_ptr<char[]> pElementText(new char[iTextLen+1]);
+    if(!pElementText.get()) { return false; }
+    memset(pElementText.get(),0,sizeof(char)*(iTextLen+1));
+    WideCharToMultiByte(CP_ACP,0,str.c_str(),-1,pElementText.get(),iTextLen,NULL,NULL);
+    _out_str=string(pElementText.get());
+    return true;
+}
+
+bool _UTF8ToUnicode(const string& str,wstring& _out_wstr)
+{
+    int unicodeLen=MultiByteToWideChar(CP_UTF8,0,str.c_str(),-1,NULL,0);
+    unique_ptr<wchar_t[]> pUnicode(new wchar_t[unicodeLen+1]);
+    if(!pUnicode.get()) { return false; }
+    memset(pUnicode.get(),0,(unicodeLen+1)*sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8,0,str.c_str(),-1,pUnicode.get(),unicodeLen);
+    _out_wstr=wstring(pUnicode.get());
+    return true;
+}
+
+bool _UnicodeToUTF8(const wstring& str,string& _out_str)
+{
+    int iTextLen=WideCharToMultiByte(CP_UTF8,0,str.c_str(),-1,NULL,0,NULL,NULL);
+    unique_ptr<char[]> pElementText(new char[iTextLen+1]);
+    if(!pElementText.get()) { return false; }
+    memset(pElementText.get(),0,sizeof(char)*(iTextLen+1));
+    WideCharToMultiByte(CP_UTF8,0,str.c_str(),-1,pElementText.get(),iTextLen,NULL,NULL);
+    _out_str=string(pElementText.get());
+    return true;
+}
+
 #ifdef _MSC_VER
 bool isexist(std::string Path)
 {
