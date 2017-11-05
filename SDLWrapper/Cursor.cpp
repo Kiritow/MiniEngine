@@ -23,7 +23,7 @@ SDL_Cursor* Cursor::_get()
 //private
 void Cursor::_clear()
 {
-    _cur.release();
+    _cur.reset();
 }
 
 Cursor::Cursor(Surface surf,Point hotspot)
@@ -76,5 +76,5 @@ void Cursor::activate()
         SDL_SetCursor(_get());
     }
 }
-} /// End of namespace MiniEngine 
+} /// End of namespace MiniEngine
 

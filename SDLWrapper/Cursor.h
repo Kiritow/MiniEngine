@@ -1,14 +1,14 @@
 #pragma once
 #include "include.h"
 #include "__Noncopyable.h"
-#include "_handler.h"
 #include "_SystemCursorType.h"
 #include "Point.h"
 #include "Surface.h"
 #include "__Plugin.h"
+#include <memory>
 namespace MiniEngine
 {
-class Cursor : public NonCopyable
+class Cursor
 {
 public:
     Cursor()=default;
@@ -25,7 +25,7 @@ public:
 
     void release();
 private:
-    res_ptr<SDL_Cursor> _cur;
+    std::shared_ptr<SDL_Cursor> _cur;
 
     void _set(SDL_Cursor*);
     void _set_no_delete(SDL_Cursor*);
@@ -34,5 +34,5 @@ private:
 
     friend class _internal::Plugin;
 };
-} /// End of namespace MiniEngine 
+} /// End of namespace MiniEngine
 

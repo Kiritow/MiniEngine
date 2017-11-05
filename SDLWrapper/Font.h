@@ -9,10 +9,9 @@
 #include <vector>
 #include "__Plugin.h"
 #include "__Noncopyable.h"
-#include "_handler.h"
 namespace MiniEngine
 {
-class Font : public NonCopyable
+class Font
 {
 public:
     Font() = default;
@@ -118,7 +117,7 @@ private:
     void _real_setFontStyle(int);
     int _style_caster(FontStyle);
 
-    res_ptr<TTF_Font> _font;
+    std::shared_ptr<TTF_Font> _font;
 
     void _set(TTF_Font*);
     void _clear();

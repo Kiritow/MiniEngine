@@ -10,7 +10,7 @@ void Font::_set(TTF_Font* p)
 // private
 void Font::_clear()
 {
-    _font.release();
+    _font.reset();
 }
 // private
 TTF_Font* Font::_get() const
