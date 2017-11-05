@@ -6,6 +6,8 @@
 #include "MessageBox.h"
 #include "Surface.h"
 #include "__Plugin.h"
+#include "Renderer.h"
+
 namespace MiniEngine
 {
 class Window
@@ -35,6 +37,8 @@ public:
     int setOpacity(float opacity);
     float getOpacity() const;
 #endif
+
+    class Renderer getRenderer();
 
     /// FIXME: Not Implemented.
     void setResizable(bool resizable);
@@ -66,5 +70,5 @@ private:
     friend class Renderer;
     friend class _internal::Plugin;
 };
-} /// End of namespace MiniEngine 
+} /// End of namespace MiniEngine
 

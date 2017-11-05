@@ -14,7 +14,7 @@ class Renderer
 public:
     Renderer() = default;
     /// Create a Renderer associated with Window
-    Renderer(Window& wnd,std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture });
+    Renderer(class Window& wnd,std::initializer_list<RendererType> RendererFlags = { RendererType::Accelerated,RendererType::TargetTexture });
     /// Create a software Renderer
     Renderer(Surface& surf);
     ~Renderer() = default;
@@ -148,7 +148,8 @@ private:
     void _clear();
     SDL_Renderer* _get() const;
 
+    friend class Window;
     friend class _internal::Plugin;
 };
-} /// End of namespace MiniEngine 
+} /// End of namespace MiniEngine
 

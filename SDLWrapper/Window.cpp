@@ -108,6 +108,13 @@ float Window::getOpacity() const
 }
 #endif /// End of SDL2 2.0.5 Require.
 
+Renderer Window::getRenderer()
+{
+    Renderer nrnd;
+    nrnd._set(SDL_GetRenderer(_get()));
+    return nrnd;
+}
+
 /// FIXME: Not Implemented.
 void Window::setResizable(bool resizable)
 {
@@ -248,5 +255,5 @@ bool Window::isScreenKeyboardShown()
 {
     return SDL_IsScreenKeyboardShown(_get())==SDL_TRUE;
 }
-} /// End of namespace MiniEngine 
+} /// End of namespace MiniEngine
 
