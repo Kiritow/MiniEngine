@@ -1,6 +1,6 @@
-#include "SDLSystem.h"
+#include "SDLWrapper/SDLSystem.h"
 #include "_caster.h"
-#include "begin_code.h"
+namespace MiniEngine {
 // private
 void SDLSystem::_init(Uint32 sdl_flag, Uint32 img_flag, Uint32 mix_flag, bool init_ttf)
 {
@@ -300,4 +300,4 @@ bool SDLSystem::HasClipboardText()
     return SDL_HasClipboardText()==SDL_TRUE;
 }
 
-#include "end_code.h"
+} /// End of namespace MiniEngine

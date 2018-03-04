@@ -1,5 +1,5 @@
-#include "SharedLibrary.h"
-#include "begin_code.h"
+#include "SDLWrapper/SharedLibrary.h"
+namespace MiniEngine {
 //private
 void* SharedLibrary::_get() const
 {
@@ -64,4 +64,4 @@ void SharedLibrary::release()
 {
     _clear();
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine

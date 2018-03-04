@@ -1,5 +1,5 @@
-#include "Point.h"
-#include "begin_code.h"
+#include "SDLWrapper/Point.h"
+namespace MiniEngine {
 
 Point::Point(int X, int Y)
 {
@@ -27,4 +27,4 @@ bool Point::inRect(const Rect& rect) const
     return ( SDL_PointInRect(&p, &r) == SDL_TRUE );
 }
 
-#include "end_code.h"
+} /// End of namespace MiniEngine

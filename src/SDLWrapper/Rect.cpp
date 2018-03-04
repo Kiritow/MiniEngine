@@ -1,6 +1,6 @@
-#include "Rect.h"
+#include "SDLWrapper/Rect.h"
 
-#include "begin_code.h"
+namespace MiniEngine {
 
 Rect::Rect(int X, int Y, int W, int H)
 {
@@ -69,4 +69,4 @@ Rect Rect::getUnion(const Rect& r) const
     return Rect(c);
 }
 
-#include "end_code.h"
+} /// End of namespace MiniEngine

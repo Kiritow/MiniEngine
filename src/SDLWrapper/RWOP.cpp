@@ -1,5 +1,5 @@
-#include "RWOP.h"
-#include "begin_code.h"
+#include "SDLWrapper/RWOP.h"
+namespace MiniEngine {
 // private
 void RWOP::_set(SDL_RWops* p)
 {
@@ -45,4 +45,4 @@ void RWOP::release()
 {
     _clear();
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine

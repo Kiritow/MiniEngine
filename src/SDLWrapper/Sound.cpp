@@ -1,5 +1,5 @@
-#include "Sound.h"
-#include "begin_code.h"
+#include "SDLWrapper/Sound.h"
+namespace MiniEngine {
 //private
 void Sound::_set(Mix_Chunk* p)
 {
@@ -170,4 +170,4 @@ Channel SoundPlayer::fadeIn(Sound sound, int loops, int ms)
     c.fadeIn(sound,loops,ms);
     return c;
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine

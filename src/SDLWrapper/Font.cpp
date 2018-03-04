@@ -1,6 +1,6 @@
-#include "Font.h"
+#include "SDLWrapper/Font.h"
 #include "_caster.h"
-#include "begin_code.h"
+namespace MiniEngine {
 // private
 void Font::_set(TTF_Font* p)
 {
@@ -399,4 +399,4 @@ void Font::release()
 {
     _clear();
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine

@@ -1,6 +1,6 @@
-#include "Texture.h"
+#include "SDLWrapper/Texture.h"
 #include "_caster.h"
-#include "begin_code.h"
+namespace MiniEngine {
 //private
 void Texture::_set(SDL_Texture* p)
 {
@@ -123,4 +123,4 @@ void Texture::release()
 {
     _clear();
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine

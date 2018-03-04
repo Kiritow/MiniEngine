@@ -1,5 +1,5 @@
-#include "ColorMode.h"
-#include "begin_code.h"
+#include "SDLWrapper/ColorMode.h"
+namespace MiniEngine {
 ColorMode::ColorMode(int R, int G, int B)
 {
     r = R;
@@ -11,4 +11,4 @@ ColorMode::ColorMode()
 {
     r = g = b = 0;
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine

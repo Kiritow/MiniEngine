@@ -1,5 +1,5 @@
-#include "Log.h"
-#include "begin_code.h"
+#include "SDLWrapper/Log.h"
+namespace MiniEngine {
 void LogSystem::d(const char* fmt,...)
 {
     va_list ap;
@@ -47,4 +47,4 @@ void LogSystem::critical(const char* fmt,...)
     SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION,SDL_LOG_PRIORITY_CRITICAL,fmt,ap);
     va_end(ap);
 }
-#include "end_code.h"
+} /// End of namespace MiniEngine

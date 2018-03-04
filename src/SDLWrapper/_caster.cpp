@@ -1,5 +1,5 @@
 #include "_caster.h"
-#include "begin_code.h"
+namespace MiniEngine {
 namespace _internal
 {
 BlendMode getBlendModeFromSDLBlendMode(SDL_BlendMode mode)
@@ -342,4 +342,4 @@ Mix_MusicType getMixMusicTypeFromMusicType(MusicType type)
 
 
 }/// End of namespace _internal
-#include "end_code.h"
+} /// End of namespace MiniEngine

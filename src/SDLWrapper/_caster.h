@@ -1,16 +1,16 @@
 #pragma once
-#include "include.h"
-#include "_BlendMode.h"
-#include "_WindowType.h"
-#include "_SystemCursorType.h"
-#include "_FontStyle.h"
-#include "_FlipMode.h"
-#include "_SDLInitFlag.h"
-#include "_IMGInitFlag.h"
-#include "_MixInitFlag.h"
-#include "_MusicType.h"
+#include "SDLWrapper/include.h"
+#include "SDLWrapper/BlendMode.h"
+#include "SDLWrapper/WindowType.h"
+#include "SDLWrapper/SystemCursorType.h"
+#include "SDLWrapper/FontStyle.h"
+#include "SDLWrapper/FlipMode.h"
+#include "SDLWrapper/SDLInitFlag.h"
+#include "SDLWrapper/IMGInitFlag.h"
+#include "SDLWrapper/MixInitFlag.h"
+#include "SDLWrapper/MusicType.h"
 #include <vector>
-#include "begin_code.h"
+namespace MiniEngine {
 namespace _internal
 {
 BlendMode getBlendModeFromSDLBlendMode(SDL_BlendMode mode);
@@ -28,4 +28,4 @@ int getIntFromMixInitFlag(MixInitFlag flag);
 MusicType getMusicTypeFromMixMusicType(Mix_MusicType);
 Mix_MusicType getMixMusicTypeFromMusicType(MusicType);
 }/// End of namespace _internal
-#include "end_code.h"
+}/// End of namespace MiniEngine
