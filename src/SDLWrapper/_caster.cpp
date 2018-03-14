@@ -269,14 +269,17 @@ int getIntFromMixInitFlag(MixInitFlag flag)
         return MIX_INIT_FLAC;
     case MixInitFlag::MOD:
         return MIX_INIT_MOD;
-    case MixInitFlag::MODPLUG:
-        return MIX_INIT_MODPLUG;
     case MixInitFlag::MP3:
         return MIX_INIT_MP3;
     case MixInitFlag::OGG:
         return MIX_INIT_OGG;
-    case MixInitFlag::FLUIDSYNTH:
-        return MIX_INIT_FLUIDSYNTH;
+#if SDL_MIXER_COMPILEDVERSION < 2002
+	/// Not available in SDL_Mixer 2.0.2
+	case MixInitFlag::MODPLUG:
+		return MIX_INIT_MODPLUG;
+	case MixInitFlag::FLUIDSYNTH:
+		return MIX_INIT_FLUIDSYNTH;
+#endif
     default:
         return 0; /// Return 0 by default. (Fix warning)
     }
@@ -300,12 +303,15 @@ MusicType getMusicTypeFromMixMusicType(Mix_MusicType type)
         return MusicType::OGG;
     case MUS_MP3:
         return MusicType::MP3;
+#if (SDL_MIXER_COMPILEDVERSION < 2002)
+	/// These two options are not defined in SDL_Mixer 2.0.2
     case MUS_MP3_MAD:
         return MusicType::MP3MAD;
-    case MUS_FLAC:
-        return MusicType::FLAC;
     case MUS_MODPLUG:
         return MusicType::MODPLUG;
+#endif
+	case MUS_FLAC:
+		return MusicType::FLAC;
     default:
         return MusicType::None;
     }
@@ -329,12 +335,15 @@ Mix_MusicType getMixMusicTypeFromMusicType(MusicType type)
         return MUS_OGG;
     case MusicType::MP3:
         return MUS_MP3;
+	case MusicType::FLAC:
+		return MUS_FLAC;
+#if SDL_MIXER_COMPILEDVERSION < 2002
+	/// Not available in SDL_Mixer 2.0.2
     case MusicType::MP3MAD:
         return MUS_MP3_MAD;
-    case MusicType::FLAC:
-        return MUS_FLAC;
     case MusicType::MODPLUG:
         return MUS_MODPLUG;
+#endif
     default:
         return MUS_NONE;
     }

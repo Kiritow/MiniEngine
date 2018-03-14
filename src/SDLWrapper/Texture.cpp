@@ -1,5 +1,7 @@
 #include "SDLWrapper/Texture.h"
 #include "_caster.h"
+#include <algorithm>
+
 namespace MiniEngine {
 //private
 void Texture::_set(SDL_Texture* p)
