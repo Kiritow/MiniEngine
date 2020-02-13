@@ -71,39 +71,6 @@ Surface::Surface(const RWOP& rwop)
     }
 }
 
-//static
-Surface Surface::load(const std::string& filename)
-{
-    Surface s;
-    s.loadAs(filename);
-    return s;
-}
-
-//static
-Surface Surface::load(const RWOP& rwop)
-{
-    Surface s;
-    s.loadAs(rwop);
-    return s;
-}
-
-//static
-Surface Surface::create(int width, int height, int depth, int Rmask, int Gmask, int Bmask, int Amask)
-{
-    Surface s;
-    s.create(width,height,depth,Rmask,Gmask,Bmask,Amask);
-    return s;
-}
-
-//static
-Surface Surface::create(int width, int height, int depth, Uint32 surfaceFormat)
-{
-    Surface s;
-    s.create(width,height,depth,surfaceFormat);
-    return s;
-}
-
-
 int Surface::loadAs(const std::string& filename)
 {
     SDL_Surface* temp=IMG_Load(filename.c_str());
@@ -150,7 +117,6 @@ int Surface::createAs(int width,int height,int depth,Uint32 surfaceFormat)
 {
     /// FIXME: This Function is available from SDL2.0.5. But the linker report a undefined reference.
 
-    /*
     SDL_Surface* temp=SDL_CreateRGBSurfaceWithFormat(0,width,height,depth,surfaceFormat);
     if(temp==nullptr)
     {
@@ -161,9 +127,7 @@ int Surface::createAs(int width,int height,int depth,Uint32 surfaceFormat)
         _set(temp);
         return 0;
     }
-    */
 
-    SDL_SetError("[MiniEngine] SDL_CreateRGBSurfaceWithFormat Not Linked.");
     return -1;
 }
 
@@ -356,4 +320,5 @@ SDL_Surface* Surface::getRawPointer()
 {
     return _get();
 }
+
 } /// End of namespace MiniEngine

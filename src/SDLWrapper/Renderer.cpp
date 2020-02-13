@@ -390,7 +390,9 @@ int Renderer::copyTo(const Texture& t, const Rect& dst, const Point& centerPoint
 
 int Renderer::copyTo(const Texture& t, const Point& lupoint, const Point& centerPoint, double angle, FlipMode mode)
 {
-    return copyTo(t,lupoint,centerPoint,angle,mode);
+    auto d = Rect(lupoint.x, lupoint.y, t.getw(), t.geth()).toSDLRect();
+    auto c = centerPoint.toSDLPoint();
+    return SDL_RenderCopyEx(_get(), t._get(), NULL, &d, angle, &c, _internal::getSDLRendererFlipFromFlipMode(mode));
 }
 
 int Renderer::copyFill(const Texture& t, const Rect& src, const Point& centerPoint, double angle, FlipMode mode)
